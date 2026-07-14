@@ -1,0 +1,52 @@
+root = false
+
+# Unreal Engine Source tree conventions.
+# Based on Epic C++ Coding Standard:
+# https://dev.epicgames.com/documentation/en-us/unreal-engine/epic-cplusplus-coding-standard-for-unreal-engine
+
+[*.{h,hpp,hxx,inl,inc,c,cc,cpp,cxx}]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = tab
+indent_size = 4
+tab_width = 4
+
+# Visual Studio C++ formatting keys that map cleanly to Epic's brace-heavy style.
+cpp_indent_braces = false
+cpp_indent_case_contents = true
+cpp_indent_case_labels = true
+cpp_indent_goto_labels = false
+cpp_indent_preprocessor = leftmost_column
+cpp_new_line_before_open_brace_type = all
+cpp_new_line_before_open_brace_function = all
+cpp_new_line_before_open_brace_namespace = all
+cpp_new_line_before_open_brace_block = all
+cpp_new_line_before_else = true
+cpp_new_line_before_catch = true
+cpp_space_before_function_open_parenthesis = false
+cpp_space_before_if_parentheses = true
+cpp_space_before_for_parentheses = true
+cpp_space_before_while_parentheses = true
+cpp_space_before_switch_parentheses = true
+cpp_space_within_function_call_parentheses = false
+cpp_space_within_function_declaration_parenthesis = false
+cpp_space_within_if_parentheses = false
+cpp_space_within_for_parentheses = false
+cpp_space_within_while_parentheses = false
+cpp_space_within_switch_parentheses = false
+
+# Epic's coding standard explicitly recommends tabs for C# in Unreal projects too.
+[*.cs]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = tab
+indent_size = 4
+tab_width = 4
+
+# Keep Markdown authoring flexible if docs are ever added under Source.
+[*.md]
+trim_trailing_whitespace = false
