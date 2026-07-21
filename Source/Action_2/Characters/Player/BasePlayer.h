@@ -4,6 +4,7 @@
 #include "../BaseCharacter.h"
 #include "../../Input/Interface/IPlayerInputComponent.h"
 #include "../../Input/Components/BasePlayerInputComponent.h"
+#include "InputMappingContext.h"
 #include "BasePlayer.generated.h"
 /**
  * プレイヤーの基盤クラス。
@@ -14,9 +15,16 @@ class ACTION_2_API ABasePlayer : public ABaseCharacter
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UPROPERTY(
+    VisibleInstanceOnly,
+    BlueprintReadOnly,
+    Transient,
+    Category = "Input")
 	TArray<TScriptInterface<IPlayerInputComponent>> PlayerInputComponents;
 
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputMappingContext* DefaultMappingContext;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

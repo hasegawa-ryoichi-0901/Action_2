@@ -32,7 +32,7 @@ void UBasePlayerInputComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
-void UBasePlayerInputComponent::Setup()
+void UBasePlayerInputComponent::Setup(UInputComponent* InputComponent)
 {
 }
 

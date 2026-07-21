@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "../Components/BasePlayerInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerMoveInputComponent.generated.h"
 
 /**
@@ -15,5 +16,7 @@ class ACTION_2_API UPlayerMoveInputComponent : public UBasePlayerInputComponent
 	GENERATED_BODY()
 
 public:
-	virtual void Setup() override;
+	virtual void Setup(UInputComponent* InputComponent) override;
+	virtual void Move(const FInputActionValue& Value);
+	virtual void DoMove(float Right, float Forward);
 };

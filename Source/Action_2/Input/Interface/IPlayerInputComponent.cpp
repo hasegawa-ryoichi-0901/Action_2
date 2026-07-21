@@ -5,7 +5,7 @@
 
 // Add default functionality here for any IPlayerInputComponent functions that are not pure virtual.
 
-void IPlayerInputComponent::Setup()
+void IPlayerInputComponent::Setup(UInputComponent* InputComponent)
 {
 
 }

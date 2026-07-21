@@ -30,6 +30,8 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
     FTaggedInputAction TaggedInputAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	bool bIsPressed = false;
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -38,7 +40,12 @@ public:
     {
         return TaggedInputAction;
     }
-	virtual void Setup() override;
+
+	virtual const bool& IsPressed() const override
+	{
+		return bIsPressed;
+	}
+	virtual void Setup(UInputComponent* InputComponent) override;
 	/* キーを押下した際の制御 */
 	virtual void HandlePressedAction() override;
 	/* キーを離した際の制御 */
@@ -47,4 +54,6 @@ public:
 	virtual  void Enable(APlayerController& controller) override;
 	/*Input無効化*/
 	virtual  void Disable(APlayerController& controller) override;
+
+
 };
