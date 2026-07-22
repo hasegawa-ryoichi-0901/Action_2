@@ -26,34 +26,34 @@ public:
 
 protected:
 	// Called when the game starts
-	virtual void BeginPlay() override;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
     FTaggedInputAction TaggedInputAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	bool bIsPressed = false;
-public:
+	public:
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual const FTaggedInputAction& GetTaggedInputAction() const override
     {
-        return TaggedInputAction;
+		return TaggedInputAction;
     }
 
-	virtual const bool& IsPressed() const override
+	virtual bool IsPressed() const override
 	{
 		return bIsPressed;
 	}
-	virtual void Setup(UInputComponent* InputComponent) override;
-	/* キーを押下した際の制御 */
-	virtual void HandlePressedAction() override;
-	/* キーを離した際の制御 */
-	virtual void HandleReleasedAction() override;
-	/*Input有効化*/
-	virtual  void Enable(APlayerController& controller) override;
-	/*Input無効化*/
-	virtual  void Disable(APlayerController& controller) override;
-
-
+	virtual void Setup(UInputComponent& InputComponent) final override;
+	virtual void Teardown() final override;
+protected:
+	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void BindActions(
+		UEnhancedInputComponent& InputComponent,
+		const UInputAction& InputAction
+    );
+private:
+    TWeakObjectPtr<UEnhancedInputComponent>
+        BoundInputComponent;
 };

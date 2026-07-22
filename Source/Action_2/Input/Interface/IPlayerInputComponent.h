@@ -27,15 +27,10 @@ class ACTION_2_API IPlayerInputComponent
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual const FTaggedInputAction& GetTaggedInputAction() const = 0;
-	virtual const bool& IsPressed() const = 0;
-public:
-	virtual  void Setup(UInputComponent* InputComponent) = 0;
-	/* キーを押下した際の制御 */
-	virtual void HandlePressedAction() = 0;
-	/* キーを離した際の制御 */
-	virtual void HandleReleasedAction() = 0;
-	/*Input有効化*/
-	virtual  void Enable(APlayerController& controller) = 0;
-	/*Input無効化*/
-	virtual  void Disable(APlayerController& controller) = 0;
+	virtual bool IsPressed() const = 0;
+	/// @brief コンポーネントのセットアップ関数
+	/// @param InputComponent キャラクターのInputComponentを参照
+	virtual  void Setup(UInputComponent& InputComponent) = 0;
+	/// @brief バインドされているInputComponentを削除する
+	virtual void Teardown() = 0;
 };

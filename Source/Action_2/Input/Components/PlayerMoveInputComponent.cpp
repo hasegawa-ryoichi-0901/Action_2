@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "../Components/PlayerMoveInputComponent.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
-#include "../Components/PlayerMoveInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Controller.h"
@@ -14,9 +13,10 @@
 #include "InputMappingContext.h"
 #include "Action_2/Action_2.h"
 
-void UPlayerMoveInputComponent::Setup(UInputComponent* InputComponent)
+void UPlayerMoveInputComponent::BindActions(
+	UEnhancedInputComponent &InputComponent,
+	const UInputAction &InputAction)
 {
-	Super::Setup(InputComponent);
 	UKismetSystemLibrary::PrintString(
 		this,
 		TEXT("this is MoveInputComponentClass "),
@@ -25,19 +25,9 @@ void UPlayerMoveInputComponent::Setup(UInputComponent* InputComponent)
 		FColor::Cyan,
 		2.0f,
 		TEXT("None"));
-    UEnhancedInputComponent* EnhancedInputComponent =
-        CastChecked<UEnhancedInputComponent>(InputComponent);
 
-    const UInputAction* AxisInput =
-        TaggedInputAction.InputAction.Get();
-
-    if (!ensure(IsValid(AxisInput)))
-    {
-        return;
-    }
-
-    EnhancedInputComponent->BindAction(
-        AxisInput,
+	InputComponent.BindAction(
+        &InputAction,
         ETriggerEvent::Triggered,
         this,
         &UPlayerMoveInputComponent::Move

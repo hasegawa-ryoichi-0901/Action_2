@@ -32,23 +32,50 @@ void UBasePlayerInputComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
-void UBasePlayerInputComponent::Setup(UInputComponent* InputComponent)
+void UBasePlayerInputComponent::Setup(UInputComponent& InputComponent)
 {
+	Teardown();
+	// 検証処理...
+
+    UEnhancedInputComponent* EnhancedInputComponent =
+        Cast<UEnhancedInputComponent>(&InputComponent);
+
+    const UInputAction* InputAction =
+        TaggedInputAction.InputAction.Get();
+
+    if (!ensure(IsValid(EnhancedInputComponent)) ||
+        !ensure(IsValid(InputAction)))
+    {
+        return;
+    }
+
+    BoundInputComponent = EnhancedInputComponent;
+
+    BindActions(
+        *EnhancedInputComponent,
+        *InputAction
+    );
 }
 
-void UBasePlayerInputComponent::HandlePressedAction()
+void UBasePlayerInputComponent::Teardown()
 {
+    if (UEnhancedInputComponent* InputComponent =
+        BoundInputComponent.Get())
+    {
+        InputComponent->ClearBindingsForObject(this);
+    }
+
+    BoundInputComponent.Reset();
 }
 
-void UBasePlayerInputComponent::HandleReleasedAction()
+void UBasePlayerInputComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    Teardown();
+    Super::EndPlay(EndPlayReason);
 }
 
-void UBasePlayerInputComponent::Enable(APlayerController& Controller)
+void UBasePlayerInputComponent::BindActions(
+    UEnhancedInputComponent& InputComponent,
+    const UInputAction& InputAction)
 {
 }
-
-void UBasePlayerInputComponent::Disable(APlayerController& Controller)
-{
-}
-

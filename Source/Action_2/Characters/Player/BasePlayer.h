@@ -28,5 +28,19 @@ protected:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* playerInputComponent) override;
+	virtual void TeardownPlayerInputComponents();
+	virtual void EnableMappingContext();
+	virtual void DisableMappingContext();
+	virtual void UnPossessed();
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+private:
+	UEnhancedInputLocalPlayerSubsystem* GetInputSubsystem(AController* controller);
+	private:
+    TWeakObjectPtr<UEnhancedInputLocalPlayerSubsystem>
+        ActiveInputSubsystem;
+    TWeakObjectPtr<UInputMappingContext>
+        ActiveMappingContext;
+public:
+	virtual void SetInputEnabled(bool bEnabled);
 };

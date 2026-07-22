@@ -5,17 +5,7 @@
 
 // Add default functionality here for any IPlayerInputComponent functions that are not pure virtual.
 
-void IPlayerInputComponent::Setup(UInputComponent* InputComponent)
-{
-
-}
-
-void IPlayerInputComponent::Enable(APlayerController& controller)
-{
-
-}
-
-void IPlayerInputComponent::Disable(APlayerController& controller)
+void IPlayerInputComponent::Setup(UInputComponent& InputComponent)
 {
 
 }
