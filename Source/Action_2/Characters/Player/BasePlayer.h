@@ -21,12 +21,11 @@ protected:
     Transient,
     Category = "Input")
 	TArray<TScriptInterface<IPlayerInputComponent>> PlayerInputComponents;
-
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputMappingContext* DefaultMappingContext;
 protected:
-	// Called when the game starts or when spawned
+// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* playerInputComponent) override;
 	virtual void TeardownPlayerInputComponents();
@@ -35,12 +34,10 @@ protected:
 	virtual void UnPossessed();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 private:
+	UPROPERTY(VisibleInstanceOnly, Transient, Category = Input)
+	bool bInputEnabled = true;
 	UEnhancedInputLocalPlayerSubsystem* GetInputSubsystem(AController* controller);
-	private:
-    TWeakObjectPtr<UEnhancedInputLocalPlayerSubsystem>
-        ActiveInputSubsystem;
-    TWeakObjectPtr<UInputMappingContext>
-        ActiveMappingContext;
+	void ApplyInputEnabledState();
 public:
-	virtual void SetInputEnabled(bool bEnabled);
+	void SetInputEnabled(bool bEnabled);
 };

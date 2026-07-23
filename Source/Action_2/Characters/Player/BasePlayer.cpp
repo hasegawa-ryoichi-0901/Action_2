@@ -16,8 +16,8 @@ void ABasePlayer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void ABasePlayer::SetupPlayerInputComponent(class UInputComponent* playerInputComponent)
 {
+	TeardownPlayerInputComponents();
 	Super::SetupPlayerInputComponent(playerInputComponent);
-	PlayerInputComponents.Reset();
     TInlineComponentArray<UBasePlayerInputComponent*> AttachedComponents(this);
 	for (UBasePlayerInputComponent* Component : AttachedComponents)
 	{
@@ -41,7 +41,7 @@ void ABasePlayer::SetupPlayerInputComponent(class UInputComponent* playerInputCo
 		PlayerInputComponents.Add(InterfaceEntry);
 		NativeInterface->Setup(*playerInputComponent);
 	}
-	this->EnableMappingContext();
+	this->ApplyInputEnabledState();
 }
 
 void ABasePlayer::TeardownPlayerInputComponents()
@@ -57,9 +57,9 @@ void ABasePlayer::TeardownPlayerInputComponents()
     PlayerInputComponents.Reset();
 }
 
-void ABasePlayer::SetInputEnabled(bool bEnabled)
+void ABasePlayer::ApplyInputEnabledState()
 {
-    if (bEnabled)
+	if (this->bInputEnabled)
     {
         EnableMappingContext();
     }
@@ -67,6 +67,12 @@ void ABasePlayer::SetInputEnabled(bool bEnabled)
     {
         DisableMappingContext();
     }
+}
+
+void ABasePlayer::SetInputEnabled(bool bEnabled)
+{
+    bInputEnabled = bEnabled;
+    ApplyInputEnabledState();
 }
 
 UEnhancedInputLocalPlayerSubsystem* ABasePlayer::GetInputSubsystem(AController* controller)
@@ -120,7 +126,7 @@ void ABasePlayer::DisableMappingContext()
     UEnhancedInputLocalPlayerSubsystem* Subsystem =
         GetInputSubsystem(GetController());
 
-		if (IsValid(Subsystem))
+	if (IsValid(Subsystem))
     {
         Subsystem->RemoveMappingContext(DefaultMappingContext);
     }
@@ -132,4 +138,5 @@ void ABasePlayer::UnPossessed()
     // LocalPlayerSubsystemを取得できる
     DisableMappingContext();
     TeardownPlayerInputComponents();
+	Super::UnPossessed();
 }

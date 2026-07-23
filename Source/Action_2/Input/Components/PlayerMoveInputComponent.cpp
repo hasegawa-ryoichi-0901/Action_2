@@ -17,14 +17,14 @@ void UPlayerMoveInputComponent::BindActions(
 	UEnhancedInputComponent &InputComponent,
 	const UInputAction &InputAction)
 {
-	UKismetSystemLibrary::PrintString(
-		this,
-		TEXT("this is MoveInputComponentClass "),
-		true,
-		true,
-		FColor::Cyan,
-		2.0f,
-		TEXT("None"));
+	// UKismetSystemLibrary::PrintString(
+	// 	this,
+	// 	TEXT("this is MoveInputComponentClass "),
+	// 	true,
+	// 	true,
+	// 	FColor::Cyan,
+	// 	2.0f,
+	// 	TEXT("None"));
 
 	InputComponent.BindAction(
         &InputAction,
