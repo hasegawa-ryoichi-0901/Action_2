@@ -53,6 +53,9 @@ protected:
 		UEnhancedInputComponent& InputComponent,
 		const UInputAction& InputAction
     );
+	virtual void HandleStarted();
+	virtual void HandleCompleted();
+	virtual void HandleCanceled();
 private:
     TWeakObjectPtr<UEnhancedInputComponent>
         BoundInputComponent;

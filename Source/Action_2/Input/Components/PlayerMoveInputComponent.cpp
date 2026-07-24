@@ -25,7 +25,7 @@ void UPlayerMoveInputComponent::BindActions(
 	// 	FColor::Cyan,
 	// 	2.0f,
 	// 	TEXT("None"));
-
+	Super::BindActions(InputComponent, InputAction);
 	InputComponent.BindAction(
         &InputAction,
         ETriggerEvent::Triggered,

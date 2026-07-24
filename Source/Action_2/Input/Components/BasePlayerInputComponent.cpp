@@ -78,4 +78,37 @@ void UBasePlayerInputComponent::BindActions(
     UEnhancedInputComponent& InputComponent,
     const UInputAction& InputAction)
 {
+	InputComponent.BindAction(
+        &InputAction,
+        ETriggerEvent::Started,
+        this,
+        &UBasePlayerInputComponent::HandleStarted
+	);
+    InputComponent.BindAction(
+        &InputAction,
+        ETriggerEvent::Completed,
+        this,
+        &UBasePlayerInputComponent::HandleCompleted
+    );
+    InputComponent.BindAction(
+        &InputAction,
+        ETriggerEvent::Canceled,
+        this,
+        &UBasePlayerInputComponent::HandleCanceled
+    );
+}
+
+void UBasePlayerInputComponent::HandleStarted()
+{
+	bIsPressed = true;
+}
+
+void UBasePlayerInputComponent::HandleCompleted()
+{
+	bIsPressed = false;
+}
+
+void UBasePlayerInputComponent::HandleCanceled()
+{
+	bIsPressed = false;
 }
