@@ -1,6 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "../Player/BasePlayer.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "../../Characters/BaseCharacter.h"
 #include "EnhancedInputSubsystems.h"
+
+ABasePlayer::ABasePlayer()
+{
+	// Create a camera boom (pulls in towards the player if there is a collision)
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->TargetArmLength = 400.0f;
+	CameraBoom->bUsePawnControlRotation = true;
+
+	// Create a follow camera
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;
+}
 
 void ABasePlayer::BeginPlay()
 {

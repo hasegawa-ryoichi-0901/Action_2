@@ -5,6 +5,7 @@
 #include "../BaseCharacter.h"
 #include "../../Input/Interface/IPlayerInputComponent.h"
 #include "../../Input/Components/BasePlayerInputComponent.h"
+#include "Components/SceneComponent.h"
 #include "InputMappingContext.h"
 #include "BasePlayer.generated.h"
 /**
@@ -15,14 +16,23 @@ UCLASS()
 class ACTION_2_API ABasePlayer : public ABaseCharacter
 {
 	GENERATED_BODY()
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* FollowCamera;
+public:
+    ABasePlayer();
 protected:
+	/// @brief インプットアクションを自動アサインする変数
 	UPROPERTY(
     VisibleInstanceOnly,
     BlueprintReadOnly,
     Transient,
     Category = "Input")
 	TMap<FGameplayTag, TScriptInterface<IPlayerInputComponent>> PlayerInputComponents;
-	/** MappingContext */
+	/// @brief 操作に使用するMappingContext
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputMappingContext* DefaultMappingContext;
 protected:
