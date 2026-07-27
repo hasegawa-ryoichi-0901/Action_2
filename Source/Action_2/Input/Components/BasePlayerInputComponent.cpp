@@ -66,6 +66,7 @@ void UBasePlayerInputComponent::Teardown()
     }
 
     BoundInputComponent.Reset();
+	this->HandleCanceled();
 }
 
 void UBasePlayerInputComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

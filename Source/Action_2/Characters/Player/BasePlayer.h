@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "../BaseCharacter.h"
 #include "../../Input/Interface/IPlayerInputComponent.h"
 #include "../../Input/Components/BasePlayerInputComponent.h"
@@ -20,7 +21,7 @@ protected:
     BlueprintReadOnly,
     Transient,
     Category = "Input")
-	TArray<TScriptInterface<IPlayerInputComponent>> PlayerInputComponents;
+	TMap<FGameplayTag, TScriptInterface<IPlayerInputComponent>> PlayerInputComponents;
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputMappingContext* DefaultMappingContext;

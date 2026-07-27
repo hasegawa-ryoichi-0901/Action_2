@@ -34,11 +34,34 @@ void ABasePlayer::SetupPlayerInputComponent(class UInputComponent* playerInputCo
 			continue;
 		}
 
+		const FGameplayTag& newInputTag = NativeInterface->GetTaggedInputAction().InputTag;
+		if (!newInputTag.IsValid())
+		{
+			UE_LOG(
+            LogTemp,
+            Error,
+            TEXT("%s: InputTag is not assigned. Component=%s"),
+            *GetName(),
+            *GetNameSafe(Component));
+            continue;
+        }
+		const bool bHasDuplicateInputTag = PlayerInputComponents.Contains(newInputTag);
+        if (bHasDuplicateInputTag)
+        {
+            UE_LOG(
+                LogTemp,
+                Error,
+                TEXT("%s: Duplicate InputTag '%s'. Component=%s"),
+                *GetName(),
+                *newInputTag.ToString(),
+                *GetNameSafe(Component));
+            continue;
+        }
+
 		TScriptInterface<IPlayerInputComponent> InterfaceEntry;
 		InterfaceEntry.SetObject(Component);
 		InterfaceEntry.SetInterface(NativeInterface);
-
-		PlayerInputComponents.Add(InterfaceEntry);
+		PlayerInputComponents.Add(InterfaceEntry->GetTaggedInputAction().InputTag, InterfaceEntry);
 		NativeInterface->Setup(*playerInputComponent);
 	}
 	this->ApplyInputEnabledState();
@@ -46,10 +69,10 @@ void ABasePlayer::SetupPlayerInputComponent(class UInputComponent* playerInputCo
 
 void ABasePlayer::TeardownPlayerInputComponents()
 {
-    for (TScriptInterface<IPlayerInputComponent>& Entry: PlayerInputComponents)
+    for (TPair<FGameplayTag, TScriptInterface<IPlayerInputComponent>>& Entry: PlayerInputComponents)
     {
         if (IPlayerInputComponent* InputInterface =
-            Entry.GetInterface())
+            Entry.Value.GetInterface())
         {
             InputInterface->Teardown();
         }
@@ -119,10 +142,6 @@ void ABasePlayer::EnableMappingContext()
 
 void ABasePlayer::DisableMappingContext()
 {
-	if (!IsValid(DefaultMappingContext))
-    {
-        return;
-    }
     UEnhancedInputLocalPlayerSubsystem* Subsystem =
         GetInputSubsystem(GetController());
 
