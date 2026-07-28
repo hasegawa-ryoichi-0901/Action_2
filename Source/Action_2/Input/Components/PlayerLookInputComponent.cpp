@@ -14,16 +14,16 @@ UPlayerLookInputComponent::UPlayerLookInputComponent()
 }
 
 void UPlayerLookInputComponent::BindActions(
-	UEnhancedInputComponent &InputComponent,
-	const UInputAction &InputAction)
+	UEnhancedInputComponent& InputComponent,
+	const UInputAction& InputAction)
 {
 	Super::BindActions(InputComponent, InputAction);
 	InputComponent.BindAction(
-        &InputAction,
-        ETriggerEvent::Triggered,
-        this,
-        &UPlayerLookInputComponent::Look
-    );
+		&InputAction,
+		ETriggerEvent::Triggered,
+		this,
+		&UPlayerLookInputComponent::Look
+	);
 }
 
 void UPlayerLookInputComponent::Look(const FInputActionValue& Value)
@@ -39,15 +39,15 @@ void UPlayerLookInputComponent::DoLook(float Yaw, float Pitch)
 {
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	if (!IsValid(OwnerPawn))
-    {
-        return;
-    }
+	{
+		return;
+	}
 
-    AController* Controller = OwnerPawn->GetController();
-    if (!IsValid(Controller))
-    {
-        return;
-    }
+	AController* Controller = OwnerPawn->GetController();
+	if (!IsValid(Controller))
+	{
+		return;
+	}
 
 	if (Controller != nullptr)
 	{

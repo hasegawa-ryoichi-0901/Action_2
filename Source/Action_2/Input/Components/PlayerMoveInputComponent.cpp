@@ -14,16 +14,16 @@
 #include "Action_2/Action_2.h"
 
 void UPlayerMoveInputComponent::BindActions(
-	UEnhancedInputComponent &InputComponent,
-	const UInputAction &InputAction)
+	UEnhancedInputComponent& InputComponent,
+	const UInputAction& InputAction)
 {
 	Super::BindActions(InputComponent, InputAction);
 	InputComponent.BindAction(
-        &InputAction,
-        ETriggerEvent::Triggered,
-        this,
-        &UPlayerMoveInputComponent::Move
-    );
+		&InputAction,
+		ETriggerEvent::Triggered,
+		this,
+		&UPlayerMoveInputComponent::Move
+	);
 }
 
 void UPlayerMoveInputComponent::Move(const FInputActionValue& Value)
@@ -38,33 +38,33 @@ void UPlayerMoveInputComponent::DoMove(float Right, float Forward)
 {
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 
-    if (!IsValid(OwnerPawn))
-    {
-        return;
-    }
+	if (!IsValid(OwnerPawn))
+	{
+		return;
+	}
 
-    AController* Controller = OwnerPawn->GetController();
+	AController* Controller = OwnerPawn->GetController();
 
-    if (!IsValid(Controller))
-    {
-        return;
-    }
+	if (!IsValid(Controller))
+	{
+		return;
+	}
 
-    const FRotator ControlRotation =
-        Controller->GetControlRotation();
+	const FRotator ControlRotation =
+		Controller->GetControlRotation();
 
-    const FRotator YawRotation(
-        0.0f,
-        ControlRotation.Yaw,
-        0.0f
-    );
+	const FRotator YawRotation(
+		0.0f,
+		ControlRotation.Yaw,
+		0.0f
+	);
 
-    const FVector ForwardDirection =
-        FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector ForwardDirection =
+		FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-    const FVector RightDirection =
-        FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	const FVector RightDirection =
+		FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-    OwnerPawn->AddMovementInput(ForwardDirection, Forward);
-    OwnerPawn->AddMovementInput(RightDirection, Right);
+	OwnerPawn->AddMovementInput(ForwardDirection, Forward);
+	OwnerPawn->AddMovementInput(RightDirection, Right);
 }
