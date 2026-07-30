@@ -7,7 +7,7 @@
 #include "PlayerLookInputComponent.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class ACTION_2_API UPlayerLookInputComponent : public UBasePlayerInputComponent

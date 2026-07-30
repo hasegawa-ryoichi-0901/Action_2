@@ -50,5 +50,7 @@ private:
 	UEnhancedInputLocalPlayerSubsystem* GetInputSubsystem(AController* controller);
 	void ApplyInputEnabledState();
 public:
+	/// @brief MappingContextのOn/OFF切り替え
+	/// @param bEnabled 切り替えBool値
 	void SetInputEnabled(bool bEnabled);
 };
