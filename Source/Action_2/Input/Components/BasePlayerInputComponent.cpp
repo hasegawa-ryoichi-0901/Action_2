@@ -20,7 +20,7 @@ void UBasePlayerInputComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 

@@ -8,7 +8,7 @@
 #include "PlayerMoveInputComponent.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class ACTION_2_API UPlayerMoveInputComponent : public UBasePlayerInputComponent
@@ -23,6 +23,9 @@ protected:
 	/// @param Right 左右の正規化
 	/// @param Forward 前後ろの正規化
 	virtual void DoMove(float Right, float Forward);
+	/// @brief セットアップにキーバインドの設定
+	/// @param InputComponent
+	/// @param InputAction
 	virtual void BindActions(
 		UEnhancedInputComponent& InputComponent,
 		const UInputAction& InputAction
