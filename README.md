@@ -6,9 +6,15 @@
 
 ## ドキュメント一覧
 
-1. [00. プロジェクト概要](Docs/00_ProjectOverview.md)
-2. [01. 要件定義](Docs/01_Requirements.md)
-3. [02. ゲームデザイン](Docs/02_GameDesign.md)
+### 基本設計
+
+- [基本設計ドキュメント一覧](Docs/FunctionalDesign/FunctionalDesign_Root.md)
+
+### プロジェクト資料
+
+1. [00. プロジェクト概要](Docs/00_ProjectOverview.md#00-プロジェクト概要)
+2. [01. 要件定義](Docs/01_Requirements.md#01-要件定義)
+3. [02. ゲームデザイン](Docs/02_GameDesign.md#02-ゲームデザイン)
 4. [03. 戦闘システム](Docs/03_CombatSystem.md)
 5. [04. 武器システム](Docs/04_WeaponSystem.md)
 6. [05. Gameplay Ability System設計](Docs/05_GASDesign.md)
