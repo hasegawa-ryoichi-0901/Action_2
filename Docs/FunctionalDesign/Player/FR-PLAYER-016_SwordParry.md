@@ -401,4 +401,4 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnParryFailed, EFailureReason);
 
 | 日付 | 変更者 | 内容 |
 |---|---|---|
-| `2026-08-07` | `Codex` | 要件定義と既存設計書から初版作成 |
+| `2026-08-07` | `hasegawa` | 要件定義と既存設計書から初版作成 |

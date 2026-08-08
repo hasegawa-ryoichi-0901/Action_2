@@ -253,3 +253,5 @@ Stamina >= ExhaustedRecoveryThreshold
 - 使用中に攻撃を受けると中断
 - ボスAIは回復Abilityの確定済み発動状態を評価可能
 - 回復量、使用回数、使用時間は未確定データとする
+
+### [戻る](../README.md#ドキュメント一覧)
