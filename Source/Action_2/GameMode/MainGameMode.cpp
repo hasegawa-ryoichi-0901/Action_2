@@ -3,3 +3,10 @@
 
 #include "../GameMode/MainGameMode.h"
 
+void AMainGameMode::InitGame(
+	const FString& MapName,
+	const FString& Options,
+	FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+}

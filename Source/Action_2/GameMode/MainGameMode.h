@@ -7,11 +7,16 @@
 #include "MainGameMode.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class ACTION_2_API AMainGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void InitGame(
+		const FString& MapName,
+		const FString& Options,
+		FString& ErrorMessage) override;
 };
