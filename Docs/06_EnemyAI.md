@@ -15,151 +15,94 @@
 - StateTreeで大状態とフェーズを管理
 - C++評価システムで攻撃候補をスコアリング
 - Gameplay Abilityで攻撃を実行
-- データアセットで攻撃を追加・調整
+- Data Assetで攻撃を追加・調整
 
-```text
-通常敵
-  |
-  +--> Behavior Tree
-  +--> Blackboard
-  +--> Attack Coordinator
-
-ボス
-  |
-  +--> StateTree
-  +--> C++ Attack Evaluator
-  +--> Attack Definition Data
-  +--> GAS Ability
-```
+初期Vertical SliceではPlayer WeaponはSword固定とし、Axe / Bowによる武器別Score補正はPost-Vertical Sliceで追加します。
 
 ## 2. 通常敵Behavior Tree
 
 ```text
 [Root]
-   |
-   v
-[Is Dead?] --------Yes------> [Stop]
-   |
-   No
-   v
-[Has Target?] -----No-------> [Patrol / Idle]
-   |
-   Yes
-   v
+   ↓
+[Is Defeated?] --Yes--> [Stop]
+   ↓ No
+[Has Target?] --No--> [Patrol / Idle]
+   ↓ Yes
 [In Attack Range?]
-   |
    +-- No --> [Move / Reposition]
-   |
-   v
+   ↓
 [Has Attack Slot?]
-   |
    +-- No --> [Circle / Threaten / Wait]
-   |
-   v
+   ↓
 [Select Attack]
-   |
-   v
+   ↓
 [Execute Ability]
-   |
-   v
+   ↓
 [Release Attack Slot]
 ```
+
+Health<=0でDefeatedになった場合、現在のTask / Abilityを停止し攻撃枠を即時解放します。
 
 ## 3. 集団戦管理
 
 ```text
-+--------------------------------------------------+
-| UEnemyAttackCoordinatorSubsystem                 |
-|--------------------------------------------------|
-| RegisterEnemy                                    |
-| UnregisterEnemy                                  |
-| RequestMeleeSlot                                 |
-| ReleaseMeleeSlot                                 |
-| RequestRangedSlot                                |
-| ReleaseRangedSlot                                |
-| ApplyWaitingPriority                             |
-+-------------------------+------------------------+
-                          |
-             +------------+------------+
-             |                         |
-             v                         v
-+------------------------+  +------------------------+
-| Melee Attack Slots     |  | Ranged Attack Slots    |
-| Max Active: 2          |  | Max Active: 未確定     |
-+------------------------+  +------------------------+
+UEnemyAttackCoordinatorSubsystem
+    +-- RegisterEnemy
+    +-- UnregisterEnemy
+    +-- RequestMeleeSlot
+    +-- ReleaseMeleeSlot
+    +-- RequestRangedSlot
+    +-- ReleaseRangedSlot
+    +-- ApplyWaitingPriority
 ```
 
-攻撃権を持たない敵は次の行動を行います。
+- Melee Active Max = 2
+- Ranged Active Max = TBD
+- Defeated / Down / Cancel / Owner破棄時のSlot解放を保証する
 
-- プレイヤー周囲で位置調整
-- 威嚇
-- 待機
-- 視界内への移動
-- 攻撃予約
-- 長時間待機による優先度上昇
+攻撃権を持たない敵は位置調整、威嚇、待機、視界内への移動、攻撃予約等を行います。
 
 ## 4. ボスStateTree
 
 ```text
 [Root]
-   |
    +--> [Intro]
-   |
    +--> [Combat]
-   |       |
    |       +--> [Phase 1]
-   |       |
    |       +--> [Phase Transition]
-   |       |
    |       +--> [Phase 2]
-   |
    +--> [Posture Down]
-   |
    +--> [Fatal Reaction]
-   |
-   +--> [Dead]
+   +--> [Defeated]
 ```
-
-### フェーズ移行
 
 ```text
-Boss HP > 50%
-    |
-    v
-[Phase 1]
-
-Boss HP <= 50%
-    |
-    v
-[Phase Transition]
-    |
-    v
-[Phase 2]
+Boss HP > 50%  -> Phase 1
+Boss HP <= 50% -> Phase Transition -> Phase 2
+Boss HP <= 0   -> Defeated
 ```
 
-## 5. 攻撃評価
+DefeatedはPhase Transition、Posture Down、Attack Recoveryより優先します。
 
-### 評価対象
+## 5. 初期Vertical Sliceの攻撃評価
+
+評価対象：
 
 - プレイヤーとの距離
-- プレイヤーの装備武器
 - プレイヤーの回復状態
 - プレイヤーの残りスタミナ
 - 直近数秒の行動履歴
 - 戦闘開始からの行動傾向
-- 攻撃のクールダウン
+- 攻撃Cooldown
 - 直前に使用した攻撃
 - 同一攻撃の連続使用回数
-- 現在フェーズ
-- 壁際やステージ端の位置関係
-
-### 評価式の概念
+- 現在Phase
+- 壁際やStage端の位置関係
 
 ```text
 FinalScore =
     BaseScore
   + DistanceScore
-  + WeaponMatchScore
   + PlayerStateScore
   + RecentHistoryScore
   + BattleTrendScore
@@ -169,53 +112,33 @@ FinalScore =
   - RepetitionPenalty
 ```
 
-## 6. 適応
+## 6. Post-Vertical Sliceの武器評価
 
-ボスは直近の行動と戦闘全体の傾向を併用します。
+Axe / Bow実装後にPlayer Weapon Modifierを追加します。
 
-```text
-[Player Action History]
-      |
-      +--> Recent Window
-      |       |
-      |       +--> 直近数秒
-      |       +--> 即時的な対応
-      |
-      +--> Battle Trend
-              |
-              +--> 回避頻度
-              +--> 遠距離維持傾向
-              +--> 回復タイミング傾向
-              +--> 武器使用傾向
-```
+- Axe：高Stagger Resistance / Guard系行動を考慮した候補補正
+- Bow：Range TrendとWeapon Typeを組み合わせた遠距離対応
+- Bowで長距離維持された場合：`FR-BOSS-014`のGap Closer候補を補正
 
-適応によって変更する項目は次のとおりです。
-
-- 攻撃候補の評価値
-- 接近頻度
-- 離脱頻度
-- 遠距離攻撃頻度
+初期Vertical SliceのSword BossをこれらのFeatureへ依存させません。
 
 ## 7. 公平性
 
-### 参照してよい
+参照してよい：
 
 - 現在位置
-- 装備武器
-- 現在HP
-- 現在スタミナ
+- 確定済み装備武器（Post-VS）
+- 現在HP / Stamina
 - 回復Abilityの確定済み発動状態
-- 実行済み回避履歴
-- 実行済み攻撃履歴
+- 実行済み回避・攻撃履歴
 - 確定済みGameplay Tag
 
-### 参照しない
+参照しない：
 
 - 未反映の入力
-- 入力バッファの中身
+- 入力Bufferの中身
 - 次に発動予定のAbility
-- プレイヤーだけが知る内部情報
-- 将来入力の予測結果を確定情報として使う処理
+- 将来入力の予測を確定情報として扱う処理
 
 ## 8. AIデバッグ表示
 
@@ -224,14 +147,12 @@ Boss State       : Phase2
 Selected Attack  : DashSlash
 Final Score      : 82.5
 Distance         : 620
-Player Weapon    : Bow
 Player Stamina   : 18%
 Recent DodgeRate : High
 Battle RangeBias : Long
-Melee Slot       : N/A
 Cooldown         : Ready
 ```
 
-デバッグ表示では、最終結果だけでなく評価項目の内訳を確認できるようにします。
+Post-VSではPlayer Weapon等の武器評価内訳を追加します。最終結果だけでなくScore内訳を確認可能にします。
 
 ### [戻る](../README.md#ドキュメント一覧)
