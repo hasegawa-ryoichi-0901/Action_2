@@ -1,4 +1,4 @@
-# FR-STAGE-012 死亡後、最後に有効化したチェックポイントから再開する
+# FR-STAGE-012 最後のCheckpointからRespawnする
 
 ## 1. 基本情報
 
@@ -7,68 +7,45 @@
 | 要件ID | `FR-STAGE-012` |
 | 優先度 | `Must` |
 | 対応範囲 | 初期Vertical Slice |
-| 設計状態 | `Draft` |
-| 関連要件 | `FR-PLAYER-020`, `FR-STAGE-003`, `FR-STAGE-004`, `FR-STAGE-008` |
+| 設計状態 | `Review` |
 
-## 2. 目的
-
-プレイヤー死亡後にゲーム進行を継続できる再開地点と復帰処理を定義する。
-
-## 3. 基本フロー
+## 2. 基本フロー
 
 ```text
-[Player Death確定]
+[Player Death]
       ↓
-[DeathDrop生成完了]
+[Death Animation完了]
       ↓
-[Respawn Request]
+[DeathDrop生成・Auto Save]
       ↓
-[ActiveCheckpoint取得]
-      +-- 無効 --> [Fallback Spawn: TBD]
+[CameraでDeathDrop確認]
       ↓
-[PlayerをCheckpointへ復帰]
-      +--> HP回復
-      +--> 回復アイテム補充
-      +--> 必要な一時状態解除
-      +--> 通常敵復活
+[Fade Out]
       ↓
-[入力再有効化]
+[Active Checkpointあり？]
+   ├─ Yes → Active CheckpointへRespawn
+   └─ No  → PlayerStartへRespawn
+      ↓
+[HP Full / Stamina Full / Healing Item Full]
+      ↓
+[Normal Enemy Respawn]
+      ↓
+[Fade In / Gameplay再開]
 ```
 
-## 4. 責務
+## 3. 確定仕様
 
-| 対象 | 責務 |
-|---|---|
-| Checkpoint管理 | 最後に有効化したCheckpoint ID / Transform管理 |
-| Death System | Respawn Request発行 |
-| Player | Respawn後の状態初期化 |
-| Enemy Respawn | 通常敵の復活 |
-| Input System | 安全なタイミングで入力を再有効化 |
+- Death状態中もCamera Lookを許可する。
+- DeathDrop確認後にFade OutしてからRespawnする。
+- Active Checkpoint未設定時はPlayerStartをFallbackとする。
+- HP、Stamina、Healing Itemを全回復する。
+- 通常敵を復活させる。
 
-## 5. 受入条件
+## 4. 受入条件
 
-- [ ] ActiveCheckpointが存在する場合、その地点から再開する。
-- [ ] Respawn後にHealthが有効値へ復元される。
-- [ ] 回復アイテムが仕様どおり補充される。
-- [ ] 通常敵が復活する。
-- [ ] `State.Dead`等の死亡用一時状態が残らない。
-- [ ] Respawn完了前にPlayer入力が誤って有効にならない。
-- [ ] 同一DeathからRespawnを複数回実行しない。
-
-## 6. テスト観点
-
-- Checkpoint A / B切替後のRespawn
-- DeathDrop生成との順序
-- Enemy Respawn
-- Respawn中Level遷移
-- Input再セットアップ
-- ActiveCheckpoint無効
-
-## 7. 未決事項
-
-- Checkpoint未有効化時のFallback Spawn
-- Respawnまでの待機条件
-- Stamina全回復の有無
-- Death / Respawn時AutoSaveの有無
-
-詳細は`Docs/15_OpenQuestions.md`で確定する。
+- [ ] Death Animation完了前にRespawnしない。
+- [ ] DeathDrop生成・Save確定前にRespawnしない。
+- [ ] Active Checkpointがあればその地点へ戻る。
+- [ ] 未設定でもPlayerStartへ安全に戻れる。
+- [ ] 復帰後のHP / Stamina / Healing Itemが全回復している。
+- [ ] 通常敵が復活している。
