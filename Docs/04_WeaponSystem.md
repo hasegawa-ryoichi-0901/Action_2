@@ -16,26 +16,27 @@ Vertical Slice完成後の4～6カ月目を目安に斧と弓を追加し、チ�
 - 初期Vertical Sliceは剣のみ。
 - 複数武器実装後はチェックポイントで変更可能。
 - 戦闘中は変更不可。
-- 最終的にはすべてのボスをすべての武器で撃破可能にする。
 - 各武器は共通の武器定義・攻撃定義・Ability連携を利用する。
 - 攻撃力、体勢削り、スタミナコスト、怯み耐性をデータ化する。
 - 強化は3段階候補。
-- 強化素材は初期仕様では共通。
-- 素材種別はマスターデータで変更可能。
-- 強化素材の振り直しはPost-Vertical Slice候補とする。
+- 武器強化には**強化素材とGoldの両方**を使用する。
+- Goldの用途は武器強化のみ。
+- 武器強化はCheckpoint Menuからのみ実行できる。
+- 強化素材・Goldの必要量はゲームデータで管理する。
 
 ## 3. 共通アクション構成
 
-最終目標は次のとおりです。初期Vertical Sliceでは剣で戦闘基盤を成立させ、斧・弓は同じ基盤を利用して追加します。
+初期Vertical Sliceでは剣で戦闘基盤を成立させ、斧・弓は同じ基盤を利用して追加します。
 
-- 通常攻撃コンボ：1系統
-- 強攻撃：1種類
-- チャージ攻撃：1種類
-- 回避攻撃：1種類
-- ジャスト回避反撃：1種類
-- 固有スキル：2種類候補
-- 空中攻撃：1種類
-- 致命攻撃：1種類
+- Light Attack
+- Heavy Attack
+- Combo Attack
+- Dodge Attack候補
+- Perfect Dodge Counter
+- Air Attack
+- Fatal Attack
+
+Light Attack、Heavy Attack、Combo AttackはIssue管理上それぞれ別Action / Featureとして扱います。ActionとActorComponentの数を一致させることは前提としません。
 
 ## 4. 剣 — Vertical Slice対象
 
@@ -59,78 +60,34 @@ Light 1
 Light 2
   +--> Heavy Branch
 
-Charge Heavy
-Dodge Attack
+Charge Heavy候補
+Dodge Attack候補
 Air Attack
 Perfect Dodge Counter
 Fatal Attack
 ```
-
-通常攻撃は4段を目標とします。
 
 ## 5. 斧 — Post-Vertical Slice Feature
 
 関連要件：`FR-PLAYER-017`、`FEATURE-AXE-001`～`FEATURE-AXE-005`。
 
-### 役割
-
-- 低速
-- 高威力
-- 高い体勢削り
-- 高い怯み耐性
-- ガードまたは受け止め
-- 一部攻撃にスーパーアーマー候補
-- ジャスト回避後に高威力の叩きつけ
-
-### アクション候補
-
-```text
-Light 1
-  +--> Light 2
-  |      +--> Light 3
-  +--> Heavy Branch
-
-Charge Heavy
-Guard / Receive
-Dodge Attack
-Air Attack
-Perfect Dodge Counter
-Fatal Attack
-```
-
-ガード / 受け止め方式、ガード中スタミナ、ガードブレイク、スーパーアーマー対象は`15_OpenQuestions.md`で確定します。
+- 低速・高威力・高い体勢削り・高い怯み耐性。
+- Guard / Receive。
+- 一部攻撃にSuper Armor候補。
+- 3段Light Combo、Charge Attack、Dodge Attack、Perfect Dodge Counterを追加候補とする。
 
 ## 6. 弓 — Post-Vertical Slice Feature
 
 関連要件：`FEATURE-BOW-001`～`FEATURE-BOW-006`、`FR-BOSS-014`。
 
-### 役割
+- 遠距離攻撃。
+- 通常時はSoft Lock。
+- 構え時は肩越し照準。
+- 通常射撃は弾数無制限候補で、射撃ごとにStaminaを消費。
+- Weak Point、距離減衰を持つ。
+- 遠距離維持に対してBossは専用Gap Closerを使用する。
 
-- 遠距離攻撃
-- 通常時はソフトロック
-- 構え時は肩越し照準
-- 通常射撃の弾数は無制限候補
-- 射撃ごとにスタミナを消費
-- 敵の弱点部位を攻撃可能
-- 弱点はUIへ明示しない
-- 距離が長くなるほどダメージが減少
-- 遠距離維持に対し、ボスは専用接近行動を使用する
-
-### 射撃方式
-
-```text
-通常矢
-  +--> Projectile候補
-  +--> 飛翔時間あり
-  +--> 距離減衰あり
-
-特殊高速射撃
-  +--> Line Trace候補
-  +--> 即着弾
-  +--> Ability / Skill候補
-```
-
-通常攻撃を3段コンボとするか連続射撃とするか、Projectile / Line Traceの最終分担はプロトタイプで決定します。
+Projectile / Line Trace等の最終方式はPost-Vertical Sliceのプロトタイプで決定します。
 
 ## 7. 武器強化
 
@@ -143,18 +100,25 @@ Level 2
   +--> 体勢削り性能上昇
 
 Level 3
-  +--> 固有スキル解放候補
+  +--> 固有Skill解放候補
 ```
 
 ```text
-[Checkpoint]
+[Checkpoint Menu]
       ↓
-[Weapon Upgrade Menu]
-      +--> 素材確認
-      +--> 強化実行
-      +--> Gameplay Ability付与
-      +--> パラメータ更新
-      +--> オートセーブ
+[Upgrade対象選択]
+      ↓
+[Gold Cost確認]
+      +-- 不足 --> [Reject]
+      ↓
+[Upgrade Material Cost確認]
+      +-- 不足 --> [Reject]
+      ↓
+[両Resourceを消費]
+      ↓
+[Weapon Level / Parameter更新]
 ```
+
+武器強化そのものをAuto Save契機にはしません。進行Saveは`Docs/09_SaveCheckpointDeath.md`で定義した契機に従います。
 
 ### [戻る](../README.md#ドキュメント一覧)
