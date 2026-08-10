@@ -14,16 +14,13 @@
     +--> [Dead]
 ```
 
-初期Vertical Sliceは剣のみを対象とします。斧のGuard / Receiveと弓固有処理はPost-Vertical Slice Featureです。
-
-状態はGameplay Tagで管理します。
+初期Vertical Sliceは剣のみを対象とします。状態はGameplay Tagで管理します。
 
 ```text
 State.Action.Attacking
 State.Action.Dodging
 State.Action.Jumping
 State.Action.Parrying
-State.Action.Guarding
 State.Action.Healing
 State.Action.Exhausted
 State.Reaction.Hit
@@ -36,25 +33,17 @@ State.Dead
 
 ```text
 [Startup]
-    |
-    | 一部の軽攻撃のみ回避キャンセル候補
-    v
+    ↓
 [Commitment]
-    |
-    | 原則キャンセル不可
-    v
+    ↓
 [Active]
-    |
-    | 攻撃判定有効
-    v
+    ↓
 [Recovery]
-    |
-    | 後半で次入力を受付
-    v
+    ↓
 [Neutral / Next Combo]
 ```
 
-キャンセル可能期間はAnim Notify StateまたはGameplay Tagで管理します。
+キャンセル・Combo・Hitbox等の受付期間はAnim Notify StateまたはGameplay Tagで表現します。
 
 ```text
 Window.Cancel.Dodge
@@ -64,93 +53,55 @@ Window.Counter.Available
 Window.FatalAttack.Available
 ```
 
-## 3. 入力と入力バッファ
+## 3. Input / Gameplay Action / Issueの境界
 
-Enhanced InputのBindingとライフサイクル管理は`IPlayerInputComponent`を入口とします。Move / Lookのような直接操作は各入力Componentがゲームプレイ処理へ接続し、攻撃・回避・パリィ等の戦闘入力はGAS入力処理へ接続します。
+Enhanced InputのBindingとライフサイクル管理は`IPlayerInputComponent`を入口とします。Gameplay Actionの単位とActorComponentの単位は同一と断定しません。
 
-入力バッファ対象：
+- Dodgeは1 Actionで、Normal Dodge / Perfect Dodgeは結果分岐。
+- Light Attackは1 Action。
+- Heavy AttackはLight Attackとは別Action。
+- Combo AttackはLight / Heavyの単体実装とは別の統合Action / Featureとして扱う。
+- Gameplay Tag、GAS、責務、ライフサイクルを考慮してComponent構成を決定する。
 
-- 通常攻撃
-- 強攻撃
-- 回避
-- ジャンプ
-- パリィ
-- 武器スキル
-- ジャスト回避反撃
-- Post-Vertical SliceではGuard等を追加
+## 4. Dodge
 
-優先順位候補：
-
-```text
-死亡・強制リアクション
-        ↓
-ジャスト回避反撃
-        ↓
-回避
-        ↓
-パリィ
-        ↓
-武器スキル
-        ↓
-強攻撃
-        ↓
-通常攻撃
-```
-
-## 4. 通常回避
-
-通常回避は防御と位置調整の基本行動です。
+Dodge Input Tagは1つです。通常回避とジャスト回避で別Input Actionを作りません。
 
 ```text
 [Dodge Input]
-      |
-      v
+      ↓
 [実行条件 / Stamina確認]
-      |
       +-- NG --> [Reject / Buffer]
-      |
-      v
+      ↓
 [State.Action.Dodging]
-      |
-      v
-[回避移動・Animation]
-      |
-      +--> 敵攻撃とPerfect Dodge Windowが重なる
-      |        ↓
-      |   [Perfect Dodge Success]
-      |
-      +--> 条件を満たさない
-               ↓
-          [Normal Dodge]
-      |
-      v
+      ↓
+[移動入力あり？]
+   ├─ Yes → 入力方向へRoll
+   └─ No  → 後方へBack Step
+      ↓
+[Invincible Window]
+[Perfect Dodge Window]
+      ↓
+[Enemy Attackとの関係を評価]
+   ├─ Perfect Window成立 → Perfect Dodge Result
+   ├─ Invincibleのみ成立 → Normal Dodge / No Damage
+   └─ 無敵外でHit          → Damage
+      ↓
 [Recovery / Neutral]
 ```
 
-- 通常回避とジャスト回避は同じ回避入力から開始する。
-- ジャスト回避条件を満たさなくても通常回避として成立可能とする。
-- 回避はスタミナを消費する。
-- 死亡・ダウン・息切れ等の禁止状態では開始できない。
-- 回避方向、無敵時間、移動距離、空中回避可否、敵をすり抜けるかは実装Issue開始前に確定する。
+確定事項：
+
+- Invincible WindowとPerfect Dodge Windowは別々の調整値。
+- 具体的な時間は開発中に調整可能とする。
+- 空中Dodge不可。
+- Dodge中に敵Collisionをすり抜けない。
+- Normal / Perfectの結果通知は、用途に応じて別のGameplay Tag / Gameplay Eventを使用できる。
+- Perfect Dodgeは別ActionではなくDodge Actionの結果。
 
 ## 5. スタミナ
 
-### 消費対象
-
-- 通常攻撃
-- 強攻撃
-- チャージ攻撃
-- 回避
-- ジャスト回避反撃
-- パリィ
-- Post-Vertical SliceのGuard / 武器スキル / 弓射撃
-
-### 回復
-
-- 最後のスタミナ消費から一定時間後に回復を開始する。
-- 回復開始遅延、回復量、息切れ解除閾値はデータで設定する。
-
-### 枯渇
+消費対象：通常攻撃、強攻撃、回避、ジャスト回避後の反撃、パリィ等。最後の消費から一定時間後に回復を開始します。
 
 ```text
 Stamina <= 0
@@ -169,40 +120,22 @@ Stamina >= ExhaustedRecoveryThreshold
 [Neutral]
 ```
 
-## 6. ジャスト回避
+## 6. Perfect Dodge Result
 
-### 成功条件
-
-- 回避Abilityが有効。
-- 敵攻撃判定とジャスト回避受付時間が重なる。
-- プレイヤーが死亡・ダウン・息切れ中ではない。
-
-### 成功処理
+成功条件は、Dodge Actionが有効で、敵攻撃判定とPerfect Dodge Windowが重なることです。
 
 ```text
-[Enemy Attack]
-      ↓
-[Dodge Window Check]
-      +-- Failed --> [Normal Dodge / Hit]
-      ↓
-[Perfect Dodge Success]
-      +--> 短いヒットストップ
-      +--> HUDカウンター表示
-      +--> Counter Gameplay Tag付与
+[Perfect Dodge Result]
+      +--> 短いHit Stop
+      +--> HUD通知
+      +--> 結果通知Tag / Event
       +--> 対象敵を記録
-      ↓
-[攻撃入力待ち]
-      +-- 入力なし・時間切れ --> [通常状態]
-      ↓
-[Sword Counter]
+      +--> Counter受付状態
 ```
 
-- スローモーションは発生させない。
+- スローモーションは使用しない。
 - 反撃は強制しない。
-- 有効時間中に攻撃入力した場合だけ専用反撃へ派生する。
-- 反撃はスタミナを消費する。
-- 有効時間は武器データで設定する。
-- 反撃時に対象敵へ向きを自動補正する。
+- Counter受付中の攻撃入力で剣固有Counterへ派生できる。
 
 ## 7. パリィ
 
@@ -210,7 +143,7 @@ Stamina >= ExhaustedRecoveryThreshold
 - 攻撃属性ごとにパリィ可否を設定する。
 - 失敗時に専用硬直を発生させる。
 - 成功時に敵の体勢値を大きく削る。
-- 体勢値が0になった場合のみダウンと致命攻撃へ接続する。
+- 体勢値0時のみDown / Fatal Attackへ接続する。
 
 ## 8. HP・死亡・撃破
 
@@ -226,46 +159,38 @@ Health <= 0
    ↓
 [State.Dead]
    ↓
-[実行中Ability / 入力 / 一時状態を終了]
+[実行中Combat処理終了]
    ↓
-[Death / Respawn System]
+[Death / DeathDrop / Respawn System]
 ```
 
-死亡状態への遷移は1回だけ行い、死亡後の素材DropとCheckpoint Respawnは`Docs/09_SaveCheckpointDeath.md`へ委譲します。
+死亡後のDeathDrop・Auto Save・Respawnは`Docs/09_SaveCheckpointDeath.md`へ委譲します。
 
 ### 通常敵
 
-- HPが0以下になったら撃破状態へ1回だけ遷移する。
-- 撃破時に攻撃Ability、AI移動、攻撃枠を終了・解放する。
-- 報酬はEnemy DefinitionのReward Definition等のデータから付与する設計候補とする。
+- HP0以下で撃破状態へ1回だけ遷移する。
+- 攻撃Ability、AI移動、攻撃枠を終了・解放する。
+- 1体撃破ごとに強化素材とGoldを直接所持値へ付与する。
+- 報酬量はゲームデータから取得する。マスターデータ読込方式そのものは別設計とする。
 
 ### ボス
 
-- HPが0以下になったら撃破状態へ1回だけ遷移する。
-- 撃破後はAI評価と攻撃Abilityを停止する。
-- Boss Defeated Eventをステージ進行とセーブへ通知する。
+- HP0以下で撃破状態へ1回だけ遷移する。
+- AI評価と攻撃Abilityを停止する。
+- Goldを付与する。
+- 初回討伐時のみ固有収集Itemを直接Inventoryへ付与する。
+- 報酬付与完了後にBoss DefeatedのSave要求を発行する。
+- 初期Vertical SliceではBoss再戦を実装しない。
 
 ## 9. 体勢値
 
-### 敵
-
-- HPとは独立して保持する。
-- 攻撃ごとに体勢ダメージを設定する。
-- 敵データごとに自然回復の有無と回復速度を設定する。
-- 0になるとダウンする。
-- ダウン時に正面・背後の両方から致命攻撃可能とする。
-- HP0の撃破状態は体勢ダウンより優先する。
-
-### プレイヤー
-
-独立した体勢ゲージは基本的に使用せず、武器に応じたStaggerResistanceを反映します。初期Vertical Sliceでは剣の値を使用し、斧・弓差分はPost-Vertical Sliceで追加します。
+敵はHPとは独立して体勢値を持ち、0でDownします。HP0による撃破状態は体勢Downより優先します。
 
 ## 10. 回復
 
-- 回数制限付き回復アイテム。
-- チェックポイントで補充。
+- 回数制限付き回復Item。
+- Checkpointで補充。
 - 使用中に攻撃を受けると中断。
 - ボスAIは回復Abilityの確定済み発動状態を評価可能。
-- 回復量、使用回数、使用時間は未確定データとする。
 
 ### [戻る](../README.md#ドキュメント一覧)
