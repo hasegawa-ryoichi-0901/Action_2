@@ -5,107 +5,93 @@
 
 ## 1. 作成方針
 
-- 機能要件67件、非機能要件18件の合計85件を管理する。
+- 機能要件68件、非機能要件18件の合計86件を管理する。
 - 要件、責務、状態、基本フロー、データ、受入条件、テスト、依存関係を要件IDで追跡する。
-- 実装済みコードと設計が競合する場合は、意図を確認した上で現在採用しているアーキテクチャへ同期する。
 - Player Inputは`IPlayerInputComponent`を正とする。
+- `1 Action = 1 ActorComponent`は前提としない。
+- Gameplay Actionは親Issue、独立した実装単位は実装Issueとして管理する。
+- 原則1実装Issue = 1 PRとする。
 - 現在存在しない`IMovementDriver` / `UMovementAdapterComponent`を初期Vertical Sliceの前提としない。
-- 未決事項は`Docs/15_OpenQuestions.md`で管理し、実装Issue開始前に必要な項目を確定する。
+- 数値調整・アセット最終選定は実装中に変更可能とし、Issue作成を妨げない。
 
 ## 2. プレイヤー（21件）
 
 | ID | 要件 | 範囲 | 基本設計 |
 |---|---|---|---|
-| `FR-PLAYER-001` | 三人称視点で移動できる | Initial VS | [ThirdPersonMovement](Player/FR-PLAYER-001_ThirdPersonMovement.md) |
-| `FR-PLAYER-002` | Gamepad / Keyboard-Mouseで同等に操作できる | Initial VS | [EquivalentInputDevices](Player/FR-PLAYER-002_EquivalentInputDevices.md) |
-| `FR-PLAYER-003` | ジャンプできる | Initial VS | [Jump](Player/FR-PLAYER-003_Jump.md) |
-| `FR-PLAYER-004` | 空中攻撃を実行できる | Initial VS | [AirAttack](Player/FR-PLAYER-004_AirAttack.md) |
-| `FR-PLAYER-005` | ソフトロックを使用できる | Initial VS | [SoftLock](Player/FR-PLAYER-005_SoftLock.md) |
-| `FR-PLAYER-006` | 手動ロックオンを使用できる | Initial VS | [ManualLockOn](Player/FR-PLAYER-006_ManualLockOn.md) |
-| `FR-PLAYER-007` | ロックオン対象を切り替えられる | Initial VS | [SwitchLockTarget](Player/FR-PLAYER-007_SwitchLockTarget.md) |
-| `FR-PLAYER-008` | 剣・斧・弓をCheckpointで変更できる | Post-VS | [ChangeWeaponAtCheckpoint](Player/FR-PLAYER-008_ChangeWeaponAtCheckpoint.md) |
-| `FR-PLAYER-009` | 戦闘中は武器変更できない | Post-VS | [BlockWeaponChangeInCombat](Player/FR-PLAYER-009_BlockWeaponChangeInCombat.md) |
-| `FR-PLAYER-010` | 通常攻撃と強攻撃を組み合わせられる | Initial VS | [LightHeavyCombo](Player/FR-PLAYER-010_LightHeavyCombo.md) |
-| `FR-PLAYER-011` | 攻撃と回避でStamina消費 | Initial VS | [StaminaCost](Player/FR-PLAYER-011_StaminaCost.md) |
-| `FR-PLAYER-012` | Stamina不足時に行動不可 | Initial VS | [RejectInsufficientStamina](Player/FR-PLAYER-012_RejectInsufficientStamina.md) |
-| `FR-PLAYER-013` | Stamina枯渇で息切れ | Initial VS | [ExhaustedState](Player/FR-PLAYER-013_ExhaustedState.md) |
-| `FR-PLAYER-014` | ジャスト回避 | Initial VS | [PerfectDodge](Player/FR-PLAYER-014_PerfectDodge.md) |
-| `FR-PLAYER-015` | ジャスト回避後の武器固有反撃 | Initial VS | [WeaponCounter](Player/FR-PLAYER-015_WeaponCounterAfterPerfectDodge.md) |
-| `FR-PLAYER-016` | 剣でパリィ | Initial VS | [SwordParry](Player/FR-PLAYER-016_SwordParry.md) |
-| `FR-PLAYER-017` | 斧でGuard / Receive | Post-VS | [AxeGuardOrReceive](Player/FR-PLAYER-017_AxeGuardOrReceive.md) |
-| `FR-PLAYER-018` | 回数制限付き回復Item | Initial VS | [LimitedHealingItem](Player/FR-PLAYER-018_LimitedHealingItem.md) |
-| `FR-PLAYER-019` | 通常回避 | Initial VS | [NormalDodge](Player/FR-PLAYER-019_NormalDodge.md) |
+| `FR-PLAYER-001` | 三人称移動 | Initial VS | [ThirdPersonMovement](Player/FR-PLAYER-001_ThirdPersonMovement.md) |
+| `FR-PLAYER-002` | Gamepad / Keyboard-Mouse同等操作 | Initial VS | [EquivalentInputDevices](Player/FR-PLAYER-002_EquivalentInputDevices.md) |
+| `FR-PLAYER-003` | Jump | Initial VS | [Jump](Player/FR-PLAYER-003_Jump.md) |
+| `FR-PLAYER-004` | Air Attack | Initial VS | [AirAttack](Player/FR-PLAYER-004_AirAttack.md) |
+| `FR-PLAYER-005` | Soft Lock | Initial VS | [SoftLock](Player/FR-PLAYER-005_SoftLock.md) |
+| `FR-PLAYER-006` | Manual LockOn / Toggle解除 | Initial VS | [ManualLockOn](Player/FR-PLAYER-006_ManualLockOn.md) |
+| `FR-PLAYER-007` | 専用左右入力でTarget Switch / 対象死亡時解除 | Initial VS | [SwitchLockTarget](Player/FR-PLAYER-007_SwitchLockTarget.md) |
+| `FR-PLAYER-008` | Checkpointで武器変更 | Post-VS | [ChangeWeaponAtCheckpoint](Player/FR-PLAYER-008_ChangeWeaponAtCheckpoint.md) |
+| `FR-PLAYER-009` | 戦闘中武器変更禁止 | Post-VS | [BlockWeaponChangeInCombat](Player/FR-PLAYER-009_BlockWeaponChangeInCombat.md) |
+| `FR-PLAYER-010` | Light / Heavy Combo | Initial VS | [LightHeavyCombo](Player/FR-PLAYER-010_LightHeavyCombo.md) |
+| `FR-PLAYER-011` | Stamina Cost | Initial VS | [StaminaCost](Player/FR-PLAYER-011_StaminaCost.md) |
+| `FR-PLAYER-012` | Stamina不足時拒否 | Initial VS | [RejectInsufficientStamina](Player/FR-PLAYER-012_RejectInsufficientStamina.md) |
+| `FR-PLAYER-013` | Exhausted | Initial VS | [ExhaustedState](Player/FR-PLAYER-013_ExhaustedState.md) |
+| `FR-PLAYER-014` | Dodge Action内Perfect Dodge Result | Initial VS | [PerfectDodge](Player/FR-PLAYER-014_PerfectDodge.md) |
+| `FR-PLAYER-015` | Perfect Dodge後Counter | Initial VS | [WeaponCounter](Player/FR-PLAYER-015_WeaponCounterAfterPerfectDodge.md) |
+| `FR-PLAYER-016` | Sword Parry | Initial VS | [SwordParry](Player/FR-PLAYER-016_SwordParry.md) |
+| `FR-PLAYER-017` | Axe Guard / Receive | Post-VS | [AxeGuardOrReceive](Player/FR-PLAYER-017_AxeGuardOrReceive.md) |
+| `FR-PLAYER-018` | Healing Item | Initial VS | [LimitedHealingItem](Player/FR-PLAYER-018_LimitedHealingItem.md) |
+| `FR-PLAYER-019` | Dodge Action / Normal Result | Initial VS | [NormalDodge](Player/FR-PLAYER-019_NormalDodge.md) |
 | `FR-PLAYER-020` | Player HP / Death | Initial VS | [PlayerHealthAndDeath](Player/FR-PLAYER-020_PlayerHealthAndDeath.md) |
-| `FR-PLAYER-021` | 三人称Camera操作 | Initial VS | [ThirdPersonCameraControl](Player/FR-PLAYER-021_ThirdPersonCameraControl.md) |
+| `FR-PLAYER-021` | Camera / LockOn追従 | Initial VS | [ThirdPersonCameraControl](Player/FR-PLAYER-021_ThirdPersonCameraControl.md) |
 
 ## 3. 敵（10件）
 
-既存`FR-ENEMY-001`～`FR-ENEMY-009`に加え、以下を追加します。
+`FR-ENEMY-001`～`FR-ENEMY-010`をInitial VSで管理します。撃破時報酬は`FR-STAGE-014`と連携します。
+
+## 4. ボス（16件）
+
+`FR-BOSS-001`～`FR-BOSS-013`、`FR-BOSS-015`、`FR-BOSS-016`はInitial VSです。`FR-BOSS-014`はBow追加後のPost-VSです。
 
 | ID | 要件 | 範囲 | 基本設計 |
 |---|---|---|---|
-| `FR-ENEMY-010` | HP0以下で撃破 | Initial VS | [DefeatAtZeroHealth](Enemy/FR-ENEMY-010_DefeatAtZeroHealth.md) |
-
-既存設計は[Enemy](Enemy/)を参照してください。
-
-## 4. ボス（15件）
-
-既存`FR-BOSS-001`～`FR-BOSS-013`はInitial VS、`FR-BOSS-014`はBow追加後のPost-VSとします。
-
-| ID | 要件 | 範囲 | 基本設計 |
-|---|---|---|---|
-| `FR-BOSS-014` | Bow遠距離維持への専用Gap Closer | Post-VS | [BowRangeGapCloser](Boss/FR-BOSS-014_BowRangeGapCloser.md) |
-| `FR-BOSS-015` | HP0以下で撃破 | Initial VS | [DefeatAtZeroHealth](Boss/FR-BOSS-015_DefeatAtZeroHealth.md) |
-
-`FR-BOSS-004`の装備武器評価は設計を保持するが、複数武器による差分評価はPost-VSで有効化します。
+| `FR-BOSS-014` | Bow Gap Closer | Post-VS | [BowRangeGapCloser](Boss/FR-BOSS-014_BowRangeGapCloser.md) |
+| `FR-BOSS-015` | HP0で撃破 | Initial VS | [DefeatAtZeroHealth](Boss/FR-BOSS-015_DefeatAtZeroHealth.md) |
+| `FR-BOSS-016` | Gold + 初回固有収集Item報酬 | Initial VS | [FirstDefeatReward](Boss/FR-BOSS-016_FirstDefeatReward.md) |
 
 ## 5. ステージ・進行（14件）
 
-既存`FR-STAGE-001`～`FR-STAGE-011`に以下を追加します。`FR-STAGE-006`武器変更はPost-VS、`FR-STAGE-011`Boss IntroはCouldです。
+`FR-STAGE-001`～`FR-STAGE-014`を管理します。`FR-STAGE-006`はPost-VS、`FR-STAGE-011`はCouldです。
 
-| ID | 要件 | 範囲 | 基本設計 |
-|---|---|---|---|
-| `FR-STAGE-012` | 最後のCheckpointからRespawn | Initial VS | [RespawnAtLastCheckpoint](Stage/FR-STAGE-012_RespawnAtLastCheckpoint.md) |
-| `FR-STAGE-013` | Boss撃破後Stage Clear | Initial VS | [StageClearAfterBossDefeat](Stage/FR-STAGE-013_StageClearAfterBossDefeat.md) |
-| `FR-STAGE-014` | 戦闘報酬で強化素材獲得 | Initial VS | [AcquireUpgradeMaterials](Stage/FR-STAGE-014_AcquireUpgradeMaterials.md) |
+特にDeathDropは`FR-STAGE-008`～`010`で、Upgrade MaterialとGoldを共通の回収対象Resourceとして扱います。Goldは死亡時70%をDeathDropへ格納し、30%を消失させます。
 
 ## 6. セーブ（7件）
 
-`FR-SAVE-001`～`FR-SAVE-006`はInitial VSで管理します。`FR-SAVE-007` Steam CloudはPost-VSです。既存設計は[Save](Save/)を参照してください。
+| ID | 要件 | 範囲 | 基本設計 |
+|---|---|---|---|
+| `FR-SAVE-001` | 1 Save Slot | Initial VS | [SingleSaveSlot](Save/FR-SAVE-001_SingleSaveSlot.md) |
+| `FR-SAVE-002` | Checkpoint Menu Open時Auto Save | Initial VS | [AutosaveAtCheckpoint](Save/FR-SAVE-002_AutosaveAtCheckpoint.md) |
+| `FR-SAVE-003` | Checkpoint Manual Save | Initial VS | [ManualSaveAtCheckpoint](Save/FR-SAVE-003_ManualSaveAtCheckpoint.md) |
+| `FR-SAVE-004` | Boss Reward後Auto Save | Initial VS | [AutosaveAfterBossDefeat](Save/FR-SAVE-004_AutosaveAfterBossDefeat.md) |
+| `FR-SAVE-005` | DeathDrop生成 / 回収後Auto Save | Initial VS | [AutosaveDeathDropLifecycle](Save/FR-SAVE-005_AutosaveDeathDropLifecycle.md) |
+| `FR-SAVE-006` | Settings変更時Save | Initial VS | [SaveSettingsOnChange](Save/FR-SAVE-006_SaveSettingsOnChange.md) |
+| `FR-SAVE-007` | Steam Cloud | Post-VS | [SteamCloudAdditional](Save/FR-SAVE-007_SteamCloudAdditional.md) |
+
+武器強化完了時とStage Clear時はAuto Save契機ではありません。
 
 ## 7. 非機能要件（18件）
 
-### Performance（6件）
+Performance 6件、Maintainability 6件、Quality 6件を管理します。
 
-`NFR-PERF-001`～`NFR-PERF-006`。既存設計は[Performance](Performance/)を参照してください。
-
-### Maintainability（6件）
-
-| ID | 要件 | 基本設計 |
-|---|---|---|
-| `NFR-MAINT-001` | Data Driven Gameplay Content | [DataDrivenGameplayContent](Maintainability/NFR-MAINT-001_DataDrivenGameplayContent.md) |
-| `NFR-MAINT-002` | C++ / Blueprint責務分離 | [SeparateCppBlueprintResponsibilities](Maintainability/NFR-MAINT-002_SeparateCppBlueprintResponsibilities.md) |
-| `NFR-MAINT-003` | `IPlayerInputComponent`による入力Component抽象化 | [PlayerInputComponentAbstraction](Maintainability/NFR-MAINT-003_PlayerInputComponentAbstraction.md) |
-| `NFR-MAINT-004` | Mover固有依存をCombatへ漏らさない | [IsolateMoverDependency](Maintainability/NFR-MAINT-004_IsolateMoverDependency.md) |
-| `NFR-MAINT-005` | Gameplay Tagで状態一元管理 | [CentralizeStateWithGameplayTags](Maintainability/NFR-MAINT-005_CentralizeStateWithGameplayTags.md) |
-| `NFR-MAINT-006` | Tick使用制限 | [LimitTickUsage](Maintainability/NFR-MAINT-006_LimitTickUsage.md) |
-
-### Quality（6件）
-
-`NFR-QUALITY-001`～`NFR-QUALITY-006`。既存設計は[Quality](Quality/)を参照してください。
+Maintainabilityでは`IPlayerInputComponent`を入力基盤の正とし、Moverは将来検証対象とします。
 
 ## 8. Future Feature
 
-斧・弓のFuture Feature IDと仕様は`Docs/01_Requirements.md`および`Docs/04_WeaponSystem.md`を正とします。これらは初期Vertical SliceのIssue依存グラフへ含めません。
+斧・弓のFuture Feature IDと仕様は`Docs/01_Requirements.md`および`Docs/04_WeaponSystem.md`を正とします。初期Vertical SliceのIssue依存グラフへ含めません。
 
-## 9. Issue化Gate
+## 9. Issue作成前の確認条件
 
-基本設計から実装Issueを作成する前に以下を満たします。
+基本設計から実装Issueを作成する前に次を確認します。
 
-1. 対象要件の未決事項のうち実装をBlockする項目が解消済み。
-2. 依存する基本設計が存在する。
-3. 既存実装との差分が確認済み。
-4. 1 Issueが単独で実装・テスト・レビュー可能。
-5. 原則1 Issue = 1 PRとする。
+1. ゲーム上の挙動が確定している。
+2. Issue境界を変更する未解決事項が残っていない。
+3. 依存する基本設計が存在する。
+4. 既存実装との差分・重複を確認している。
+5. 実装Issue単独で受入確認できる。
 
-現時点では`Docs/15_OpenQuestions.md`に初期Vertical Sliceの未確定仕様が残るため、該当機能のIssue作成は保留します。
+詳細なIssue階層ルールは`Docs/14_RepositoryOperation.md`を参照します。
