@@ -7,77 +7,54 @@
 | 要件ID | `FR-PLAYER-021` |
 | 優先度 | `Must` |
 | 対応範囲 | 初期Vertical Slice |
-| 設計状態 | `Draft` |
-| 関連要件 | `FR-PLAYER-001`, `FR-PLAYER-002`, `FR-PLAYER-005`, `FR-PLAYER-006` |
+| 設計状態 | `Review` |
+| 関連要件 | `FR-PLAYER-006`, `FR-PLAYER-007` |
 
-## 2. 目的
+## 2. 基本フロー
 
-探索・戦闘中に高い入力応答性で周囲を確認できる三人称カメラ操作を提供する。
-
-## 3. 現行構成
+### 非LockOn時
 
 ```text
-[Enhanced Input / Look]
+[Look Input]
       ↓
-[ABasePlayer::SetupPlayerInputComponent]
+[IPlayerInputComponent実装]
       ↓
-[IPlayerInputComponent]
+[Controller Yaw / Pitch]
       ↓
-[UPlayerLookInputComponent]
-      ↓
-[AddControllerYawInput / AddControllerPitchInput]
-      ↓
-[CameraBoom]
-      ↓
-[FollowCamera]
+[CameraBoom / FollowCamera]
 ```
 
-`ABasePlayer`がSpringArmとFollowCameraを保持し、Look入力ComponentがControllerへYaw / Pitch入力を渡す現行実装を正とする。
+### LockOn時
 
-## 4. 基本フロー
+```text
+[State.Targeting.Locked]
+      ↓
+[通常Camera Look無効]
+      ↓
+[Current TargetへCamera追従]
+```
 
-1. Look Input ComponentをInterface経由でSetupする。
-2. Vector2DのLook入力を受け取る。
-3. Owner PawnとControllerを検証する。
-4. Yaw / Pitch入力をControllerへ渡す。
-5. CameraBoom / FollowCameraが視点結果を反映する。
+## 3. 確定仕様
 
-## 5. 責務
+- 非LockOn時はPlayer Look InputでYaw / Pitch操作可能。
+- LockOn中のみTarget追従を行う。
+- LockOn中は通常Camera Lookを無効化する。
+- Target Switchは別専用入力へ委譲する。
+- Current Target死亡・無効化でLockOn解除後、通常Camera Lookへ戻る。
+- Player死亡中はCamera Lookを許可する。
 
-| 対象 | 責務 |
-|---|---|
-| `ABasePlayer` | CameraBoom / FollowCamera保持、入力Lifecycle |
-| `UPlayerLookInputComponent` | Look軸解釈、Controller入力 |
-| `IPlayerInputComponent` | Setup / Teardown等の共通契約 |
-| Targeting System | LockOn時の対象追従・補正 |
-| Settings / Config | 感度、反転等の調整値候補 |
+## 4. 調整可能項目
 
-## 6. 受入条件
-
-- [ ] MouseでYaw / Pitch操作できる。
-- [ ] Gamepad右Stick等でYaw / Pitch操作できる。
-- [ ] 移動入力と同時にカメラを操作できる。
-- [ ] Owner / Controller無効時にクラッシュしない。
-- [ ] Input Disable時にLook操作が仕様どおり停止する。
-- [ ] Setup再実行でLook入力が重複発火しない。
-- [ ] LockOn導入後に自由視点入力と自動補正の優先順位を一意にできる。
-
-## 7. テスト観点
-
-- Mouse / Gamepad
-- Move+Look同時入力
-- Pitch上限 / 下限
-- Possess / UnPossessed
-- Input Disable / Enable
-- Camera Collision
-- LockOn開始 / 解除 / Target Switch
-
-## 8. 未決事項
-
-- Mouse / Gamepad感度と設定場所
+- Mouse / Gamepad感度
 - Pitch Clamp
-- Y軸反転を初期VSに含めるか
-- LockOn中の手動入力と自動補正の優先順位
-- SpringArm長、Camera Collision等の最終調整値
+- Camera Collision
+- SpringArm長
+- Y軸反転設定
 
-`Docs/15_OpenQuestions.md`で確定する。
+## 5. 受入条件
+
+- [ ] 非LockOn時にYaw / Pitch操作できる。
+- [ ] LockOn時に通常Look入力でCameraを自由回転できない。
+- [ ] LockOn時にCurrent Targetへ追従する。
+- [ ] Lock解除後に自由Cameraへ復帰する。
+- [ ] Death状態中もCameraを操作できる。
