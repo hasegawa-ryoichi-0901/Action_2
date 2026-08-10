@@ -2,16 +2,14 @@
 
 ## 1. 公開範囲
 
-- リポジトリは非公開
-- 応募先企業へ限定公開
-- 購入アセットの再配布を行わない
-- アセットのライセンス条件を別資料で管理する
+- リポジトリは応募先企業への提示を想定する。
+- 購入アセットの再配布を行わない。
+- アセットのライセンス条件を別資料で管理する。
 
 ## 2. 推奨構成
 
 ```text
 ProjectRoot/
-|
 +-- README.md
 +-- Docs/
 +-- Config/
@@ -34,8 +32,6 @@ ProjectRoot/
 *.tga
 ```
 
-Git LFSは利用可能な無料枠の範囲から開始し、容量を継続的に確認します。
-
 ## 4. 除外候補
 
 ```text
@@ -48,8 +44,6 @@ Saved/
 .vscode/
 ```
 
-`.vscode/`は共有設定を使用する場合のみ必要ファイルを選択して管理します。
-
 ## 5. ブランチ
 
 ```text
@@ -57,18 +51,67 @@ main
   |
   +-- develop
          |
-         +-- feature/player-combat
-         +-- feature/gas
-         +-- feature/enemy-ai
-         +-- feature/boss-ai
-         +-- feature/save-system
-         +-- feature/ui
-         +-- feature/performance
+         +-- feature/...
+         +-- fix/...
+         +-- docs/...
 ```
 
-個人開発でも、機能単位で差分を確認できるようにします。
+実装Issueごとに差分を独立して確認できるようにします。
 
-## 6. コミット
+## 6. Issue構造
+
+### 6.1 Gameplay Action
+
+Gameplay Actionは**1 Action = 1親Issue**を基本とします。
+
+例：
+
+```text
+[Parent] Light Attack
+├─ [Implementation] ASC初期化
+├─ [Implementation] Gameplay Tag基盤
+├─ [Implementation] Stamina Attribute
+├─ [Implementation] Damage
+├─ [Implementation] Hit Collision
+├─ [Implementation] Montage連携
+├─ [Implementation] Input
+└─ [Implementation] Light Attack統合
+```
+
+Light Attack、Heavy Attack、Combo Attack、Dodge等はそれぞれ別の親Issueとして管理します。
+
+### 6.2 ActionとComponentは同義ではない
+
+`1 Action = 1 ActorComponent`はルールにしません。Gameplay Tag、GAS、責務、ライフサイクル、再利用性、テスト容易性を考慮してComponent構成を決定します。
+
+Dodgeのように1つの入力・ActionからNormal Dodge / Perfect Dodgeへ結果分岐する場合も、親Issueは1つのDodge Actionとして管理します。
+
+### 6.3 実装Issue
+
+親Issueの下に、独立して実装・テスト・レビューできる実装Issueを配置します。
+
+- 原則として1実装Issue = 1 PR。
+- 1つのPRで説明できる責務に絞る。
+- 独立して動作確認できる受入条件を持たせる。
+- 共有基盤を同じAction内で必要とする場合は実装Issueとして分離できる。
+- すでに別Actionで実装済みの共有基盤は重複Issueを作らず、依存先として参照する。
+- 親Issue自体は進捗・依存関係を集約するために使用し、必ずしも親Issue単独のPRを作らない。
+
+GitHub上でネイティブなSub-issue関係を利用できない場合は、親Issue本文のチェックリストと子Issue本文の`Parent: #xxx`参照で階層を表現します。
+
+## 7. Issue作成前の確認条件
+
+実装Issueを作る前に次を確認します。
+
+1. 対象機能のゲーム上の挙動が確定している。
+2. 実装方式を決めないとIssue境界が変わる未解決事項が残っていない。
+3. 対応する要件定義・基本設計が存在する。
+4. 既存実装との競合・重複を確認している。
+5. 実装Issueが単独で検証可能な受入条件を持つ。
+
+数値調整、アセットの最終選定など、後からデータで変更できる事項はIssue作成を妨げません。
+
+## 8. コミット
 
 ```text
 feat: 剣の通常攻撃Abilityを追加
@@ -79,7 +122,7 @@ test: スタミナ枯渇テストを追加
 perf: ボス攻撃評価の更新頻度を削減
 ```
 
-## 7. タグ
+## 9. タグ
 
 ```text
 prototype-movement
@@ -89,29 +132,16 @@ portfolio-build-0.1
 steam-demo-0.1
 ```
 
-## 8. アセット管理
+## 10. アセット管理
 
-購入アセットごとに次を記録します。
+購入アセットごとにAsset Name、Seller、License、Commercial Use、Redistribution Restriction、Project Usage等を記録します。
 
-```text
-Asset Name
-Marketplace / Seller
-Purchase Date
-License
-Commercial Use
-Redistribution Restriction
-Modified Files
-Project Usage
-Credit Requirement
-```
+## 11. READMEへ記載する注意
 
-## 9. READMEへ記載する注意
-
-- 購入アセットを含むためリポジトリの再配布は禁止
-- ソースコードの閲覧目的
+- 購入アセットを含む場合の再配布条件
 - 使用エンジンバージョン
-- 必要プラグイン
-- ビルド手順
+- 必要Plugin
+- Build手順
 - 操作方法
 - 既知の問題
 
