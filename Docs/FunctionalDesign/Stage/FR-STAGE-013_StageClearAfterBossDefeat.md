@@ -1,4 +1,4 @@
-# FR-STAGE-013 ボス撃破後にステージクリア状態へ遷移する
+# FR-STAGE-013 Boss撃破後にClear Areaへ到達するとStage Clearする
 
 ## 1. 基本情報
 
@@ -7,61 +7,49 @@
 | 要件ID | `FR-STAGE-013` |
 | 優先度 | `Must` |
 | 対応範囲 | 初期Vertical Slice |
-| 設計状態 | `Draft` |
-| 関連要件 | `FR-BOSS-015`, `FR-SAVE-004`, `FR-SAVE-005` |
+| 設計状態 | `Review` |
+| 関連要件 | `FR-BOSS-015`, `FR-BOSS-016`, `FR-SAVE-004` |
 
 ## 2. 目的
 
-Boss Defeatをゲーム進行上の明確な完了条件へ変換し、クリア演出・進行保存へ接続する。
+Boss撃破とEnding開始を分離し、撃破後にPlayer自身が奥のClear Areaへ進む余韻と進行を作る。
 
 ## 3. 基本フロー
 
 ```text
-[BossDefeated Event]
+[Boss Defeated]
       ↓
-[Stage Clear Guard]
-      +-- 既にClear --> [Ignore]
+[Reward Grant]
       ↓
-[Stage Clear]
-      +--> Progress更新
-      +--> Player操作制御
-      +--> Clear UI / Presentation
-      +--> AutoSave Request
+[Auto Save]
+      ↓
+[PlayerがClear Areaへ移動]
+      ↓
+[Clear Trigger Collision進入]
+      ↓
+[Ending Sequence開始]
+      +--> Skip可能
+      ↓
+[Ending終了 / Skip]
+      ↓
+[Titleへ戻る]
 ```
 
-Boss Defeat処理そのものは`FR-BOSS-015`が担当し、本要件は進行状態への変換を担当する。
+## 4. 確定仕様
 
-## 4. 責務
-
-| 対象 | 責務 |
-|---|---|
-| Boss System | BossDefeated Event発行 |
-| Stage / GameMode | Stage Clear状態の一意な確定 |
-| Save System | Stage Clear進行データ保存 |
-| UI / Presentation | Clear表示・入力制御 |
+- Boss撃破だけではEndingを開始しない。
+- Boss撃破報酬のSave後、Clear Areaへの進行を許可する。
+- Clear Areaは城・洞窟・祠等のMap表現から後で決定する。
+- Clear Triggerへの進入でEnding Sequenceを開始する。
+- Ending SequenceはSkip可能。
+- 終了後はTitleへ戻る。
+- Stage Clear自体では追加Auto Saveしない。
 
 ## 5. 受入条件
 
-- [ ] BossがDefeatedになるまでStage Clearへ遷移しない。
-- [ ] BossDefeated EventからStage Clearへ1回だけ遷移する。
-- [ ] Stage Clear後の進行状態を保存できる。
-- [ ] 重複EventでClear演出や保存を多重実行しない。
-- [ ] Stage Clear中にBoss Combatへ戻らない。
-
-## 6. テスト観点
-
-- Boss通常撃破
-- Phase Transition中の撃破
-- BossDefeated Event重複
-- Save失敗時
-- Clear後のPlayer入力
-- Clear後の再Load
-
-## 7. 未決事項
-
-- Boss撃破Animation完了を待つか
-- Stage Clear時のPlayer入力ロック範囲
-- Clear UIから次に遷移する画面 / 状態
-- Boss Defeat SaveとStage Clear Saveの集約方式
-
-詳細は`Docs/15_OpenQuestions.md`で確定する。
+- [ ] Boss生存中にClear TriggerでEndingを開始できない。
+- [ ] Boss撃破直後に自動Endingへ入らない。
+- [ ] Boss Reward / Auto Save完了後にClear Triggerを有効化できる。
+- [ ] Trigger進入でEndingが1回だけ開始する。
+- [ ] EndingをSkipできる。
+- [ ] Ending終了またはSkip後にTitleへ戻る。
