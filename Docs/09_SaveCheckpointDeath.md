@@ -1,157 +1,192 @@
 # 09. セーブ・チェックポイント・死亡
 
-## 1. セーブスロット
+## 1. セーブ方針
 
-- 1スロット
-- オートセーブ中心
-- 設定データは進行データと分離可能な構造にする
+- 進行データは1スロット。
+- 設定データは進行データとは別の保存契機を持つ。
+- 保存媒体、JSON構造、Steam Cloud同期などの永続化アーキテクチャは別設計で定義し、本ドキュメントではゲーム上の保存契機と復元要件を定義する。
 
-## 2. オートセーブ
+## 2. 進行データのAuto Save契機
 
-次のタイミングで保存します。
+Auto Saveは次のタイミングに限定します。
 
-- チェックポイント使用時
-- 武器強化時
-- ボス撃破時
-- ステージクリア時
-- 設定変更時
+1. Checkpointで操作し、Checkpoint Menuを開いた時点。
+2. Player死亡時、新しいDeathDropの位置と格納内容が確定した直後。
+3. DeathDropの回収が完了した直後。
+4. Boss撃破時、Goldと初回固有収集Itemを含む報酬付与が完了した直後。
 
-Boss DefeatedとStage Clearが連続するため、同一進行で2回のSave Requestが発生した場合の集約・直列化方針は実装前に確定します。
+次はAuto Save契機にしません。
 
-## 3. セーブ処理
+- 武器強化完了時
+- Stage Clear時
+- Clear Trigger進入時
 
-```text
-[Save Request]
-      ↓
-[Build Save Data]
-      +--> SaveVersion
-      +--> Checkpoint
-      +--> Weapon Upgrade
-      +--> Material
-      +--> Progress
-      ↓
-[Validate]
-      +-- NG --> [Log / Abort]
-      ↓
-[Write Temporary File]
-      ↓
-[Replace Main Save]
-      ↓
-[Complete]
-```
+設定データは別系統として設定変更時に保存します。
 
-## 4. チェックポイント
+## 3. Manual Save
 
-チェックポイント使用時に次を行います。
+Checkpoint MenuからManual Saveを実行できます。Checkpoint以外からのManual Saveは初期Vertical Sliceでは提供しません。
+
+## 4. Checkpoint
+
+Checkpointへ接近しただけではSaveしません。PlayerがCheckpointを操作してMenuを開いた時点でActive Checkpointを更新し、Auto Save要求を発行します。
 
 ```text
-[Rest at Checkpoint]
+[Checkpoint Interaction]
+      ↓
+[Checkpoint Menu Open]
       +--> ActiveCheckpoint更新
       +--> HP回復
-      +--> スタミナ回復
-      +--> 回復アイテム補充
-      +--> 武器強化UI
+      +--> Stamina回復
+      +--> Healing Item補充
       +--> 通常敵復活
-      +--> オートセーブ
+      +--> Weapon Upgrade Menu
+      +--> Auto Save
 ```
 
-初期Vertical Sliceでは剣のみのため武器変更UIを必須としません。斧・弓追加後に武器変更を有効化します。
+初期Vertical Sliceの武器は剣のみです。斧・弓追加後に武器変更機能を有効化します。
 
-## 5. プレイヤー死亡
+## 5. Weapon Upgrade
+
+武器強化はCheckpoint Menuでのみ実行します。
+
+```text
+[Weapon Upgrade Request]
+      ↓
+[Gold Cost確認]
+      ↓
+[Upgrade Material Cost確認]
+      +-- どちらか不足 --> [Reject / 消費なし]
+      ↓
+[Gold + Upgrade Material消費]
+      ↓
+[Weapon Upgrade反映]
+```
+
+強化完了そのものではAuto Saveしません。必要であればPlayerがCheckpoint MenuからManual Saveできます。
+
+## 6. Player Death / DeathDrop
+
+### 6.1 死亡フロー
 
 ```text
 [Player Health <= 0]
       ↓
-[State.Deadを確定]
-      +--> 実行中戦闘処理停止
-      +--> 入力 / 一時状態解除
-      +--> 所持強化素材を記録
-      +--> 以前の未回収DeathDropを削除
-      +--> 新しいDeathDropを死亡位置に生成
+[State.Dead確定]
+      +--> 実行中Combat処理終了
+      +--> 通常Gameplay入力停止
+      +--> Camera Lookは許可
       ↓
-[Respawn Request]
+[Death Animation]
       ↓
-[Respawn at Active Checkpoint]
-      +--> HP回復
-      +--> 回復アイテム補充
-      +--> 通常敵復活
+[以前のDeathDropが存在する？]
+      +-- Yes --> [以前のDeathDrop本体・格納Resourceを全消失]
+      ↓
+[現在所持Resourceを計算]
+      +--> Upgrade Material : 100%を新DeathDropへ
+      +--> Gold             : 70%を新DeathDropへ
+      +--> Gold             : 30%を永久消失
+      ↓
+[死亡座標に新DeathDrop生成]
+      ↓
+[位置・格納内容を確定]
+      ↓
+[Auto Save]
+      ↓
+[CameraでDeathDropを確認]
+      ↓
+[Fade Out]
+      ↓
+[Respawn]
 ```
 
-未決事項：
-- ActiveCheckpointが存在しない場合のFallback Spawn。
-- Death確定からRespawnまでの待機条件（Death Animation完了 / Timer等）。
-- Respawn時にStaminaを全回復するか。
-- DeathDrop生成・Respawn直後にSaveするか。
+Goldの70%算出時に端数が発生する場合の丸め規則は実装時に一貫した整数規則として定義します。
 
-## 6. 敵・ボス撃破との連携
-
-### 通常敵
+### 6.2 Respawn
 
 ```text
-[Enemy Health <= 0]
+[Active Checkpointあり？]
+   ├─ Yes → Active Checkpoint
+   └─ No  → PlayerStart
       ↓
-[Defeated]
-      +--> AI停止
-      +--> 攻撃枠解放
-      +--> Combat停止
+[Player復帰]
+   +--> HP Full
+   +--> Stamina Full
+   +--> Healing Item Full
+   +--> Normal Enemy Respawn
       ↓
-[Reward Grant]
-      ↓
-[Upgrade Material加算候補]
+[Fade In / Gameplay再開]
 ```
 
-報酬量・付与対象はEnemy Definition / Reward Definition等のデータで設定します。
+### 6.3 DeathDrop回収
 
-### ボス
+```text
+[Player enters DeathDrop recovery range]
+      ↓
+[格納Upgrade Materialを全量返却]
+[格納Goldを全量返却]
+      ↓
+[DeathDropを消去]
+      ↓
+[Auto Save]
+```
+
+未回収DeathDropはSave/Load後も位置・格納内容をゲーム上復元できることを要求します。保存形式は別Architecture Designで定義します。
+
+## 7. Enemy Reward
+
+通常敵は1体撃破ごとに次を直接Player所持値へ付与します。
+
+- Upgrade Material
+- Gold
+
+World上のReward Actorを生成して拾わせる方式にはしません。数量のデータ取得方式は別のMaster Data設計で扱います。
+
+## 8. Boss Reward / Save
 
 ```text
 [Boss Health <= 0]
       ↓
 [Boss Defeated]
       +--> AI / Ability停止
-      +--> Boss Defeat Save Request
       ↓
-[Stage Clear]
-      +--> Progress更新
-      +--> Stage Clear Save Request
-      +--> Clear Presentation
+[Gold付与]
+      ↓
+[初回討伐報酬判定]
+      +-- 未取得 --> [固有収集ItemをInventoryへ直接付与]
+      ↓
+[報酬状態確定]
+      ↓
+[Auto Save]
 ```
 
-Boss DefeatとStage Clearのイベント順序は上記を基本とし、Save Request重複時の扱いを確定してから実装します。
+初期Vertical SliceではBoss再戦を実装しません。初回討伐状態をどのデータ形式で永続化するかは別Architecture Designで扱います。
 
-## 7. 素材回収
+## 9. Stage Clear
+
+Boss撃破はClear条件の前提ですが、Boss撃破直後にはEndingへ遷移しません。
 
 ```text
-[Player overlaps DeathDrop]
+[Boss Defeated + Reward Save完了]
       ↓
-[Add Dropped Material]
+[PlayerがClear Areaへ移動]
       ↓
-[Destroy DeathDrop]
+[Clear Trigger Collision]
       ↓
-[Auto Save候補]
+[Ending Sequence]
+      +--> Skip可能
+      ↓
+[Titleへ戻る]
 ```
 
-通常の強化素材獲得と死亡素材回収は別経路とし、最終的には同じUpgradeMaterial所持値へ集約します。
+Stage Clear時には追加Auto Saveを行いません。Clear Triggerの具体的な場所・外観・演出内容はMap制作時に決定します。
 
-## 8. バージョン管理
+## 10. Settings Save
 
-```text
-SaveVersion = 1
-```
+設定変更時は進行データのAuto Saveとは独立して設定データを保存します。
 
-将来のアップデートを想定し、ロード時にバージョンを確認します。
+## 11. Steam Cloud
 
-```text
-[Load]
-   ↓
-[Version Check]
-   +-- Current --> [Load Directly]
-   +-- Old --> [Migrate]
-   +-- Unsupported --> [Backup / New Save / Error]
-```
-
-## 9. Steam Cloud
-
-Steam CloudはSteam公開版のPost-Vertical Slice追加要件です。ローカルセーブが安定した後に採用方式を比較します。
+Steam CloudはPost-Vertical Sliceの追加要件です。ローカルの保存・復元仕様を安定させた後、別Architecture Designで同期方式を定義します。
 
 ### [戻る](../README.md#ドキュメント一覧)
