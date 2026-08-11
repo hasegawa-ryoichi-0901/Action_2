@@ -4,100 +4,102 @@
 
 ### 通常敵
 
-- Behavior Tree
-- Blackboard
-- AI Perception
+- Behavior Tree / Blackboard / AI Perception
 - C++ Task / Service
 - 集団戦管理Subsystem
 
-### ボス
+### Boss
 
-- StateTreeで大状態とフェーズを管理
-- C++評価システムで攻撃候補をスコアリング
-- Gameplay Abilityで攻撃を実行
-- Data Assetで攻撃を追加・調整
+- StateTreeで大状態とPhaseを管理する。
+- C++評価システムでAttack候補をScore化する。
+- Gameplay AbilityでAttackを実行する。
+- Attack / Score調整値はGameplay Dataから取得する。
+- **Boss AIの各基本設計には、その判断根拠を確認できるDebug出力を含める。Debugは別Gameplay機能ではなくBoss AIの検証責務とする。**
 
-初期Vertical SliceではPlayer WeaponはSword固定とし、Axe / Bowによる武器別Score補正はPost-Vertical Sliceで追加します。
+初期Vertical SliceではPlayer WeaponはSword固定とし、Axe / BowによるWeapon ModifierはPost-VSで追加する。
 
-## 2. 通常敵Behavior Tree
+## 2. 通常敵
 
 ```text
 [Root]
-   ↓
-[Is Defeated?] --Yes--> [Stop]
-   ↓ No
-[Has Target?] --No--> [Patrol / Idle]
-   ↓ Yes
-[In Attack Range?]
-   +-- No --> [Move / Reposition]
-   ↓
-[Has Attack Slot?]
-   +-- No --> [Circle / Threaten / Wait]
-   ↓
-[Select Attack]
-   ↓
-[Execute Ability]
-   ↓
-[Release Attack Slot]
+↓
+[Defeated?] --Yes--> Stop
+↓ No
+[Target?] --No--> Patrol / Idle
+↓ Yes
+[Attack Range?]
+↓
+[Attack Slot?]
+├─ No → Reposition / Wait
+└─ Yes → Select Attack → Execute Ability → Release Slot
 ```
 
-Health<=0でDefeatedになった場合、現在のTask / Abilityを停止し攻撃枠を即時解放します。
+Defeated / Down / Cancel / Owner破棄時はAttack Slotを必ず解放する。
 
 ## 3. 集団戦管理
 
-```text
-UEnemyAttackCoordinatorSubsystem
-    +-- RegisterEnemy
-    +-- UnregisterEnemy
-    +-- RequestMeleeSlot
-    +-- ReleaseMeleeSlot
-    +-- RequestRangedSlot
-    +-- ReleaseRangedSlot
-    +-- ApplyWaitingPriority
-```
-
 - Melee Active Max = 2
-- Ranged Active Max = TBD
-- Defeated / Down / Cancel / Owner破棄時のSlot解放を保証する
+- Ranged Active Max = 調整データ
+- Melee / Ranged Slotを分離する。
+- Slot二重取得・解放漏れを防ぐ。
 
-攻撃権を持たない敵は位置調整、威嚇、待機、視界内への移動、攻撃予約等を行います。
-
-## 4. ボスStateTree
-
-```text
-[Root]
-   +--> [Intro]
-   +--> [Combat]
-   |       +--> [Phase 1]
-   |       +--> [Phase Transition]
-   |       +--> [Phase 2]
-   +--> [Posture Down]
-   +--> [Fatal Reaction]
-   +--> [Defeated]
-```
+## 4. Enemy Down / Fatal Attack受付
 
 ```text
-Boss HP > 50%  -> Phase 1
-Boss HP <= 50% -> Phase Transition -> Phase 2
-Boss HP <= 0   -> Defeated
+Posture <= 0
+↓
+Down State
+↓
+Down Animation
+↓
+Fatal Attack受付State / Collision ON
+↓
+Down終了 / Defeat / Fatal成立
+↓
+受付State / Collision OFF
 ```
 
-DefeatedはPhase Transition、Posture Down、Attack Recoveryより優先します。
+Player側Fatal Attack実行は`FR-PLAYER-022`が担当する。
 
-## 5. 初期Vertical Sliceの攻撃評価
+## 5. Boss StateTree
 
-評価対象：
+```text
+Root
+├─ Intro
+├─ Combat
+│  ├─ Phase1
+│  ├─ PhaseTransition
+│  └─ Phase2
+├─ Posture Down
+├─ Fatal Reaction
+└─ Defeated
+```
 
-- プレイヤーとの距離
-- プレイヤーの回復状態
-- プレイヤーの残りスタミナ
-- 直近数秒の行動履歴
-- 戦闘開始からの行動傾向
-- 攻撃Cooldown
-- 直前に使用した攻撃
-- 同一攻撃の連続使用回数
+`Boss HP <= 0`によるDefeatedをPhase Transition、Posture Down、Attack Recoveryより優先する。
+
+## 6. Boss Combat Context
+
+初期VSで評価する情報：
+
+- Playerとの距離
+- Healing状態
+- 残りStamina
+- 直近数秒のAction History
+- 戦闘全体のRange / Action傾向
+- Attack Cooldown
+- 直前Attack
+- 同一Attack連続回数
 - 現在Phase
-- 壁際やStage端の位置関係
+- 壁際 / Stage端等の位置関係
+
+参照しない情報：
+
+- 未反映Input
+- Input Buffer内容
+- 次に発動予定のAbility
+- 将来入力の予測
+
+## 7. Attack Candidate Score
 
 ```text
 FinalScore =
@@ -112,47 +114,59 @@ FinalScore =
   - RepetitionPenalty
 ```
 
-## 6. Post-Vertical Sliceの武器評価
+Score式の各項目はAttack / Boss Dataから調整可能にする。
 
-Axe / Bow実装後にPlayer Weapon Modifierを追加します。
+## 8. Boss AI Debug — 各基本設計へ組み込む共通要件
 
-- Axe：高Stagger Resistance / Guard系行動を考慮した候補補正
-- Bow：Range TrendとWeapon Typeを組み合わせた遠距離対応
-- Bowで長距離維持された場合：`FR-BOSS-014`のGap Closer候補を補正
-
-初期Vertical SliceのSword BossをこれらのFeatureへ依存させません。
-
-## 7. 公平性
-
-参照してよい：
-
-- 現在位置
-- 確定済み装備武器（Post-VS）
-- 現在HP / Stamina
-- 回復Abilityの確定済み発動状態
-- 実行済み回避・攻撃履歴
-- 確定済みGameplay Tag
-
-参照しない：
-
-- 未反映の入力
-- 入力Bufferの中身
-- 次に発動予定のAbility
-- 将来入力の予測を確定情報として扱う処理
-
-## 8. AIデバッグ表示
+Boss AIの設計・Issueでは、該当機能を実装した時点で以下のうち関連する値を確認可能にする。
 
 ```text
-Boss State       : Phase2
-Selected Attack  : DashSlash
-Final Score      : 82.5
-Distance         : 620
-Player Stamina   : 18%
-Recent DodgeRate : High
-Battle RangeBias : Long
-Cooldown         : Ready
+Boss State
+Current Phase
+Selected Attack
+Attack Candidate List
+Base Score
+Final Score
+Distance / Distance Score
+Player HP / Stamina
+Healing State
+Recent Action History
+Battle Range Bias
+Cooldown
+Repetition Penalty
+Position Score
+Combo Branch
+Recovery / Counter Window State
 ```
 
-Post-VSではPlayer Weapon等の武器評価内訳を追加します。最終結果だけでなくScore内訳を確認可能にします。
+### Debug原則
+
+- 最終選択結果だけでなく、選択理由となるScore内訳を確認できる。
+- Shipping BuildのGameplay仕様には依存させない。
+- Debug表示を無効化してもAI判断結果が変わらない。
+- 無効Targetや未初期化DataでDebug処理からCrashしない。
+- Post-VSではPlayer Weapon Modifier等を追加する。
+
+### 各FRへの対応
+
+| 要件 | Debugで確認する主項目 |
+|---|---|
+| `FR-BOSS-001/002` | State / Phase / HP Threshold |
+| `FR-BOSS-003` | Distance / Distance Score |
+| `FR-BOSS-005` | Healing State / Modifier |
+| `FR-BOSS-006` | Player Stamina / Modifier |
+| `FR-BOSS-007` | Recent History / Battle Trend |
+| `FR-BOSS-008` | Candidate List / Score内訳 / Selected Attack |
+| `FR-BOSS-009/010` | Approach / Retreat / Ranged Frequency補正 |
+| `FR-BOSS-011` | Combo Branch条件 / 選択結果 |
+| `FR-BOSS-012/013` | Recovery / Counter Window State |
+
+## 9. 必要データ
+
+各Boss FR基本設計に、その評価で必要なData項目を記載する。DB / CSV SchemaやReaderは別Architecture Designで定義し、AI実装は具体Readerへ直接依存しない。
+
+## 10. Post-VS
+
+Axe / Bow追加後にPlayer Weapon Modifierを追加する。Bow長距離維持には`FR-BOSS-014` Gap Closerを接続する。
 
 ### [戻る](../README.md#ドキュメント一覧)
