@@ -99,7 +99,50 @@ Dodgeのように1つの入力・ActionからNormal Dodge / Perfect Dodgeへ結�
 
 GitHub上でネイティブなSub-issue関係を利用できない場合は、親Issue本文のチェックリストと子Issue本文の`Parent: #xxx`参照で階層を表現します。
 
-## 7. Issue作成前の確認条件
+## 7. GitHub Project / Roadmap運用
+
+Issue番号順ではなく、`Docs/ImplementationRoadmap.md`で定義した依存関係順を正とします。
+
+### Project Fields
+
+```text
+Status
+  Todo / In Progress / Review / Done
+
+Priority
+  P0 / P1 / P2 / P3
+
+Phase
+  P0 Foundation
+  P1 Sword Core
+  P2 Normal Enemy
+  P3 Progression
+  P4 Boss
+  P5 Stage Clear
+  P6 Quality
+
+Milestone / Roadmap
+  M0 Core Foundation
+  M1 Combat Core
+  M2 Normal Battle Loop
+  M3 Death & Progression
+  M4 Boss Vertical Slice
+  M5 Release Gate
+
+Start date
+End date
+```
+
+### View方針
+
+- Tracking View: 親Issueを表示し、Action / System全体の進捗を確認する。
+- Implementation Board: 実装IssueのみをStatusで管理する。
+- Roadmap View: 実装IssueをPhase / Milestone / Start date / End dateで表示する。
+- Priority View: P0 / P1を優先確認する。
+
+親Issue番号やIssue作成日時を実装順として使用しません。依存Issueが完了したものから次の実装Issueへ進みます。
+
+## 8. Issue作成前の確認条件
 
 実装Issueを作る前に次を確認します。
 
@@ -111,7 +154,7 @@ GitHub上でネイティブなSub-issue関係を利用できない場合は、�
 
 数値調整、アセットの最終選定など、後からデータで変更できる事項はIssue作成を妨げません。
 
-## 8. コミット
+## 9. コミット
 
 ```text
 feat: 剣の通常攻撃Abilityを追加
@@ -122,7 +165,7 @@ test: スタミナ枯渇テストを追加
 perf: ボス攻撃評価の更新頻度を削減
 ```
 
-## 9. タグ
+## 10. タグ
 
 ```text
 prototype-movement
@@ -132,11 +175,11 @@ portfolio-build-0.1
 steam-demo-0.1
 ```
 
-## 10. アセット管理
+## 11. アセット管理
 
 購入アセットごとにAsset Name、Seller、License、Commercial Use、Redistribution Restriction、Project Usage等を記録します。
 
-## 11. READMEへ記載する注意
+## 12. READMEへ記載する注意
 
 - 購入アセットを含む場合の再配布条件
 - 使用エンジンバージョン
