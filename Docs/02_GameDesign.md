@@ -1,178 +1,167 @@
 # 02. ゲームデザイン
 
-## 1. プレイヤー体験
+## 1. Player Experience
 
-本作の中心は「プレイヤーを操作すること」と「敵との戦闘」です。
+本作の中心はPlayer操作と敵との戦闘。移動とCameraは高い応答性を持たせ、Attackは入力遅延ではなくStartup / Commitment / Active / RecoveryとCancel制約によって重量感を表現する。
 
-移動とカメラは軽快に反応し、攻撃には一定のコミットを持たせます。これにより、入力遅延による鈍さではなく、攻撃選択の責任によって重量感を表現します。
+Initial Vertical SliceではSwordのみを使用し、Boot / Title、Tutorial、移動、回避、Attack、Parry、Fatal Attack、通常敵、Boss、Death / Respawn、Endingまでの一連の体験を完成させる。Axe / BowはPost-VSとする。
 
-初期Vertical Sliceでは剣のみを使用し、移動・回避・攻撃・パリィ・死亡・再開・ボス撃破・エンディング到達までの体験を完成させます。斧と弓はVertical Slice完成後の追加Featureとします。
-
-## 2. 入力体験
-
-入力はEnhanced Inputを使用し、プレイヤーにアタッチされた入力Componentを`IPlayerInputComponent`で共通管理します。
-
-`ABasePlayer`は個別入力Componentの具体型へ依存せず、Input Tag、Setup、Teardown、押下状態の共通契約を通じて管理します。Gameplay ActionとActorComponentの粒度は同一とは限らず、Gameplay Tag・GAS・責務分離を考慮して実装時に決定します。
-
-## 3. 戦闘テンポ
-
-- 移動：軽快
-- カメラ：高い入力応答性
-- 通常攻撃：武器ごとに異なるコミット
-- 通常回避：位置調整と被弾回避の基本防御
-- ジャスト回避：同じDodge Action中に敵攻撃とPerfect Dodge Windowが重なった場合の追加成功判定
-- パリィ：剣固有の高リスク防御
-- スローモーション：使用しない
-- ジャスト回避成功演出：短いヒットストップとHUD表示
-
-Dodge Input Tagは1つとし、通常回避とジャスト回避は別入力・別Actionにしません。結果通知は用途に応じたGameplay Tag / Gameplay Eventへ分離します。
-
-## 4. Dodge
+## 2. Boot / Title / Start
 
 ```text
-[Dodge Input]
-      ↓
-[移動入力あり？]
-   ├─ Yes → 入力方向へRoll
-   └─ No  → キャラクター後方へBack Step
-      ↓
-[Dodge実行]
-   ├─ Invincible Window
-   └─ Perfect Dodge Window
-      ↓
-[敵Attackとの関係を評価]
-   ├─ Perfect Window成立 → Perfect Dodge
-   ├─ Invincibleのみ成立 → Normal Dodge / No Damage
-   └─ 無敵外でHit          → Damage
+Game Boot
+↓
+Intro
+↓
+Title
+├─ Continue → Play Start
+├─ Load Game → Save Data Select → Play Start
+├─ New Game → Tutorial Text → Tutorial → Play Start
+├─ Config
+└─ Exit
 ```
 
-- Invincible WindowとPerfect Dodge Windowは別々の調整値を持つ。
-- 数値は開発中に調整可能とする。
-- 空中Dodgeは不可。
-- Dodge中も敵Collisionをすり抜けない。
+Ending完了 / Skip後はTitleへ戻る。
 
-## 5. ロックオン・カメラ
+## 3. Input
 
-- 非ロックオン時は通常のYaw / Pitch Camera Lookを使用する。
-- ロックオン中のみCameraが対象へ追従し、通常Camera Lookは無効化する。
-- ロックオン入力を再度行うと解除する。
-- 対象切替はCamera Lookとは別の左右専用入力で行う。
-- ロックオン対象が死亡または無効になった場合はロックオンを自動解除する。
+Enhanced Inputを使用し、Playerへアタッチされた入力Componentを`IPlayerInputComponent`で共通管理する。Gameplay ActionとActorComponentの粒度は一致させず、Gameplay Tag、GAS、責務に応じて機能ごとに決定する。
 
-## 6. HP・撃破
+## 4. Combat Tempo
 
-### プレイヤー
+- Move / Camera: 軽快かつ高応答。
+- Light / Heavy Attack: Startup / Commitment / Active / Recoveryを持つ。
+- Cancel: 許可Window内だけ成立する。
+- Dodge: 1 ActionでNormal / Perfect Resultを扱う。
+- Parry: Sword固有の高リスク防御。
+- Fatal Attack: Enemy Down中の明確な報酬Action。
+- Slow Motionは使用しない。
+- Perfect Dodge成功は短いHit StopとHUD Feedbackを使用する。
 
-- HPが0以下になった時点で死亡状態へ遷移する。
-- 死亡状態では戦闘行動を終了するが、Camera Lookは許可する。
-- Death Animation完了後にDeathDropを生成し、PlayerがCameraで確認できる状態を作ってからFade Outへ進む。
-
-### 通常敵
-
-- HPが0以下になった時点で撃破状態へ遷移する。
-- 攻撃・移動・攻撃枠占有を終了する。
-- 1体撃破ごとに強化素材とGoldを直接所持値へ加算する。
-
-### ボス
-
-- HPが0以下になった時点で撃破状態へ遷移する。
-- Goldを直接付与する。
-- 初回討伐時のみ固有収集Itemを直接Inventoryへ付与する。
-- 初期Vertical SliceではBoss再戦を実装しない。
-
-## 7. 強化ループ
+## 5. Dodge
 
 ```text
-[通常敵撃破]
-      ↓
-[強化素材 + Gold獲得]
-      ↓
-[Checkpoint Menu]
-      ↓
-[Gold + 強化素材を確認]
-      ↓
-[武器強化]
+Dodge Input
+↓
+移動入力あり？
+├─ Yes → 入力方向へRoll
+└─ No  → 後方Back Step
+↓
+Invincible Window / Perfect Dodge Window
+↓
+Enemy Attackとの関係を評価
+├─ Perfect成立 → Perfect Dodge Result
+├─ Invincibleのみ → Normal Dodge / No Damage
+└─ 無敵外 → Hit
 ```
 
-Goldの用途は武器強化のみです。武器強化はCheckpointでのみ実行できます。
+空中Dodge不可、Enemy Collision非通過。Window時間・移動量は調整可能。
 
-## 8. 死亡ループ
+## 6. Player Reaction / Fatal Attack
+
+PlayerはHit / Stagger / Downの3段階Reactionを持つ。Enemy / Boss Attack Dataが持つReaction蓄積値をPlayer内部で計算し、蓄積値そのものはHUDへ表示しない。DeathをReactionより優先する。
+
+Enemy Posture<=0ではDown Animationを再生し、Down中のみFatal Attack受付Collision / Stateを有効化する。Playerが範囲内でAttack InputするとFatal Attack基準Transformへ位置合わせし、`UGA_FatalAttack`、Montage、Fatal Damageへ進む。Down終了 / Defeat / Fatal成立時に受付を解除する。
+
+## 7. Targeting / Camera
+
+- 非LockOn時はYaw / Pitch Camera Look。
+- LockOn中は通常Lookを無効にしCurrent Targetへ追従。
+- 同一LockOn入力で解除。
+- Target Switchは別左右入力。
+- Target死亡 / 無効化時は自動Lock解除。
+- Death中もCamera Lookを許可する。
+
+## 8. Inventory / Reward / Upgrade
+
+Gold、Upgrade Material、Boss Unique ItemはPlayer Inventoryを正本とする。
+
+通常敵DefeatごとにReward Masterから0..N Reward Entryを取得してInventoryへ直接加算する。World Reward Actorは生成しない。
+
+Weapon UpgradeはCheckpoint MenuでGold + Upgrade Materialを消費する。Upgrade完了自体はAuto Save契機にしない。
+
+## 9. Checkpoint
 
 ```text
-[Player HP <= 0]
-      ↓
-[Death Animation]
-      ↓
-[以前のDeathDropがある場合は本体・内容を全消失]
-      ↓
-[死亡地点に新しいDeathDrop生成]
-   ├─ 所持強化素材 100% を格納
-   ├─ 所持Gold 70% を格納
-   └─ 所持Gold 30% を消失
-      ↓
-[DeathDrop状態確定後Auto Save]
-      ↓
-[CameraでDeathDropを確認]
-      ↓
-[Fade Out]
-      ↓
-[最後のCheckpoint / 未使用ならPlayerStartへRespawn]
-   ├─ HP全回復
-   ├─ Stamina全回復
-   ├─ Healing Item全補充
-   └─ 通常敵復活
+Interaction
+↓
+ActiveCheckpoint更新
+↓
+Menu Open
+↓
+Rest処理確定
+├─ HP Full
+├─ Stamina Full
+├─ Healing Item補充
+└─ Normal Enemy Respawn
+↓
+Auto Save
 ```
 
-DeathDropを回収すると格納された強化素材とGoldを全量返却し、その直後にAuto Saveします。Save/Load後も未回収DeathDropのゲーム上の状態は復元対象とします。保存媒体・JSON構造などの永続化アーキテクチャは別設計で扱います。
-
-## 9. CheckpointとSave
-
-Checkpointで操作してMenuを開いた時点でAuto Saveします。Checkpoint MenuからManual Saveも可能です。
-
-進行Auto Saveは次のタイミングに限定します。
-
-- Checkpoint Menuを開いた時
-- DeathDrop生成内容が確定した時
-- DeathDrop回収が完了した時
-- Boss撃破報酬の付与が完了した時
-
-武器強化そのもの、およびStage ClearそのものではAuto Saveしません。設定データは進行データとは別に、設定変更時に保存します。
-
-## 10. Stage Clear
-
-Boss撃破だけでは即座にStage Clearへ遷移しません。
+## 10. Death / DeathDrop / Respawn
 
 ```text
-[Boss Defeat]
-      ↓
-[報酬付与]
-      ↓
-[Auto Save]
-      ↓
-[クリア用エリアへ移動]
-      ↓
-[城 / 洞窟 / 祠等のClear Trigger Collisionへ進入]
-      ↓
-[Ending Sequence]
-   └─ Skip可能
-      ↓
-[Titleへ戻る]
+Player HP <= 0
+↓
+Death Animation
+↓
+旧未回収DeathDropがあれば本体・内容を完全消失
+↓
+Player Inventoryから新DeathDropへ全量移動
+├─ Upgrade Material 100%
+└─ Gold 100%
+↓
+死亡座標・格納内容確定
+↓
+Auto Save
+↓
+CameraでDeathDrop確認
+↓
+Fade Out
+↓
+ActiveCheckpoint / 未設定時PlayerStartへRespawn
+├─ HP Full
+├─ Stamina Full
+├─ Healing Item Full
+└─ Normal Enemy Respawn
+↓
+Fade In
 ```
 
-Clear Triggerの具体的な場所・見た目・Ending演出内容はMap制作時に決定しますが、上記の進行ロジックを基本仕様とします。
+未回収DeathDropの座標・内容はSave / Load後も復元する。JSON具体構造は別Architecture Designで扱う。
 
-## 11. 将来武器Feature
+## 11. Boss Defeat / Stage Clear
 
-### 斧
+```text
+Boss HP <= 0
+↓
+Boss Defeated
+↓
+Gold付与
+↓
+初回固有Item付与
+↓
+Reward確定
+↓
+Auto Save
+↓
+PlayerがClear Areaへ移動
+↓
+Clear Trigger
+↓
+Skippable Ending
+↓
+Title
+```
 
-Vertical Slice完成後に、低速・高威力・高い体勢削り・高い怯み耐性を持つ武器として追加します。ガード / 受け止め、スーパーアーマー、3段通常コンボ、チャージ攻撃、回避攻撃、ジャスト回避反撃を候補とします。
+Boss撃破直後にEndingへ自動遷移せず、Stage Clear自体では追加Auto Saveを行わない。
 
-### 弓
+## 12. HUD
 
-Vertical Slice完成後に、遠距離戦・肩越し照準・スタミナ消費射撃・距離減衰・弱点攻撃を持つ武器として追加します。弓による遠距離維持に対し、ボス側には専用Gap Closerを追加します。
+Initial VSで必要な表示：Player HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態、Tutorial表示。Player Reaction内部蓄積値は表示しない。
 
-## 12. ストーリー
+## 13. Future Weapons
 
-初期版ではストーリー制作工数を抑えます。導入テキストは必須とし、Ending Sequenceの具体的な内容はMap・アセット確定後に決定します。
+Axe / BowはVertical Slice完成後に追加する。Weapon追加がSword VSの完成条件を阻害しないよう共通基盤を再利用する。
 
 ### [戻る](../README.md#ドキュメント一覧)
