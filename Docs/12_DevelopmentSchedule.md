@@ -9,99 +9,88 @@
 - 途中状態でも提出可能にする
 - 3カ月時点ではゲーム全体より、剣とボス1体による戦闘品質を優先する
 - **初期Vertical Sliceは剣のみで完成させる**
-- 斧・弓は初期Vertical SliceのBlockerにせず、4～6カ月目のPost-Vertical Slice Featureとする
+- 斧・弓は初期Vertical Slice完成に必須とせず、4～6カ月目のPost-Vertical Slice Featureとする
+- Issue番号順ではなく、`Docs/ImplementationRoadmap.md`の依存関係順で実装する
+- Gameplay Action / Systemの親IssueはTracking用途とし、実装Issueは原則`1 Issue = 1 PR`とする
 
-## 2. 0～1カ月
+## 2. 0～1カ月 — Foundation / Sword Core
 
 ### 目的
 
-プレイヤー操作と戦闘基盤の成立を確認する。
+プレイヤー操作、GAS共有基盤、剣戦闘の成立を確認する。
 
-### 作業
+### 依存順
 
-- プロジェクト初期設定
-- Git / Git LFS
-- コーディング規約
-- Enhanced Input
-- `IPlayerInputComponent`入力基盤
-- Move / Look / Camera
-- PlayerState ASC
-- AttributeSet
-- Gameplay Tag
-- 剣通常攻撃
-- 通常回避
-- スタミナ
-- 入力バッファ
-- ロックオン
-- テストマップ
-- Moverは必要性を検証する候補とし、初期開発を停止させない
+1. Player Move / Look / Camera / Jump
+2. Player ASC / GameplayTag / Stamina / Damage共有基盤
+3. Light Attack
+4. Heavy Attack
+5. Combo Attack
+6. Dodge / Perfect Dodge
+7. Sword Counter / Parry / Air Attack
+8. Manual LockOn / Target Switch / Soft Lock
+9. Performance計測環境を準備
 
 ### 完了条件
 
 - 剣で敵ダミーを攻撃できる
-- 通常回避できる
+- Light / Heavy / Comboが成立する
+- 通常回避とPerfect Dodgeを1つのDodge Actionとして実行できる
 - 攻撃と回避でスタミナを消費する
+- LockOn / Target Switch / Soft Lockが動作する
 - GamepadとKeyboard / Mouseで移動・カメラ・戦闘操作できる
 - 入力再セットアップ時にBindingが重複しない
 
-## 3. 2カ月目
+## 3. 2カ月目 — Normal Battle / Progression
 
-### 作業
+### 依存順
 
-- 剣4段コンボ
-- 強攻撃分岐
-- 空中攻撃
-- ジャスト回避
-- パリィ
-- Player HP / Death
-- 敵HP / Defeat
-- 体勢値
-- ダウン
-- 致命攻撃
-- 近接敵
-- 遠距離敵
-- Behavior Tree
-- 集団戦管理
-- チェックポイント
-- ActiveCheckpoint Respawn
-- DeathDrop
-- 強化素材報酬
-- 回復アイテム
+1. Enemy Attack Coordinator / Health / Posture
+2. Melee / Ranged Enemy
+3. Down / Fatal Attack / Posture Recovery
+4. Enemy Defeat / Material + Gold Reward
+5. Player Health / Death State
+6. Checkpoint / ActiveCheckpoint / Menu / Save
+7. Healing Item
+8. DeathDrop / Auto Save / Respawn
+9. Gold + MaterialによるWeapon Upgrade
 
 ### 完了条件
 
 - 通常戦の基本ループが成立する
 - Player Death → DeathDrop → Checkpoint Respawnが成立する
-- 敵撃破から強化素材を獲得できる
-- ジャスト回避とパリィから反撃できる
+- DeathDropにMaterial 100% / Gold 70%が格納される
+- 再死亡時に未回収DeathDrop本体と中身が消滅する
+- Enemy撃破からMaterial / Goldを取得できる
+- CheckpointでGold + Materialを消費してWeapon Upgradeできる
 - 近接2体の攻撃枠が機能する
 
-## 4. 3カ月目 — 初期Vertical Slice
+## 4. 3カ月目 — Boss Vertical Slice / Stage Clear
 
-### 作業
+### 依存順
 
-- ボス1体
-- Boss HP / Defeat
-- StateTree
-- C++攻撃評価
-- Phase1 / Phase2
-- 行動履歴
-- AIデバッグ表示
-- Boss Defeat → Stage Clear
-- 導入テキスト
-- チュートリアル
-- セーブ
-- 基本UI
-- パフォーマンス初回計測
-- 技術資料初版
-- プレイ動画
+1. Boss 1対1 / Phase2
+2. Combat Context収集
+3. Attack Candidate Score
+4. 接近・離脱 / 遠距離攻撃頻度適応
+5. Boss Combo Branch
+6. Recovery / Counter Window
+7. Boss Defeat
+8. Gold + 初回固有収集Item Reward
+9. Boss Reward後Auto Save
+10. Intro Text / Tutorial
+11. Clear Trigger
+12. Skippable Ending / Title遷移
+13. Performance / Stability / Shipping確認
 
 ### 提出版完了条件
 
 - タイトルから剣でボス撃破・ステージクリアまで進行可能
 - 死亡してもActiveCheckpointから再攻略可能
 - ボス1体と高品質な1対1戦闘ができる
-- 60fps目標を確認できる
+- Boss撃破後はReward / Auto Saveまで完了してからClear Areaへ進行できる
+- Clear Trigger → Ending → Titleまで完走できる
+- 60fps最低保証目標を確認できる
 - 実行ビルドを提出できる
 - READMEと主要設計資料が完成している
 
@@ -134,5 +123,11 @@
 - ローカライズ
 - 第三者テスト
 - Shippingビルド
+
+## 7. Issue単位の実装順
+
+GitHub Projectへ配置するIssueの具体的な依存順・Tracking Parent・Phase / Milestone割当は次を正とする。
+
+- `Docs/ImplementationRoadmap.md`
 
 ### [戻る](../README.md#ドキュメント一覧)
