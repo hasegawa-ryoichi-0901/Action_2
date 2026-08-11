@@ -2,7 +2,7 @@
 
 本ドキュメントは、Action_2で実装する機能要件・非機能要件と、初期Vertical Slice以降に追加するFuture Featureを定義します。
 
-初期Vertical Sliceは**剣のみ**を使用して、移動・戦闘・通常敵・ボス・チェックポイント・死亡・セーブ・ステージクリアまでの一連のゲームループを完成させます。斧と弓は4～6カ月目の追加目標とします。
+初期Vertical Sliceは**剣のみ**を使用して、起動・タイトル・チュートリアル・移動・戦闘・通常敵・ボス・チェックポイント・死亡・セーブ・ステージクリアまでの一連のゲームループを完成させます。斧と弓は4～6カ月目の追加目標とします。
 
 ## 1. 機能要件
 
@@ -17,7 +17,7 @@
 - `FR-PLAYER-007` ロックオン中に専用の左右入力で対象を切り替えられ、対象が死亡した場合は自動解除する
 - `FR-PLAYER-008` 剣、斧、弓をチェックポイントで変更できる `[Post-Vertical Slice]`
 - `FR-PLAYER-009` 戦闘中は武器を変更できない `[Post-Vertical Slice]`
-- `FR-PLAYER-010` 通常攻撃と強攻撃を組み合わせられる
+- `FR-PLAYER-010` 通常攻撃と強攻撃を組み合わせられ、Light / HeavyそれぞれがStartup / Commitment / Active / Recoveryと許可されたCancel Windowを持つ
 - `FR-PLAYER-011` 攻撃と回避でスタミナを消費する
 - `FR-PLAYER-012` スタミナ不足時は対象行動を実行できない
 - `FR-PLAYER-013` スタミナ枯渇時に息切れ状態となる
@@ -29,6 +29,8 @@
 - `FR-PLAYER-019` 通常回避を実行できる
 - `FR-PLAYER-020` プレイヤーはHPを持ち、HPが0以下になると死亡する
 - `FR-PLAYER-021` 三人称カメラを操作でき、ロックオン中は通常Camera Lookを無効化して対象へ追従する
+- `FR-PLAYER-022` Down中の敵のFatal Attack受付範囲内で攻撃入力した場合、PlayerをFatal Attack基準座標へ位置合わせし、`UGA_FatalAttack`とMontageを実行してFatal Damageを与えられる
+- `FR-PLAYER-023` Playerは被弾時にHit / Stagger / Downの3段階Reactionを持ち、通常敵・Bossの攻撃データが持つ内部蓄積値を加算してReactionを判定する。蓄積値はPlayer HUDへ表示しない
 
 ### 1.2 敵
 
@@ -38,8 +40,8 @@
 - `FR-ENEMY-004` 同時に近接攻撃する敵を最大2体に制限する
 - `FR-ENEMY-005` 近接攻撃枠と遠距離攻撃枠を分離する
 - `FR-ENEMY-006` HPと体勢値を持つ
-- `FR-ENEMY-007` 体勢値が0になるとダウンする
-- `FR-ENEMY-008` ダウン時に専用致命攻撃を受ける
+- `FR-ENEMY-007` 体勢値が0になるとDown状態へ遷移し、Down Animationを再生する
+- `FR-ENEMY-008` Down中のみFatal Attack受付可能状態とFatal Attack受付Collisionを有効化し、Down終了・Defeat・Fatal Attack成立時に受付を無効化する
 - `FR-ENEMY-009` 敵ごとに体勢値の回復設定を変更できる
 - `FR-ENEMY-010` HPが0以下になると撃破状態へ遷移する
 
@@ -59,35 +61,40 @@
 - `FR-BOSS-012` 特定攻撃後に大きな隙を持つ
 - `FR-BOSS-013` ジャスト回避またはパリィ成功時に反撃可能な隙を作る
 - `FR-BOSS-014` 弓で距離を取られた場合に専用接近行動を選択できる `[Post-Vertical Slice]`
-- `FR-BOSS-015` HPが0以下になると撃破状態へ遷移する
-- `FR-BOSS-016` ボス撃破時にGoldを獲得し、初回討伐時のみ固有収集アイテムを直接Inventoryへ獲得できる
+- `FR-BOSS-015` HPが0以下になると撃破状態へ遷移する。撃破後はGold付与、初回固有Item付与、Reward確定、Auto Save、Clear Area進行、Clear Trigger、Ending、Titleの順で進行する
+- `FR-BOSS-016` ボス撃破時にGoldを獲得し、初回討伐時のみ固有収集アイテムをPlayer Inventoryへ直接獲得できる
 
 ### 1.4 ステージ・進行
 
-- `FR-STAGE-001` 導入テキストを表示する
+- `FR-STAGE-001` New Game開始時にTutorial Textを表示し、その後Tutorialへ遷移する
 - `FR-STAGE-002` チュートリアルを実施する
-- `FR-STAGE-003` チェックポイントを使用してメニューを開ける
-- `FR-STAGE-004` チェックポイント使用時に通常敵が復活する
-- `FR-STAGE-005` チェックポイントで回復アイテムを補充する
+- `FR-STAGE-003` チェックポイントをInteractionし、ActiveCheckpoint更新後にMenuを開き、Rest処理を確定できる
+- `FR-STAGE-004` Checkpoint Rest時に通常敵が復活する
+- `FR-STAGE-005` Checkpoint Rest時にHP / Staminaを回復し、回復アイテムを最大数まで補充する
 - `FR-STAGE-006` チェックポイントで武器を変更する `[Post-Vertical Slice]`
 - `FR-STAGE-007` チェックポイントでGoldと強化素材を消費して武器を強化する
-- `FR-STAGE-008` 死亡時に所持強化素材100%と所持Gold70%をDeathDropへ移し、残りGold30%を消失させる
-- `FR-STAGE-009` DeathDropを回収すると格納されている強化素材とGoldを全量回収できる
-- `FR-STAGE-010` DeathDrop回収前に再死亡した場合は以前のDeathDropとその中身をすべて消失させ、新しい死亡地点に現在所持分から新しいDeathDropを生成する
+- `FR-STAGE-008` 死亡時にPlayer Inventoryが所持する強化素材100%とGold100%を1つのDeathDropへ移す
+- `FR-STAGE-009` DeathDropを回収すると格納されている強化素材とGoldを全量Player Inventoryへ戻せる
+- `FR-STAGE-010` DeathDrop回収前に再死亡した場合は以前のDeathDropとその中身をすべて消失させ、新しい死亡地点に現在Inventoryが所持する強化素材100%とGold100%から新しいDeathDropを生成する
 - `FR-STAGE-011` ボス登場演出は工数に余裕がある場合に実装する `[Could]`
-- `FR-STAGE-012` 死亡後、死亡AnimationとDeathDrop確認、Fade Outを経て最後に有効化したチェックポイントから再開する。未有効化時はPlayerStartから再開する
-- `FR-STAGE-013` ボス撃破後、クリア用エリアのCollisionへ進入するとスキップ可能なエンディングSequenceへ遷移し、終了後タイトルへ戻る
-- `FR-STAGE-014` 通常敵1体の撃破ごとに強化素材とGoldを直接所持値へ加算できる
+- `FR-STAGE-012` 死亡後、死亡Animation、DeathDrop生成・Auto Save、Camera確認、Fade Outを経て最後に有効化したCheckpointから再開する。未有効化時はPlayerStartから再開する
+- `FR-STAGE-013` ボス撃破報酬の確定・Auto Save後、クリア用エリアのCollisionへ進入するとスキップ可能なEnding Sequenceへ遷移し、終了後Titleへ戻る
+- `FR-STAGE-014` 通常敵1体の撃破ごとに強化素材とGoldをPlayer Inventoryへ直接加算できる
 
 ### 1.5 セーブ
 
 - `FR-SAVE-001` セーブスロットは1つ
-- `FR-SAVE-002` チェックポイントでメニューを開いた時点で進行データをオートセーブする
-- `FR-SAVE-003` チェックポイントのメニューから手動セーブできる
-- `FR-SAVE-004` ボス撃破報酬の付与完了後に進行データをオートセーブする
-- `FR-SAVE-005` DeathDrop生成データ確定後、およびDeathDrop回収完了後に進行データをオートセーブする
+- `FR-SAVE-002` Checkpointで`Interaction → ActiveCheckpoint更新 → Menu Open → Rest処理確定 → Auto Save`の順に処理する
+- `FR-SAVE-003` Checkpoint Menuから手動セーブできる
+- `FR-SAVE-004` Boss撃破後、Goldと初回固有Itemを含むReward確定後に進行データをAuto Saveする
+- `FR-SAVE-005` DeathDrop生成位置・格納データ確定後、およびDeathDrop回収完了後に進行データをAuto Saveする。未回収DeathDropはSave / Load後も死亡座標と格納内容を復元する
 - `FR-SAVE-006` 設定変更時に設定データを保存する
 - `FR-SAVE-007` Steam CloudはSteam公開版の追加要件とする `[Post-Vertical Slice]`
+
+### 1.6 UI / HUD
+
+- `FR-UI-001` ゲーム起動後にIntroを経てTitleを表示し、TitleからContinue / Load Game / New Game / Config / Exitを選択できる。New GameはTutorial TextとTutorialへ進み、ContinueはPlay Start、Load GameはSave Data選択へ進む。Ending終了後はTitleへ戻る
+- `FR-UI-002` Initial Vertical Sliceで必要なGameplay HUDとしてPlayer HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態表示、Tutorial表示を提供する
 
 ## 2. 非機能要件
 
@@ -102,9 +109,9 @@
 
 ### 2.2 保守性
 
-- `NFR-MAINT-001` 武器、攻撃、敵、Abilityをデータ駆動で追加できる
+- `NFR-MAINT-001` 武器、攻撃、敵、Ability、Reward等のGameplay Dataをデータ駆動で追加できる。各基本設計は必要データを明示し、Gameplay実装をCSV読込方式へ直接依存させない
 - `NFR-MAINT-002` C++とBlueprintの責務を分離する
-- `NFR-MAINT-003` プレイヤー入力コンポーネントを`IPlayerInputComponent`で抽象化し、`ABasePlayer`が個別入力コンポーネントへ直接依存しない
+- `NFR-MAINT-003` プレイヤー入力コンポーネントを`IPlayerInputComponent`で抽象化し、`ABasePlayer`が個別入力コンポーネントへ直接依存しない。Component粒度は固定せず、仕様と責務に応じて変更可能とする
 - `NFR-MAINT-004` Moverを検証・採用する場合でも、戦闘システムへMover固有型・固有APIの直接依存を持ち込まない
 - `NFR-MAINT-005` Gameplay Tagで状態を一元管理する
 - `NFR-MAINT-006` Tickの使用を必要なクラスに限定する
