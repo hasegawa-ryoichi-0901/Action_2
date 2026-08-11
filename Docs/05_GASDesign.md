@@ -2,32 +2,23 @@
 
 ## 1. 方針
 
-Gameplay Ability Systemは、攻撃・回避・スタミナ・属性・状態・バフ・デバフを管理します。入力BindingそのものはGASの責務にせず、`IPlayerInputComponent`を入口とするプレイヤー入力層から必要なゲームプレイ要求を配送します。
+GASは攻撃・回避・スタミナ・状態・Damage / Reaction等のGameplay処理を管理する。Enhanced InputのBinding lifecycleそのものはGASの責務にせず、`IPlayerInputComponent`を入口とする入力層からGameplay要求を配送する。
 
-Ability System ComponentはPlayerStateに配置する方針です。
+ASCはPlayerState側へ配置する方針を維持する。
 
 ```text
-+----------------------------------+
-| AActionPlayerState               |
-|----------------------------------|
-| UActionAbilitySystemComponent    |
-| UCharacterAttributeSet           |
-| UPostureAttributeSet             |
-+----------------+-----------------+
-                 | Owner
-                 v
-+----------------------------------+
-| Player Character / ABasePlayer   |
-|----------------------------------|
-| ASC Avatar                       |
-| Input Components                 |
-| Animation / Physics              |
-+----------------------------------+
+PlayerState
+├─ AbilitySystemComponent
+└─ AttributeSet
+
+Player Character / ABasePlayer
+├─ ASC Avatar
+├─ Input
+├─ Camera
+└─ Collision / Animation
 ```
 
-## 2. プレイヤー入力との境界
-
-現在の入力基盤は次を正とします。
+## 2. Player Inputとの境界
 
 ```text
 [Enhanced Input]
@@ -35,149 +26,119 @@ Ability System ComponentはPlayerStateに配置する方針です。
 [ABasePlayer::SetupPlayerInputComponent]
       ↓
 [IPlayerInputComponent]
-      ↓
-[UBasePlayerInputComponent派生]
-      |
-      +--> Move / Lookなど直接処理
-      |
-      +--> Combat Input
-              ↓
-         [Ability Input Tag / Gameplay Request]
-              ↓
-         [ASC Input Processing]
+      ├─ Move / Look → Movement / Camera
+      └─ Combat Input → Ability Input Tag / Gameplay Request → ASC
 ```
 
-- `IPlayerInputComponent`はInputActionのSetup / Teardown、Input Tag、押下状態の共通契約を定義する。
-- `ABasePlayer`は具体的な派生入力Componentを列挙せず、Interface経由で管理する。
-- Move / LookはGASを経由する必要がない。
-- Attack / Dodge / Parry / Heal等は入力ComponentからASCへAbility入力として接続する。
-- GAS側がEnhanced InputのMapping ContextやBindingライフサイクルを直接所有しない。
-- 戦闘入力Componentを1Action単位にするか、複数Actionを集約するかは戦闘入力実装前に確定する。
+- `ABasePlayer`は具体Input Component型を列挙しない。
+- Attack / Dodge / Parry / Heal / Fatal Attack等をASCへ接続できる。
+- `1 Action = 1 Component`は前提にしない。
+- 1 Action 1 Component / 複数Action集約のどちらも許容し、Gameplay Tag、GAS、責務、Lifecycleに応じて決定する。
+- Component粒度はAction Issue開始のBlockerではない。
 
-## 3. AttributeSet
+## 3. Attribute / Runtime Data
 
-### CharacterAttributeSet
+Player側で少なくとも次を扱う。
+
+- Health / MaxHealth
+- Stamina / MaxStamina
+- AttackPower等の戦闘値
+- Healing Item関連値
+- Player Reaction内部蓄積値
+
+Enemy / BossはHealth / Posture等を扱う。
+
+Gold / Upgrade Material / Boss Unique ItemはGAS AttributeではなくPlayer Inventoryを正本とする。
+
+## 4. Ability構成
+
+初期Vertical Sliceの主なAbility：
+
+- Light Attack
+- Heavy Attack
+- Air Attack
+- Dodge
+- Perfect Dodge Counter
+- Parry
+- Heal
+- Jump
+- **Fatal Attack**
+
+Post-VSでGuard / Axe / Bow固有Abilityを追加する。
+
+## 5. Attack Phase / Window
+
+Light / Heavyは個別基本設計に従い、次のPhaseを持つ。
 
 ```text
-Health
-MaxHealth
-Stamina
-MaxStamina
-AttackPower
-DefensePower
-StaminaRecoveryRate
-StaminaRecoveryDelay
-ExhaustedRecoveryThreshold
-HealingItemCount
-MaxHealingItemCount
-UpgradeMaterial
+Startup → Commitment → Active → Recovery
 ```
 
-`Health <= 0`をプレイヤー・敵・ボスの死亡 / 撃破判定へ接続します。死亡 / 撃破遷移は同一Actorについて1回だけ確定させます。
+Gameplay上必要なWindow：
 
-### PostureAttributeSet
+- Hitbox Active
+- Combo Accept Input
+- Cancel Window
+- Perfect Dodge Window
+- Counter Window
+- Parry Window
+- Fatal Attack Available
+
+Commitment中は許可されていないCancelを拒否する。
+
+## 6. Fatal Attack
 
 ```text
-Posture
-MaxPosture
-PostureRecoveryRate
-PostureRecoveryDelay
-StaggerResistance
-PostureDamageMultiplier
+[Enemy Down / Fatal受付]
+      ↓
+[Playerが受付Collision内でAttack Input]
+      ↓
+[Target / Transform確定]
+      ↓
+[UGA_FatalAttack]
+      ↓
+[位置合わせ]
+      ↓
+[Fatal Attack Montage]
+      ↓
+[Fatal Damage]
 ```
 
-プレイヤーは独立した体勢ゲージを基本的に使用せず、StaggerResistanceを武器データから反映します。
+Enemy Down終了・Defeat・Fatal成立時は受付を解除する。
 
-## 4. Ability階層
+## 7. Player Reaction
+
+Enemy / Boss Attack DataがPlayer Reaction用蓄積値を持ち、Player内部で加算する。
 
 ```text
-UActionGameplayAbility
-    +--> UGA_AttackBase
-    |       +--> UGA_LightAttack
-    |       +--> UGA_HeavyAttack
-    |       +--> UGA_ChargeAttack
-    |       +--> UGA_AirAttack
-    |       +--> UGA_DodgeAttack
-    +--> UGA_Dodge
-    +--> UGA_PerfectDodgeCounter
-    +--> UGA_Parry
-    +--> UGA_Guard              [Post-Vertical Slice]
-    +--> UGA_FatalAttack
-    +--> UGA_WeaponSkill
-    +--> UGA_Heal
-    +--> UGA_Jump
+Attack Hit
+↓
+Health更新
++-- Health <= 0 → Dead
+↓
+Reaction累積
+├─ Hit
+├─ Stagger
+└─ Down
 ```
 
-初期Vertical Sliceでは剣に必要なAbilityを優先し、斧・弓固有AbilityはPost-Vertical Sliceで追加します。
+Reaction蓄積値はHUDへ表示しない。DeathをReactionより優先する。
 
-## 5. 戦闘Ability実行フロー
+## 8. Gameplay Tag方針
 
-```text
-[Enhanced Input]
-      ↓
-[IPlayerInputComponent実装]
-      ↓
-[Ability Input Tag / Gameplay Request]
-      ↓
-[ASC Input Processing]
-      +--> 状態Tag確認
-      +--> スタミナ確認
-      +--> クールダウン確認
-      +--> 武器条件確認
-      +-- NG --> [Reject / Buffer]
-      ↓
-[Activate Ability]
-      +--> Cost適用
-      +--> Montage再生
-      +--> Gameplay Tag付与
-      +--> Hit / Dodge / Parry Window開始
-      ↓
-[終了 / Cancel]
-```
+確定した状態・WindowをGameplay Tagで一元管理可能にする。具体Tag名は既存`DefaultGameplayTags.ini`および各Action実装と整合させて決定するため、未実装Tag名を基本設計だけで実装済みと扱わない。
 
-Movement補正が必要なAbilityは、現在利用しているCharacterMovement等の移動APIへゲームプレイ層から要求します。実装されていない`IMovementDriver`や`UMovementAdapterComponent`を前提にはしません。Moverを将来評価する場合のみ、必要性が確認された時点で戦闘層とMover固有APIの境界を追加します。
-
-## 6. Gameplay Tag案
-
-### 状態
+概念例：
 
 ```text
 State.Action.Attacking
 State.Action.Dodging
-State.Action.Parrying
-State.Action.Guarding
 State.Action.Healing
-State.Action.Exhausted
 State.Action.FatalAttacking
 State.Reaction.Hit
 State.Reaction.Staggered
 State.Reaction.Downed
 State.Dead
-```
-
-### 入力
-
-```text
-Input.Move
-Input.Look
-Input.Attack.Light
-Input.Attack.Heavy
-Input.Attack.Charge
-Input.Dodge
-Input.Jump
-Input.Parry
-Input.Guard
-Input.Heal
-Input.LockOn
-Input.WeaponSkill.Primary
-Input.WeaponSkill.Secondary
-```
-
-Input Tagは`FTaggedInputAction`と入力Componentの識別にも使用可能とし、同一プレイヤー内の重複Tagは設定不備として扱います。
-
-### ウィンドウ
-
-```text
 Window.Hitbox.Active
 Window.Combo.AcceptInput
 Window.Cancel.Dodge
@@ -187,45 +148,16 @@ Window.Parry.Active
 Window.FatalAttack.Available
 ```
 
-### 攻撃属性
+## 9. Animation
 
-```text
-Attack.Type.Melee
-Attack.Type.Ranged
-Attack.Type.Grab
-Attack.Type.Heavy
-Attack.Type.Projectile
-Attack.Property.Parryable
-Attack.Property.Unparryable
-Attack.Property.GuardBreak
-```
+Attack / Heal / Fatal Attack等のMontageとGameplay Event / Notifyを利用して、Hit / Combo / Cancel / Fatal Damage等のGameplay Windowと同期する。Animation Assetを差し替えてもGameplay Ruleの正本が壊れない構造にする。
 
-## 7. Montage
+## 10. 初期化・Lifecycle
 
-GASからの攻撃Montage再生は`UAbilityTask_PlayMontageAndWait`を基本候補とします。Montage NotifyとGameplay Eventを用いて、攻撃判定、コンボ受付、回避・パリィ受付等を同期します。
+Possess / Re-Possess / UnPossessed / EndPlay / InputComponent再構築を考慮し、Input BindingとASC ActorInfoを重複初期化しない。Input側は`IPlayerInputComponent::Setup / Teardown`契約に従う。
 
-## 8. 初期化
+## 11. Data境界
 
-```text
-[PlayerState生成]
-      ↓
-[ASC / AttributeSet初期化]
-      ↓
-[Player Character Possessed]
-      ↓
-[InitAbilityActorInfo]
- Owner  = PlayerState
- Avatar = Player Character
-      ↓
-[ABasePlayer::SetupPlayerInputComponent]
-      ↓
-[IPlayerInputComponent::Setup]
-      ↓
-[Startup Ability付与]
-      ↓
-[剣Ability付与]
-```
-
-UnPossessed / EndPlay / InputComponent再構築時は、入力側が`Teardown()`を実行して古いBindingを残さないようにします。
+各FRの基本設計に`必要データ`を記載する。GAS / Gameplay Systemは具体的CSV Reader、DB Schema、JSON Schemaへ直接依存しない。
 
 ### [戻る](../README.md#ドキュメント一覧)
