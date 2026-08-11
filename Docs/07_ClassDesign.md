@@ -2,254 +2,209 @@
 
 ## 1. 方針
 
-設計書は実装済みのプレイヤー基盤を正として更新します。現在存在しない`IMovementDriver`、`UMovementAdapterComponent`、`UMoverDriver`、`UCharacterMovementDriver`は現行アーキテクチャの前提としません。
+現行実装を正とし、存在しないClass / Interface / Adapterを基本設計上の確定実装として扱いません。`ABasePlayer`と`IPlayerInputComponent`を入力基盤として拡張し、GAS、Targeting、Inventory、Save、Stage Progressionを段階的に追加します。
 
-初期Vertical Sliceでは、既存の`ABasePlayer`と`IPlayerInputComponent`を入力基盤として拡張し、戦闘・Targeting・GAS等を段階的に追加します。
+`1 Action = 1 ActorComponent`は前提にしません。Component粒度はGameplay Tag、GAS、責務、Lifecycle、テスト容易性に応じて機能ごとに決定します。
 
-## 2. 現在のプレイヤー基盤
+## 2. 現在のPlayer Input基盤
 
 ```text
-+---------------------------------------------------+
-| ABasePlayer                                       |
-|---------------------------------------------------|
-| CameraBoom / FollowCamera                         |
-| DefaultMappingContext                             |
-| TMap<InputTag, IPlayerInputComponent>             |
-| SetupPlayerInputComponent                         |
-| TeardownPlayerInputComponents                     |
-| Enable / Disable MappingContext                   |
-+-----------------------------+---------------------+
-                              |
-                              v
-+---------------------------------------------------+
-| IPlayerInputComponent                             |
-|---------------------------------------------------|
-| GetTaggedInputAction                              |
-| IsPressed                                         |
-| Setup                                             |
-| Teardown                                          |
-+-----------------------------+---------------------+
-                              ^
-                              |
-+---------------------------------------------------+
-| UBasePlayerInputComponent : UActorComponent       |
-|---------------------------------------------------|
-| TaggedInputAction                                 |
-| bIsPressed                                        |
-| BindActions                                       |
-| HandleStarted / Completed / Canceled              |
-+---------------+----------------------+------------+
-                |                      |
-                v                      v
-+---------------------------+   +---------------------------+
-| UPlayerMoveInputComponent |   | UPlayerLookInputComponent |
-|---------------------------|   |---------------------------|
-| Move / DoMove             |   | Look / DoLook             |
-| AddMovementInput          |   | Controller Yaw / Pitch    |
-+---------------------------+   +---------------------------+
+ABasePlayer
+  ↓ discovers / manages
+IPlayerInputComponent
+  ↓
+UBasePlayerInputComponent派生
+  ├─ Move → CharacterMovement
+  ├─ Look → Controller / Camera
+  ├─ Combat → ASC / Gameplay Ability
+  └─ Targeting → Targeting System
 ```
 
-### 責務
+`ABasePlayer`は具体Input Component型へ個別依存せず、Input Tag、Setup、Teardown、Pressed Stateの共通契約で管理します。
 
-`ABasePlayer`:
-- アタッチ済み`UBasePlayerInputComponent`を収集する。
-- `IPlayerInputComponent`としてInput Tagごとに管理する。
-- Input Tag重複を拒否する。
-- `SetupPlayerInputComponent`再実行時に古いBindingをTeardownしてから再構築する。
-- UnPossessed / EndPlayでMapping ContextとBindingを解除する。
-
-`IPlayerInputComponent`:
-- 入力Componentの共通契約を定義する。
-- 個別Actionの実装内容そのものは規定しない。
-
-`UBasePlayerInputComponent`:
-- InputAction、Input Tag、押下状態、Bindingライフサイクルを共通化する。
-
-派生Input Component:
-- Move、Look、Jump、Combat等の個別入力をゲームプレイ要求へ変換する。
-
-## 3. 入力からゲームプレイへの依存方向
+## 3. Player Gameplay責務
 
 ```text
-[Enhanced Input]
-      ↓
-[IPlayerInputComponent]
-      |
-      +--> [Move Input] ------> [Pawn / Character Movement]
-      |
-      +--> [Look Input] ------> [Controller / Camera]
-      |
-      +--> [Combat Input] ----> [ASC / Gameplay Ability]
-      |
-      +--> [Target Input] ----> [Targeting System]
+Player Character / ABasePlayer
+├─ Input
+├─ Camera
+├─ ASC Avatar
+├─ Targeting
+└─ Interaction
+
+PlayerState候補
+├─ AbilitySystemComponent
+└─ CharacterAttributeSet
+
+Player Inventory
+├─ Gold
+├─ Upgrade Material
+├─ Boss Unique Item
+└─ Healing Item / Inventory系所持データ
 ```
 
-入力Componentは入力受付と配送を担当し、戦闘ルール、ダメージ計算、AI、セーブ等を所有しません。
+Gold、Upgrade Material、Boss Unique ItemはすべてPlayer Inventoryを正本とします。HUD、Weapon Upgrade、Reward、DeathDrop、SaveはInventoryの値を利用します。
 
-## 4. 初期Vertical Sliceで追加するプレイヤー責務
+## 4. Player Reaction
+
+PlayerはHit / Stagger / Downの3段階Reactionを持ちます。Enemy / Boss Attack Dataが持つReaction蓄積値を内部加算し、閾値に応じてReactionへ遷移します。蓄積値はHUDへ表示しません。
 
 ```text
-ABasePlayer / Player Character
-    |
-    +-- Input Components
-    |      +-- Move
-    |      +-- Look
-    |      +-- Jump
-    |      +-- Dodge
-    |      +-- Attack / Parry / Heal
-    |      +-- LockOn
-    |
-    +-- AbilitySystem連携
-    |      +-- Health / Stamina
-    |      +-- Attack / Dodge / Parry / Heal
-    |
-    +-- Targeting
-    |      +-- Soft Lock
-    |      +-- Manual Lock
-    |      +-- Target Switch
-    |
-    +-- Input Buffer
-    |      +-- 保存 / 有効期限 / 優先順位 / 消費
-    |
-    +-- Interaction
-           +-- Checkpoint
-           +-- DeathDrop回収
+Attack Hit
+↓
+Damage / Reaction値取得
+↓
+Health <= 0 ? → Dead
+↓ No
+Reaction累積
+├─ Down
+├─ Stagger
+└─ Hit
 ```
 
-これらの具体クラス名は実装Issueで既存命名との整合を確認して決定します。存在しないクラスを基本設計上の確定実装として扱いません。
-
-## 5. Movement方針
-
-現在の通常移動は`UPlayerMoveInputComponent`から`APawn::AddMovementInput`へ要求し、`ABasePlayer`はCharacterMovementを使用しています。
+## 5. Fatal Attack
 
 ```text
-[Move Input]
-      ↓
-[UPlayerMoveInputComponent]
-      ↓
-[Controller Yawから方向算出]
-      ↓
-[APawn::AddMovementInput]
-      ↓
-[CharacterMovement]
+Enemy Down
+↓
+Down Animation
+↓
+Fatal Attack受付Collision / Window ON
+↓
+Playerが範囲内でAttack Input
+↓
+Fatal Attack基準Transformへ位置合わせ
+↓
+UGA_FatalAttack
+↓
+Fatal Attack Montage
+↓
+Fatal Damage
 ```
 
-Moverは将来のプロトタイプ候補として残しますが、現時点ではMovement AdapterやMovement Driverを先行実装しません。Mover導入の具体的必要性が確認された場合のみ、戦闘・入力層へMover固有依存を漏らさない境界を設計します。
+Down終了、Enemy Defeat、Fatal Attack成立時に受付を無効化します。
 
-## 6. カメラ
+## 6. Movement / Camera
 
-`ABasePlayer`が`USpringArmComponent`と`UCameraComponent`を保持し、`UPlayerLookInputComponent`がControllerへYaw / Pitch入力を渡します。
+通常移動は現行`UPlayerMoveInputComponent → AddMovementInput → CharacterMovement`を維持します。Moverは将来検証対象で、必要性が確認されるまでAdapterを先行追加しません。
+
+Cameraは`UPlayerLookInputComponent → Controller Yaw/Pitch → CameraBoom / FollowCamera`を基本とし、LockOn中はTargeting側の追従を優先します。Player Death中もCamera Lookは許可します。
+
+## 7. Boss AI
 
 ```text
-[Look Input]
-      ↓
-[UPlayerLookInputComponent]
-      ↓
-[AddControllerYawInput / PitchInput]
-      ↓
-[CameraBoom]
-      ↓
-[FollowCamera]
+Boss AI Controller
+├─ StateTree
+├─ Combat Context
+├─ Attack Evaluator
+├─ Action History
+└─ Debug Presentation
 ```
 
-Targeting導入後は、自由カメラ操作とロックオン補正の責務境界をTargeting設計で定義します。
+Boss AIは距離、Healing、Stamina、Action History、Phase等を評価してAttack候補をScore化します。各Boss基本設計は、その要件で利用した入力値・Score・選択結果をDebug表示で確認可能にします。
 
-## 7. GAS / PlayerState候補
+## 8. Checkpoint
 
-Combat実装時はASCをPlayerState側に配置する既存方針を維持します。`ABasePlayer`またはその派生Player CharacterをAvatar Actorとし、入力Componentから戦闘入力をASCへ配送します。
+確定処理順は次です。
 
 ```text
-AActionPlayerState候補
-    +-- AbilitySystemComponent
-    +-- CharacterAttributeSet
-
-ABasePlayer / 派生Player Character
-    +-- ASC Avatar
-    +-- Input Components
-    +-- Mesh / Collision / Camera
+Interaction
+↓
+ActiveCheckpoint更新
+↓
+Menu Open
+↓
+Rest処理確定
+├─ HP Full
+├─ Stamina Full
+├─ Healing Item補充
+└─ Normal Enemy Respawn
+↓
+Auto Save
 ```
 
-## 8. 武器
+Weapon UpgradeはCheckpoint Menuから行いますが、Upgrade完了自体はAuto Save契機にしません。
+
+## 9. Player Death / DeathDrop / Respawn
 
 ```text
-AWeaponActor
-    +-- Weapon Mesh
-    +-- Hit Collision
-    +-- WeaponDefinition
-
-UWeaponDefinition / PrimaryDataAsset
-    +-- WeaponType
-    +-- AbilitySet
-    +-- ComboDefinition
-    +-- StaminaCost
-    +-- StaggerResistance
-    +-- PostureDamageMultiplier
-    +-- DodgeDefinition
-    +-- CounterWindowDuration
+Health <= 0
+↓
+Death Animation
+↓
+旧DeathDropがあれば本体・内容を完全消失
+↓
+Player Inventoryから新DeathDropへ移動
+├─ Upgrade Material 100%
+└─ Gold 100%
+↓
+DeathDrop座標・格納内容確定
+↓
+Auto Save
+↓
+CameraでDeathDrop確認
+↓
+Fade Out
+↓
+ActiveCheckpoint / 未設定時PlayerStartへRespawn
+↓
+HP / Stamina / Healing Item Full
+↓
+Normal Enemy Respawn
+↓
+Fade In
 ```
 
-初期Vertical Sliceは剣のみ。斧・弓はPost-Vertical Slice Featureです。
+未回収DeathDropの座標と格納内容はSave / Load対象です。JSON形式は別Architecture Designで定義します。
 
-## 9. 敵
+## 10. Boss Defeat / Stage Clear
 
-```text
-AEnemyCharacter候補
-    +-- AbilitySystemComponent
-    +-- AttributeSet
-    +-- EnemyDefinition
-    +-- CombatComponent
-    +-- PerceptionContext
-
-AEnemyAIController
-    +-- Behavior Tree / Blackboard
-```
-
-HP0時にはAI、攻撃Ability、攻撃枠を終了して撃破状態へ遷移します。
-
-## 10. ボスAI
+確定フローは次です。
 
 ```text
-ABossAIController
-    +-- StateTreeComponent
-    +-- AttackEvaluator
-    +-- ActionHistory
-    +-- DebugPresenter
-
-UEnemyAttackEvaluator
-    +-- BuildContext
-    +-- ScoreAttack
-    +-- SelectAttack
-    +-- RecordResult
-```
-
-Boss HP0時には評価・攻撃を停止し、Boss Defeated Eventをステージ進行へ通知します。
-
-## 11. チェックポイント・死亡・進行
-
-```text
-ACheckpointActor
-      ↓
-Checkpoint管理
-      +--> ActiveCheckpoint更新
-      +--> Rest
-      +--> Heal Refill
-      +--> Enemy Respawn
-      +--> Weapon Upgrade
-      +--> Auto Save
-
-Player Death
-      ↓
-DeathDrop生成
-      ↓
-ActiveCheckpoint Respawn
-
+Boss HP <= 0
+↓
 Boss Defeated
-      ↓
-Stage Clear
-      ↓
-Save / Clear Presentation
+↓
+Gold付与
+↓
+初回固有Item付与
+↓
+Reward確定
+↓
+Auto Save
+↓
+PlayerがClear Areaへ移動
+↓
+Clear Trigger
+↓
+Skippable Ending
+↓
+Title
 ```
 
-チェックポイント未有効化時のFallback Spawn、死亡からRespawnまでのタイミング、Boss SaveとStage Clear Saveの重複制御は未決事項として確定します。
+Boss Defeat後のStage Clear自体では追加Auto Saveを行いません。
+
+## 11. Title / UI
+
+```text
+Game Boot → Intro → Title
+Title
+├─ Continue → Play Start
+├─ Load Game → Save Data Select → Play Start
+├─ New Game → Tutorial Text → Tutorial → Play Start
+├─ Config
+└─ Exit
+
+Ending → Title
+```
+
+Gameplay HUDはHP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態、Tutorial表示を提供します。
+
+## 12. Data / Master Data境界
+
+各FR基本設計に必要データを記載し、DB Schema、CSV Reader、JSON Save Schemaは別Architecture Designへ分離します。Gameplay実装は具体的CSV Readerへ直接依存しません。
+
+Rewardは`RewardID -> 0..N Item`の関係を扱える契約とし、Reward件数をコード構造へ埋め込みません。
 
 ### [戻る](../README.md#ドキュメント一覧)
