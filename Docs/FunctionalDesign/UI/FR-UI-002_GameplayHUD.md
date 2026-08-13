@@ -1,13 +1,13 @@
-# FR-UI-002 Initial Vertical SliceのGameplay HUDを提供する
+# FR-UI-002 初期プレイアブル版のGameplay HUDを提供する
 
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-UI-002` |
+| 要件ID | [`FR-UI-002`](../../01_Requirements.md#fr-ui-002) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#151` |
+| 関連Issue | [#151](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/151) |
 | 関連要件・設計 | Player / Boss / Save / Tutorial各要件 |
 
 ## 2. 目的
@@ -74,9 +74,10 @@ Perfect Dodge、LockOn等のGameplay状態 / Eventを表示条件として参照
 ## 11. 依存・Issue反映
 ### 依存
 - 各Gameplay Systemの通知契約
+- [#153 Player Inventory](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/153)
 
 ### Issue反映
-- `#151`へ全表示項目、Event更新、Cleanupを反映する。
+- [#151](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/151)へ全表示項目、Event更新、Cleanupを反映する。
 
 ## 12. 未決事項
 なし
