@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | `NFR-QUALITY-004` |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
 | 関連Issue | `#144` |
 | 関連要件・設計 | `FR-SAVE-001`～`006`, `Docs/18_SaveJsonArchitecture.md` |
@@ -16,8 +16,9 @@
 ## 3. 確定仕様・スコープ
 - Save読込時に形式・Version・必須Data等を検証可能にする。
 - 破損または読込失敗したDataをRuntimeへ部分適用しない。
+- Save破損を検出した場合は破損Saveを削除し、New Gameを開始できる状態へ戻す。
+- 破損SaveからのBackup復旧は初期プレイアブル版では行わない。
 - Load失敗をUI / 呼出元へ通知可能にする。
-- 破損時の具体的なRecovery PolicyはSave Architectureで確定する。
 
 ## 4. 基本フロー
 ```text
@@ -27,15 +28,24 @@ Data読込
 ↓
 Validation
 ├ Valid → Runtimeへ復元
-└ Invalid → 適用しない → Failure通知 → Recovery導線
+└ Invalid / Corrupt
+   ↓
+Runtimeへ適用しない
+   ↓
+破損Saveを削除
+   ↓
+Failure / Recovery通知
+   ↓
+New Game開始可能状態へ戻る
 ```
 
 ## 5. 責務
 | 対象 | 責務 |
 |---|---|
 | Save Reader / Validator | 破損検出 |
+| Save System | 破損Save削除と状態初期化 |
 | Gameplay Restore | Valid Dataのみ適用 |
-| UI | Load失敗通知・Recovery導線 |
+| UI | Load失敗通知とNew Game導線 |
 
 ## 6. 状態 / Gameplay Tag
 なし。
@@ -46,30 +56,33 @@ Validation
 | Save Version | Compatibility確認 | Save Metadata |
 | Validation Result | Load可否 | Runtime |
 | Failure Reason | UI / Log | Runtime |
-| Recovery Policy | 破損時対応 | Architecture |
+| Save Slot Identifier | 破損Save削除対象 | Save Metadata |
 
 ## 8. UI / HUD / Animation / Feedback
-破損 / Load失敗を成功として表示せず、Title / Load UIからRecovery可能な通知を行う。
+- 破損 / Load失敗を成功として表示しない。
+- Saveが破損していることを通知し、破損Save削除後にNew Gameを開始できる導線へ戻す。
 
 ## 9. 異常系・終了条件
 - Invalid SaveをRuntimeへ部分適用しない。
 - Load失敗でCrashしない。
-- 元Saveを自動上書きする場合はRecovery Policy確定前に実装しない。
+- 正常Saveを破損Saveと誤判定して削除しない。
+- 削除後に旧SaveのRuntime値を残さない。
 
 ## 10. 受入条件
 - [ ] 破損Saveを検出できる。
 - [ ] Invalid DataをGameplayへ部分適用しない。
-- [ ] CrashせずLoad Failureを通知できる。
-- [ ] 確定したRecovery Policyをテストできる。
+- [ ] 破損Saveだけを削除できる。
+- [ ] 削除後にNew Gameを開始できる状態へ戻れる。
+- [ ] Backup復旧を行わない。
+- [ ] Corrupt SaveからCrashしない。
 
 ## 11. 依存・Issue反映
 ### 依存
 - Save JSON Architecture
+- Title / Start Flow
 
 ### Issue反映
-- `#144`へ破損検出・非適用・Failure通知を反映し、Recovery Policy確定後に最終受入条件を確定する。
+- `#144`へ破損検出、非適用、破損Save削除、New Game復帰を反映する。
 
 ## 12. 未決事項
-| 未決事項 | Issue作成前に確定必須 | 理由 |
-|---|---|---|
-| 破損Save検出後にBackup復旧、新規開始、削除確認等のどのRecoveryを採用するか | Yes | Player Dataの扱いとUI導線が変わるため |
+なし
