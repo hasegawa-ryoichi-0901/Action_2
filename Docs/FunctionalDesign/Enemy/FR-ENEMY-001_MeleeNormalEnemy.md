@@ -3,19 +3,19 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-001` |
+| 要件ID | [`FR-ENEMY-001`](../../01_Requirements.md#fr-enemy-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#119` |
-| 関連要件・設計 | `FR-ENEMY-003`～`005`, `FR-ENEMY-006`, `Docs/06_EnemyAI.md` |
+| 関連Issue | [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118), [#119](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/119) |
+| 関連要件・設計 | [`FR-ENEMY-003`](../../01_Requirements.md#fr-enemy-003)～[`FR-ENEMY-006`](../../01_Requirements.md#fr-enemy-006), [Enemy AI](../../06_EnemyAI.md) |
 
 ## 2. 目的
-近距離でPlayerへ接近・攻撃する通常Enemyを用意し、複数Enemy戦の基本構成要素とする。
+近距離でPlayerへ接近・Attackする通常Enemyを用意し、複数Enemy戦の基本構成要素とする。
 
 ## 3. 確定仕様・スコープ
-- Playerを有効Targetとして認識し近接Attack Rangeまで接近する。
-- 近接AttackはMelee Attack Slot取得後のみ開始する。
+- Playerを有効Targetとして認識しMelee Attack Rangeまで接近する。
+- Melee AttackはMelee Attack Slot取得後のみ開始する。
 - Down / Defeated中は通常AIとAttackを停止する。
 - Target無効化時は追跡・Attackを終了する。
 
@@ -54,7 +54,7 @@ Melee Slot取得
 ## 8. UI / HUD / Animation / Feedback
 | 種別 | 内容 |
 |---|---|
-| Animation | 移動、近接Attack、Hit / Down / Death |
+| Animation | 移動、Melee Attack、Hit / Down / Death |
 | VFX / SE | Attack予兆とHit Feedback |
 
 ## 9. 異常系・終了条件
@@ -70,11 +70,11 @@ Melee Slot取得
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#121` Attack Coordinator
-- `#122` Health / Posture
+- [#121 Attack Coordinator](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/121)
+- [#122 Health / Posture](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/122)
 
 ### Issue反映
-- `#119`へTarget、Range、Slot、Attack、Cleanupを反映する。
+- [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118)をNormal Enemy Combat親Issue、[#119](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/119)をMelee Enemy実装Issueとして扱う。
 
 ## 12. 未決事項
 なし

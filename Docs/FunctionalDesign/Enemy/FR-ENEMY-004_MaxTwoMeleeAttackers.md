@@ -1,21 +1,21 @@
-# FR-ENEMY-004 同時に近接AttackするEnemyを最大2体に制限する
+# FR-ENEMY-004 同時にMelee AttackするEnemyを最大2体に制限する
 
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-004` |
+| 要件ID | [`FR-ENEMY-004`](../../01_Requirements.md#fr-enemy-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#121` |
-| 関連要件・設計 | `FR-ENEMY-003`, `FR-ENEMY-005` |
+| 関連Issue | [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118), [#121](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/121) |
+| 関連要件・設計 | [`FR-ENEMY-003`](../../01_Requirements.md#fr-enemy-003), [`FR-ENEMY-005`](../../01_Requirements.md#fr-enemy-005) |
 
 ## 2. 目的
-集団戦で近接Attackが同時多発しすぎることを防ぎ、Playerが認識・対応可能な圧力へ制御する。
+集団戦でMelee Attackが同時多発しすぎることを防ぎ、Playerが認識・対応可能な圧力へ制御する。
 
 ## 3. 確定仕様・スコープ
 - Melee Active Slotの最大数は2体とする。
-- Slot取得済みEnemyだけが近接Attackを開始できる。
+- Slot取得済みEnemyだけがMelee Attackを開始できる。
 - Attack終了 / Cancel / Down / Defeat / Owner破棄時にSlotを解放する。
 
 ## 4. 基本フロー
@@ -50,16 +50,16 @@ Active Melee Count < 2?
 - 同じEnemyへ複数Slotを付与しない。
 
 ## 10. 受入条件
-- [ ] 同時近接Attack Enemyが2体を超えない。
+- [ ] 同時Melee Attack Enemyが2体を超えない。
 - [ ] 3体目以降のRequestを拒否 / 待機できる。
 - [ ] 終了・中断でSlotを確実に解放できる。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `FR-ENEMY-003`
+- [`FR-ENEMY-003`](../../01_Requirements.md#fr-enemy-003)
 
 ### Issue反映
-- `#121`へMelee Max=2と解放条件を反映する。
+- [#121](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/121)へMelee Max=2と解放条件を反映する。
 
 ## 12. 未決事項
 なし

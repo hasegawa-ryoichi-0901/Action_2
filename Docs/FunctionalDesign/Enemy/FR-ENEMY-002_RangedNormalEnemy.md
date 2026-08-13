@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-002` |
+| 要件ID | [`FR-ENEMY-002`](../../01_Requirements.md#fr-enemy-002) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#120` |
-| 関連要件・設計 | `FR-ENEMY-003`, `FR-ENEMY-005`, `Docs/06_EnemyAI.md` |
+| 関連Issue | [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118), [#120](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/120) |
+| 関連要件・設計 | [`FR-ENEMY-003`](../../01_Requirements.md#fr-enemy-003), [`FR-ENEMY-005`](../../01_Requirements.md#fr-enemy-005), [Enemy AI](../../06_EnemyAI.md) |
 
 ## 2. 目的
 距離を維持しながら射撃する通常Enemyを追加し、近接Enemyと異なる圧力を作る。
@@ -69,11 +69,11 @@ Down / DefeatedをAI停止条件として扱う。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#121` Attack Coordinator
-- `#122` Health / Posture
+- [#121 Attack Coordinator](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/121)
+- [#122 Health / Posture](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/122)
 
 ### Issue反映
-- `#120`へ距離維持、Ranged Slot、Projectile、Cleanupを反映する。
+- [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118)を親Issue、[#120](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/120)をRanged Enemy実装Issueとして扱う。
 
 ## 12. 未決事項
 なし

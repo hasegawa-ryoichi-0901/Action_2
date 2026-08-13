@@ -3,15 +3,15 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-005` |
+| 要件ID | [`FR-ENEMY-005`](../../01_Requirements.md#fr-enemy-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#121` |
-| 関連要件・設計 | `FR-ENEMY-003`, `FR-ENEMY-004` |
+| 関連Issue | [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118), [#121](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/121) |
+| 関連要件・設計 | [`FR-ENEMY-003`](../../01_Requirements.md#fr-enemy-003), [`FR-ENEMY-004`](../../01_Requirements.md#fr-enemy-004) |
 
 ## 2. 目的
-近接Attack制限と遠距離Attack制限を独立調整し、片方のSlot使用がもう片方を不必要に停止しないようにする。
+Melee Attack制限とRanged Attack制限を独立調整し、片方のSlot使用がもう片方を不必要に停止しないようにする。
 
 ## 3. 確定仕様・スコープ
 - Melee SlotとRanged Slotを別Poolで管理する。
@@ -62,10 +62,10 @@ Granted時のみAttack
 
 ## 11. 依存・Issue反映
 ### 依存
-- `FR-ENEMY-003`, `FR-ENEMY-004`
+- [`FR-ENEMY-003`](../../01_Requirements.md#fr-enemy-003), [`FR-ENEMY-004`](../../01_Requirements.md#fr-enemy-004)
 
 ### Issue反映
-- `#121`へPool分離とCapacity設定を反映する。
+- [#121](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/121)へPool分離とCapacity設定を反映する。
 
 ## 12. 未決事項
 なし

@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-007` |
+| 要件ID | [`FR-ENEMY-007`](../../01_Requirements.md#fr-enemy-007) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#123` |
-| 関連要件・設計 | `FR-ENEMY-006`, `FR-ENEMY-008`, `FR-PLAYER-022` |
+| 関連Issue | [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118), [#123](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/123) |
+| 関連要件・設計 | [`FR-ENEMY-006`](../../01_Requirements.md#fr-enemy-006), [`FR-ENEMY-008`](../../01_Requirements.md#fr-enemy-008), [`FR-PLAYER-022`](../../01_Requirements.md#fr-player-022) |
 
 ## 2. 目的
 Posture BreakをEnemyの行動停止とFatal Attack機会へ接続する。
@@ -76,10 +76,10 @@ Down終了 / Fatal / Defeat
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#122` Health / Posture
+- [#122 Health / Posture](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/122)
 
 ### Issue反映
-- `#123`へDown、Animation、Slot、Fatal受付接続を反映する。
+- [#123](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/123)へDown、Animation、Slot、Fatal受付接続を反映する。
 
 ## 12. 未決事項
 なし

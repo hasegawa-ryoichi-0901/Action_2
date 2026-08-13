@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-008` |
+| 要件ID | [`FR-ENEMY-008`](../../01_Requirements.md#fr-enemy-008) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#123`, `#148` |
-| 関連要件・設計 | `FR-ENEMY-007`, `FR-PLAYER-022` |
+| 関連Issue | [#123](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/123), [#148](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/148) |
+| 関連要件・設計 | [`FR-ENEMY-007`](../../01_Requirements.md#fr-enemy-007), [`FR-PLAYER-022`](../../01_Requirements.md#fr-player-022) |
 
 ## 2. 目的
 Enemy Down中だけPlayer Fatal Attackの対象となる受付状態・Collision・基準Transformを提供する。
@@ -70,15 +70,15 @@ Window + Collision OFF
 - [ ] Down中だけ受付State / Collisionを有効化できる。
 - [ ] PlayerへFatal Transformを提供できる。
 - [ ] Down終了 / Defeat / Fatal成立で受付を無効化できる。
-- [ ] #148と安全に連携できる。
+- [ ] [#148](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/148)と安全に連携できる。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `FR-ENEMY-007`
-- `FR-PLAYER-022`
+- [`FR-ENEMY-007`](../../01_Requirements.md#fr-enemy-007)
+- [`FR-PLAYER-022`](../../01_Requirements.md#fr-player-022)
 
 ### Issue反映
-- Enemy側は`#123`、Player Action側は`#148`へ分離する。
+- Enemy側は[#123](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/123)、Player Action側は[#148](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/148)へ分離する。
 
 ## 12. 未決事項
 なし

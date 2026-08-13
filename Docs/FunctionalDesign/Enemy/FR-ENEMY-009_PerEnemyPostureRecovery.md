@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-009` |
+| 要件ID | [`FR-ENEMY-009`](../../01_Requirements.md#fr-enemy-009) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#124` |
-| 関連要件・設計 | `FR-ENEMY-006`, `FR-ENEMY-007` |
+| 関連Issue | [#118](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/118), [#124](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/124) |
+| 関連要件・設計 | [`FR-ENEMY-006`](../../01_Requirements.md#fr-enemy-006), [`FR-ENEMY-007`](../../01_Requirements.md#fr-enemy-007) |
 
 ## 2. 目的
 Enemy種別ごとにPosture回復有無・Delay・Rateを調整し、Posture Break難度を差別化する。
@@ -16,7 +16,7 @@ Enemy種別ごとにPosture回復有無・Delay・Rateを調整し、Posture Bre
 ## 3. 確定仕様・スコープ
 - Enemy DataごとにPosture Recovery設定を持つ。
 - Recovery Enabled、Delay、Rateを個別調整可能にする。
-- Down / Defeated中の回復規則はDown / Defeat状態を優先する。
+- Down / Defeated中の回復RuleはDown / Defeat状態を優先する。
 
 ## 4. 基本フロー
 ```text
@@ -60,15 +60,15 @@ Down / Defeated中は回復処理より状態遷移を優先する。
 
 ## 10. 受入条件
 - [ ] Enemyごとに回復有無を変えられる。
-- [ ] Delay / Rateをデータ変更できる。
+- [ ] Delay / RateをData変更できる。
 - [ ] Down / Defeated中に不正回復しない。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#122`, `#123`
+- [#122](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/122), [#123](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/123)
 
 ### Issue反映
-- `#124`へEnemy DataとRecovery Lifecycleを反映する。
+- [#124](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/124)へEnemy DataとRecovery Lifecycleを反映する。
 
 ## 12. 未決事項
 なし

@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-ENEMY-010` |
+| 要件ID | [`FR-ENEMY-010`](../../01_Requirements.md#fr-enemy-010) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#97`, `#98` |
-| 関連要件・設計 | `FR-ENEMY-006`, `FR-STAGE-014` |
+| 関連Issue | [#97](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/97), [#98](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/98) |
+| 関連要件・設計 | [`FR-ENEMY-006`](../../01_Requirements.md#fr-enemy-006), [`FR-STAGE-014`](../../01_Requirements.md#fr-stage-014) |
 
 ## 2. 目的
 Enemy戦の終了条件を一意に定義し、AI停止・Slot解放・Targeting解除・Reward付与へ接続する。
@@ -73,11 +73,11 @@ Defeated状態を死亡終端として管理する。具体Tag名は共通Tag設
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#122` Health
-- `#99` Reward付与
+- [#122 Health](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/122)
+- [#99 Reward付与](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/99)
 
 ### Issue反映
-- `#98`へDefeat状態、AI停止、Slot、Targeting、Reward通知を反映する。
+- [#97](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/97)をDefeat / Reward親Issue、[#98](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/98)をDefeat実装Issueとして扱う。
 
 ## 12. 未決事項
 なし
