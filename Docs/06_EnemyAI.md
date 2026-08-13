@@ -11,12 +11,12 @@
 ### Boss
 
 - StateTreeで大状態とPhaseを管理する。
-- C++評価システムでAttack候補をScore化する。
+- C++評価SystemでAttack候補をScore化する。
 - Gameplay AbilityでAttackを実行する。
 - Attack / Score調整値はGameplay Dataから取得する。
-- **Boss AIの各基本設計には、その判断根拠を確認できるDebug出力を含める。Debugは別Gameplay機能ではなくBoss AIの検証責務とする。**
+- **Boss AIの各基本設計には、その判断根拠を確認できるDebug出力を含める。Debugは別Gameplay FeatureではなくBoss AIの検証責務とする。**
 
-初期Vertical SliceではPlayer WeaponはSword固定とし、Axe / BowによるWeapon ModifierはPost-VSで追加する。
+初期プレイアブル版ではPlayer WeaponはSword固定とし、Axe / BowによるWeapon ModifierはPost-VSで追加する。
 
 ## 2. 通常敵
 
@@ -39,7 +39,7 @@ Defeated / Down / Cancel / Owner破棄時はAttack Slotを必ず解放する。
 ## 3. 集団戦管理
 
 - Melee Active Max = 2
-- Ranged Active Max = 調整データ
+- Ranged Active Max = 調整Data
 - Melee / Ranged Slotを分離する。
 - Slot二重取得・解放漏れを防ぐ。
 
@@ -59,7 +59,7 @@ Down終了 / Defeat / Fatal成立
 受付State / Collision OFF
 ```
 
-Player側Fatal Attack実行は`FR-PLAYER-022`が担当する。
+Player側Fatal Attack実行は[`FR-PLAYER-022`](01_Requirements.md#fr-player-022)が担当する。
 
 ## 5. Boss StateTree
 
@@ -79,25 +79,25 @@ Root
 
 ## 6. Boss Combat Context
 
-初期VSで評価する情報：
+初期プレイアブル版で評価する情報：
 
-- Playerとの距離
-- Healing状態
-- 残りStamina
+- PlayerとのDistance
+- Healing State
+- Remaining Stamina
 - 直近数秒のAction History
-- 戦闘全体のRange / Action傾向
+- Combat全体のRange / Action傾向
 - Attack Cooldown
-- 直前Attack
-- 同一Attack連続回数
-- 現在Phase
-- 壁際 / Stage端等の位置関係
+- Previous Attack
+- Same Attack Repetition Count
+- Current Phase
+- Wall / Stage Edge等のPosition関係
 
 参照しない情報：
 
 - 未反映Input
 - Input Buffer内容
 - 次に発動予定のAbility
-- 将来入力の予測
+- 将来Inputの予測
 
 ## 7. Attack Candidate Score
 
@@ -161,9 +161,13 @@ Recovery / Counter Window State
 | `FR-BOSS-011` | Combo Branch条件 / 選択結果 |
 | `FR-BOSS-012/013` | Recovery / Counter Window State |
 
+Boss AI実装は親Issue [#125](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/125)および子Issue[#126](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/126)～[#131](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/131)で管理する。
+
 ## 9. 必要データ
 
 各Boss FR基本設計に、その評価で必要なData項目を記載する。DB / CSV SchemaやReaderは別Architecture Designで定義し、AI実装は具体Readerへ直接依存しない。
+
+Master Data Architectureは[#155](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/155)で確定する。
 
 ## 10. Post-VS
 
