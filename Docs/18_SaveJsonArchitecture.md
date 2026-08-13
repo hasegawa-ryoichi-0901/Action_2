@@ -1,5 +1,7 @@
 # 18. Save JSON Architecture
 
+関連Issue: [#154 JSON Save Architectureを確定する](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154)
+
 ## 1. 目的
 
 Gameplay基本設計で確定したSave / Load上の挙動と、JSONの具体Schema・Reader / Writerを分離する。
@@ -29,7 +31,7 @@ Save破損を検出した場合は、破損SaveをGameplayへ適用せず削除�
 [Local Save]
 ```
 
-Gameplay SystemはJSONキー名・JSON Library・File Layoutへ直接依存しない。
+Gameplay SystemはJSON Key・JSON Library・File Layoutへ直接依存しない。
 
 ## 4. 確定Save契機
 
@@ -64,17 +66,18 @@ New Game開始可能状態
 - 削除後は旧Save由来のRuntime状態を残さない。
 - 初期プレイアブル版ではBackup復旧を行わない。
 
-## 6. 後続Architecture設計事項
-
-以下は具体実装時に本Architectureで決定する。
+## 6. #154で確定するArchitecture事項
 
 - JSON Schema
-- Version field
+- Version field / Compatibility
 - Migration方式
 - Atomic Write方式
 - Corrupt Save検出方式
-- Serializer / Deserializer実装
+- Serializer / Deserializer責務
 - File Path / Slot Nameの物理表現
-- Steam Cloud連携
+- Save Request基盤とのStorage境界
+- 将来Steam Cloudを追加できる境界
 
-これらの具体実装方式は、Gameplay基本設計で確定済みのSave挙動を変更しない範囲で決定する。
+これらの具体実装方式は、Gameplay基本設計で確定済みのSave挙動を変更しない範囲で[#154](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154)にて確定する。
+
+### [戻る](../README.md#ドキュメント一覧)
