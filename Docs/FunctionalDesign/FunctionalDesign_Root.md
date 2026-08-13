@@ -1,7 +1,7 @@
 # 基本設計ドキュメント一覧
 
 > `Docs/01_Requirements.md` の各要件を基本設計へ具体化する索引です。
-> 初期Vertical Sliceは剣のみを対象とし、斧・弓はPost-Vertical Slice Featureとして扱います。
+> 初期プレイアブル版は剣のみを対象とし、斧・弓はPost-Vertical Slice Featureとして扱います。
 
 ## 1. 作成方針
 
@@ -14,7 +14,7 @@
 - Component粒度はAction Issue作成・実装開始を妨げる未解決事項として扱わない。
 - Gameplay Actionは親Issue、独立した実装単位は実装Issueとして管理する。
 - 原則`1実装Issue = 1 PR`とする。
-- 現在存在しない`IMovementDriver` / `UMovementAdapterComponent`を初期Vertical Sliceの前提としない。
+- 現在存在しない`IMovementDriver` / `UMovementAdapterComponent`を初期プレイアブル版の前提としない。
 - 数値調整・Asset最終選定は実装中に変更可能とし、Issue作成を妨げない。
 - 基本設計で確定した実装範囲・必要データ・UI / Animation・異常系・受入条件は関連Issueへ反映する。ただし設計書全文のコピーは行わない。
 
@@ -29,7 +29,7 @@
 
 ## 3. Enemy（10件）
 
-`FR-ENEMY-001`～`FR-ENEMY-010`をInitial VSで管理します。
+`FR-ENEMY-001`～`FR-ENEMY-010`を初期プレイアブル版で管理します。
 
 - `FR-ENEMY-007`はDown状態とAnimation。
 - `FR-ENEMY-008`はDown中のFatal Attack受付State / Collision。
@@ -37,7 +37,7 @@
 
 ## 4. Boss（16件）
 
-`FR-BOSS-001`～`013`、`015`、`016`はInitial VS、`FR-BOSS-014`はPost-VSです。
+`FR-BOSS-001`～`013`、`015`、`016`は初期プレイアブル版、`FR-BOSS-014`はPost-VSです。
 
 Boss AIの共通判断・Debug契約は`Boss/BossAI_CommonDesign.md`に記載します。Debugを別Gameplay Featureには分離せず、各Boss AI要件の検証責務として扱います。
 
@@ -95,6 +95,7 @@ Auto Save
 - 未回収DeathDropの位置・内容をSave / Load対象とする。
 - Settings SaveはProgress Saveとは別契機。
 - Weapon Upgrade完了時とStage Clear時はAuto Saveしない。
+- 破損SaveはGameplayへ適用せず削除し、New Game開始可能状態へ戻す。
 
 ## 7. UI / HUD（2件）
 
@@ -129,7 +130,7 @@ Gameplay付与ロジックをReward件数へ依存させません。
 
 ## 10. Future Feature
 
-Axe / BowのFuture Featureは`Docs/01_Requirements.md`および`Docs/04_WeaponSystem.md`を正とし、Initial VS Issue依存グラフへ含めません。
+Axe / BowのFuture Featureは`Docs/01_Requirements.md`および`Docs/04_WeaponSystem.md`を正とし、初期プレイアブル版のIssue依存グラフへ含めません。
 
 ## 11. Issue作成・同期条件
 
