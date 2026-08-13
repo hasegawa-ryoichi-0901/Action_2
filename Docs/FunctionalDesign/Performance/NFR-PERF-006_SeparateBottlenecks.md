@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-PERF-006` |
+| 要件ID | [`NFR-PERF-006`](../../01_Requirements.md#nfr-perf-006) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#136` |
-| 関連要件・設計 | `NFR-PERF-005`, `NFR-MAINT-006` |
+| 関連Issue | [#136](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/136) |
+| 関連要件・設計 | [`NFR-PERF-005`](../../01_Requirements.md#nfr-perf-005), [`NFR-MAINT-006`](../../01_Requirements.md#nfr-maint-006) |
 
 ## 2. 目的
 Performance未達時に推測だけで最適化せず、Game Thread、Render Thread、GPUのどこが支配的かを特定して改善する。
@@ -65,10 +65,10 @@ Game / Render / GPU Time取得
 
 ## 11. 依存・Issue反映
 ### 依存
-- `NFR-PERF-005`
+- [`NFR-PERF-005`](../../01_Requirements.md#nfr-perf-005)
 
 ### Issue反映
-- `#136`へThread / GPU分離分析を反映する。
+- [#136](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/136)へThread / GPU分離分析を反映する。
 
 ## 12. 未決事項
 なし

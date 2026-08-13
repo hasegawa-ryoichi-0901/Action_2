@@ -3,15 +3,15 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-PERF-001` |
+| 要件ID | [`NFR-PERF-001`](../../01_Requirements.md#nfr-perf-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#134` |
-| 関連要件・設計 | `NFR-PERF-002`～`006` |
+| 関連Issue | [#134](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/134) |
+| 関連要件・設計 | [`NFR-PERF-002`](../../01_Requirements.md#nfr-perf-002)～[`006`](../../01_Requirements.md#nfr-perf-006) |
 
 ## 2. 目的
-Performance計測条件を揃えるため、Initial VSの基準解像度を1920x1080へ固定する。
+Performance計測条件を揃えるため、初期プレイアブル版の基準解像度を1920x1080へ固定する。
 
 ## 3. 確定仕様・スコープ
 - 1920x1080をPerformance基準解像度とする。
@@ -63,7 +63,7 @@ Graphics条件確認
 - Performance計測Build
 
 ### Issue反映
-- `#134`へ基準解像度と計測条件を反映する。
+- [#134](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/134)へ基準解像度と計測条件を反映する。
 
 ## 12. 未決事項
 なし

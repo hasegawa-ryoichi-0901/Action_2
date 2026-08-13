@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-PERF-005` |
+| 要件ID | [`NFR-PERF-005`](../../01_Requirements.md#nfr-perf-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#136` |
-| 関連要件・設計 | `NFR-PERF-002`, `NFR-PERF-006` |
+| 関連Issue | [#136](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/136) |
+| 関連要件・設計 | [`NFR-PERF-002`](../../01_Requirements.md#nfr-perf-002), [`NFR-PERF-006`](../../01_Requirements.md#nfr-perf-006) |
 
 ## 2. 目的
 平均FPSでは見えにくいFrame Spikeや操作感の不安定さを検出するため、Frame Timeを主要指標として確認する。
@@ -64,7 +64,7 @@ Thread / GPU分析へ接続
 - Performance計測環境
 
 ### Issue反映
-- `#136`へFrame Time分析を反映する。
+- [#136](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/136)へFrame Time分析を反映する。
 
 ## 12. 未決事項
 なし

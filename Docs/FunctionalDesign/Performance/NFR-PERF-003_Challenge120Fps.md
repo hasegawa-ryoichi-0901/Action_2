@@ -3,18 +3,18 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-PERF-003` |
+| 要件ID | [`NFR-PERF-003`](../../01_Requirements.md#nfr-perf-003) |
 | 優先度 | `Should` |
-| 対応範囲 | `Initial Vertical Slice / Optimization` |
+| 対応範囲 | `初期プレイアブル版 / Optimization` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#135` |
-| 関連要件・設計 | `NFR-PERF-002`, `NFR-PERF-004`～`006` |
+| 関連Issue | [#135](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/135) |
+| 関連要件・設計 | [`NFR-PERF-002`](../../01_Requirements.md#nfr-perf-002), [`NFR-PERF-004`](../../01_Requirements.md#nfr-perf-004)～[`006`](../../01_Requirements.md#nfr-perf-006) |
 
 ## 2. 目的
 60fps最低目標を維持した上で、余力がある場合により高いFrame Rateへ最適化できる基準を持つ。
 
 ## 3. 確定仕様・スコープ
-- 120fpsは挑戦目標でありInitial VS完成条件の最低ラインではない。
+- 120fpsは挑戦目標であり初期プレイアブル版完成条件の最低ラインではない。
 - 60fps要件を犠牲にして120fps専用設計へ変更しない。
 - 1080p基準条件で計測する。
 
@@ -50,7 +50,7 @@ Bottleneck分析
 なし。
 
 ## 9. 異常系・終了条件
-- 120fps未達をInitial VS不合格理由にしない。
+- 120fps未達を初期プレイアブル版不合格理由にしない。
 - 品質 / 可読性を大幅に損なう最適化を無条件に採用しない。
 
 ## 10. 受入条件
@@ -60,10 +60,10 @@ Bottleneck分析
 
 ## 11. 依存・Issue反映
 ### 依存
-- `NFR-PERF-002`
+- [`NFR-PERF-002`](../../01_Requirements.md#nfr-perf-002)
 
 ### Issue反映
-- `#135`内で60fps Gateとは別の挑戦目標として扱う。
+- [#135](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/135)内で60fps Gateとは別の挑戦目標として扱う。
 
 ## 12. 未決事項
 なし

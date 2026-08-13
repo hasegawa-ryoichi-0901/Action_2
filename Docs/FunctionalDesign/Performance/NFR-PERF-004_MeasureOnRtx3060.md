@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-PERF-004` |
+| 要件ID | [`NFR-PERF-004`](../../01_Requirements.md#nfr-perf-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#134` |
-| 関連要件・設計 | `NFR-PERF-001`～`003`, `NFR-PERF-005`, `NFR-PERF-006` |
+| 関連Issue | [#134](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/134) |
+| 関連要件・設計 | [`NFR-PERF-001`](../../01_Requirements.md#nfr-perf-001)～[`003`](../../01_Requirements.md#nfr-perf-003), [`NFR-PERF-005`](../../01_Requirements.md#nfr-perf-005), [`NFR-PERF-006`](../../01_Requirements.md#nfr-perf-006) |
 
 ## 2. 目的
 同一GPU環境を継続的な比較基準として使用し、実装変更によるPerformance退行を追跡する。
@@ -65,7 +65,7 @@ FPS / Frame Time / Thread / GPU計測
 - Performance Scenario
 
 ### Issue反映
-- `#134`へ基準環境・条件記録を反映する。
+- [#134](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/134)へ基準環境・条件記録を反映する。
 
 ## 12. 未決事項
 なし
