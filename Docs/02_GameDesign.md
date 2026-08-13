@@ -2,9 +2,9 @@
 
 ## 1. Player Experience
 
-本作の中心はPlayer操作と敵との戦闘。移動とCameraは高い応答性を持たせ、Attackは入力遅延ではなくStartup / Commitment / Active / RecoveryとCancel制約によって重量感を表現する。
+本作の中心はPlayer操作とEnemyとのCombat。MovementとCameraは高い応答性を持たせ、Attackは入力遅延ではなくStartup / Commitment / Active / RecoveryとCancel制約によって重量感を表現する。
 
-Initial Vertical SliceではSwordのみを使用し、Boot / Title、Tutorial、移動、回避、Attack、Parry、Fatal Attack、通常敵、Boss、Death / Respawn、Endingまでの一連の体験を完成させる。Axe / BowはPost-VSとする。
+初期プレイアブル版ではSwordのみを使用し、Boot / Title、Tutorial、Movement、Dodge、Attack、Parry、Fatal Attack、Normal Enemy、Boss、Death / Respawn、Endingまでの一連の体験を完成させる。Axe / BowはPost-VSとする。
 
 ## 2. Boot / Title / Start
 
@@ -25,7 +25,7 @@ Ending完了 / Skip後はTitleへ戻る。
 
 ## 3. Input
 
-Enhanced Inputを使用し、Playerへアタッチされた入力Componentを`IPlayerInputComponent`で共通管理する。Gameplay ActionとActorComponentの粒度は一致させず、Gameplay Tag、GAS、責務に応じて機能ごとに決定する。
+Enhanced Inputを使用し、PlayerへアタッチされたInput Componentを`IPlayerInputComponent`で共通管理する。Gameplay ActionとActorComponentの粒度は一致させず、Gameplay Tag、GAS、責務に応じて機能ごとに決定する。
 
 ## 4. Combat Tempo
 
@@ -34,7 +34,7 @@ Enhanced Inputを使用し、Playerへアタッチされた入力Componentを`IP
 - Cancel: 許可Window内だけ成立する。
 - Dodge: 1 ActionでNormal / Perfect Resultを扱う。
 - Parry: Sword固有の高リスク防御。
-- Fatal Attack: Enemy Down中の明確な報酬Action。
+- Fatal Attack: Enemy Down中の明確なCombat Reward Action。
 - Slow Motionは使用しない。
 - Perfect Dodge成功は短いHit StopとHUD Feedbackを使用する。
 
@@ -55,7 +55,7 @@ Enemy Attackとの関係を評価
 └─ 無敵外 → Hit
 ```
 
-空中Dodge不可、Enemy Collision非通過。Window時間・移動量は調整可能。
+Air Dodge不可、Enemy Collision非通過。Window時間・移動量は調整可能。
 
 ## 6. Player Reaction / Fatal Attack
 
@@ -74,13 +74,31 @@ Enemy Posture<=0ではDown Animationを再生し、Down中のみFatal Attack受�
 
 ## 8. Inventory / Reward / Upgrade
 
-Gold、Upgrade Material、Boss Unique ItemはPlayer Inventoryを正本とする。
+Gold、Upgrade Material、Boss Unique ItemはPlayer Inventoryを正本とする。共通Inventory責務は[#153](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/153)で管理する。
 
-通常敵DefeatごとにReward Masterから0..N Reward Entryを取得してInventoryへ直接加算する。World Reward Actorは生成しない。
+Normal Enemy DefeatごとにReward Masterから0..N Reward Entryを取得してInventoryへ直接加算する。World Reward Actorは生成しない。
 
 Weapon UpgradeはCheckpoint MenuでGold + Upgrade Materialを消費する。Upgrade完了自体はAuto Save契機にしない。
 
-## 9. Checkpoint
+## 9. Healing Item
+
+```text
+Heal Input
+↓
+Healing Item Count確認
+↓
+Heal Animation開始
+↓
+Healing Itemを1個消費
+↓
+Animation継続
+├─ 被弾 → Heal中断 / Item非返却
+└─ 完了 → HP回復
+```
+
+Animation開始前にActionが成立しなければItemを消費しない。Animation開始直後に消費した後は、被弾・CancelされてもItemを返却しない。
+
+## 10. Checkpoint
 
 ```text
 Interaction
@@ -98,7 +116,7 @@ Rest処理確定
 Auto Save
 ```
 
-## 10. Death / DeathDrop / Respawn
+## 11. Death / DeathDrop / Respawn
 
 ```text
 Player HP <= 0
@@ -130,7 +148,7 @@ Fade In
 
 未回収DeathDropの座標・内容はSave / Load後も復元する。JSON具体構造は別Architecture Designで扱う。
 
-## 11. Boss Defeat / Stage Clear
+## 12. Boss Defeat / Stage Clear
 
 ```text
 Boss HP <= 0
@@ -156,12 +174,12 @@ Title
 
 Boss撃破直後にEndingへ自動遷移せず、Stage Clear自体では追加Auto Saveを行わない。
 
-## 12. HUD
+## 13. HUD
 
-Initial VSで必要な表示：Player HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態、Tutorial表示。Player Reaction内部蓄積値は表示しない。
+初期プレイアブル版で必要な表示：Player HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態、Tutorial表示。Player Reaction内部蓄積値は表示しない。
 
-## 13. Future Weapons
+## 14. Future Weapons
 
-Axe / BowはVertical Slice完成後に追加する。Weapon追加がSword VSの完成条件を阻害しないよう共通基盤を再利用する。
+Axe / Bowは初期プレイアブル版完成後に追加する。Weapon追加が初期プレイアブル版の完成条件を妨げないよう共通基盤を再利用する。
 
 ### [戻る](../README.md#ドキュメント一覧)
