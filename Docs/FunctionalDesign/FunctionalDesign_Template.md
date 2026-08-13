@@ -5,6 +5,8 @@
 > 本テンプレートでは、以下の12章のみを基本設計の標準構成とする。詳細設計レベルのprivate関数、内部アルゴリズム、最終調整値、アセット最終選定は記載しない。
 >
 > 実装方式が未確定の場合、存在しないClass / Interface / Component / Adapterをテンプレート都合で確定実装として記載しない。
+>
+> 本プロジェクトでは、従来の`Initial Vertical Slice`を日本語で**「初期プレイアブル版」**と表記する。
 
 # [要件ID] [要件名]
 
@@ -14,7 +16,7 @@
 |---|---|
 | 要件ID | `[FR-...]` |
 | 優先度 | `Must / Should / Could` |
-| 対応範囲 | `Initial Vertical Slice / Post-VS` |
+| 対応範囲 | `初期プレイアブル版 / Post-VS` |
 | 設計状態 | `Draft / Review / Approved / Implemented` |
 | 関連Issue | `未割当 / #xxx` |
 | 関連要件・設計 | `[Requirement ID / 相対リンク]` |
