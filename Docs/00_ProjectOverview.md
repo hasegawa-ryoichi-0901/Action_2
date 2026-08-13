@@ -12,52 +12,56 @@ Steamでの公開と販売も想定しますが、売上を優先して仕様を
 - 設計理由とトレードオフを説明できる
 - 実行可能ビルドと技術ドキュメントを提出できる
 
-## 2. 初期Vertical Slice成功条件
+## 2. 初期プレイアブル版の成功条件
 
-初期Vertical Sliceは**剣のみ**で完成させます。斧・弓は完成条件に含めません。
+初期プレイアブル版は**Swordのみ**で完成させます。Axe / Bowは完成条件に含めません。
 
 ### 必須
 
-- 応募企業へ実行可能ビルドを提出できる
-- 3～5分のプレイ動画を用意できる
+- 応募企業へ実行可能Buildを提出できる
+- 3～5分のPlay動画を用意できる
 - 技術資料が完成している
-- C++コードの主要部分を限定公開できる
-- 剣でボス1体との高品質な戦闘が完成している
-- Player Death → DeathDrop → Checkpoint Respawnが成立する
-- Enemy Defeat → Upgrade Material → Weapon Upgradeが成立する
-- Boss Defeat → Stage Clearが成立する
+- C++ Codeの主要部分を限定公開できる
+- SwordでBoss1体との高品質なCombatが完成している
+- Player Death → DeathDrop → Auto Save → Checkpoint Respawnが成立する
+- Normal Enemy Defeat → Upgrade Material + Gold → Player Inventory → Weapon Upgradeが成立する
+- Boss Defeat → Gold + 初回Unique Item → Auto Save → Clear Area → Ending → Titleが成立する
 - Gamepad / Keyboard-Mouseの両方で操作できる
-- 60fpsを安定して維持できる
+- 60fps最低保証目標を確認できる
 
-### Post-Vertical Slice追加目標
+### Post-VS追加目標
 
-- 斧を実装する
-- 弓を実装する
-- Checkpointで武器変更できる
-- Steam体験版を公開する
-- 最大3ステージを実装する
-- 最大3体のボスを実装する
+- Axeを実装する
+- Bowを実装する
+- CheckpointでWeapon Changeできる
+- Steam Demoを公開する
+- 最大3Stageを実装する
+- 最大3体のBossを実装する
 - Steam Cloudへ対応する
 - 120fpsを達成する
 
-## 3. 初期Vertical Sliceフロー
+## 3. 初期プレイアブル版フロー
 
 ```text
-[Title]
+[Game Boot]
     ↓
-[Intro Text]
+[Intro]
+    ↓
+[Title]
+    ↓ New Game
+[Tutorial Text]
     ↓
 [Tutorial]
     ↓
-[近接敵]
+[Melee Enemy]
     ↓
-[Upgrade Material]
+[Upgrade Material + Gold]
     ↓
 [Checkpoint]
     ↓
-[近接 + 遠距離の集団戦]
+[Melee + Ranged Group Battle]
     ↓
-[Weapon Upgrade]
+[Gold + MaterialによるWeapon Upgrade]
     ↓
 [Boss前Checkpoint]
     ↓
@@ -65,46 +69,56 @@ Steamでの公開と販売も想定しますが、売上を優先して仕様を
     ↓
 [Boss Defeat]
     ↓
-[Stage Clear]
+[Gold + 初回Unique Item]
+    ↓
+[Auto Save]
+    ↓
+[Clear Area]
+    ↓
+[Clear Trigger]
+    ↓
+[Skippable Ending]
+    ↓
+[Title]
 ```
 
-プレイヤー死亡時は最後に有効化したCheckpointから再開し、通常敵を復活させます。
+Player Death時はDeath Animation後にUpgrade Material 100% + Gold 100%をDeathDropへ移し、DeathDrop確定後Auto Saveを行います。その後Camera確認・Fade Outを経て最後のActiveCheckpoint、未設定時はPlayerStartから再開し、Normal Enemyを復活させます。
 
-## 4. Post-Vertical Slice候補
+## 4. Post-VS候補
 
-- 武器：斧、弓
-- ステージ：最大3
-- 通常敵：ステージの役割に応じて追加
-- ボス：各ステージ1体を上限候補
-- 想定プレイ時間：30分～1時間
+- Weapon：Axe、Bow
+- Stage：最大3
+- Normal Enemy：Stageの役割に応じて追加
+- Boss：各Stage1体を上限候補
+- 想定Play時間：30分～1時間
 
 ## 5. スコープ削減方針
 
-開発が遅延した場合、システムの中核を削除せずコンテンツ量を減らします。
+開発が遅延した場合、Systemの中核を削除せずContent量を減らします。
 
 ```text
-ステージ3
+Stage 3
   ↓
-ステージ2
+Stage 2
   ↓
-通常敵の派生種類
+Normal Enemy派生種類
   ↓
-追加ボス
+追加Boss
   ↓
-斧・弓の追加Feature
+Axe / Bow追加Feature
 ```
 
-次はポートフォリオの中心であるため原則として削除しません。
+次はPortfolioの中心であるため原則として削除しません。
 
-- C++中心の戦闘基盤
-- `IPlayerInputComponent`を中心とした入力基盤
+- C++中心のCombat基盤
+- `IPlayerInputComponent`を中心としたInput基盤
 - GAS
-- 通常回避 / ジャスト回避
-- 体勢値
-- Boss AI
-- 集団戦管理
-- Debug表示
-- Player Death / Respawn
+- Normal Dodge / Perfect Dodge
+- Posture
+- Boss AI / Debug
+- Group Battle管理
+- Player Death / DeathDrop / Respawn
+- Player Inventory / Reward / Weapon Upgrade
 - Save / Stage Clear
 - 技術資料
 
