@@ -8,17 +8,31 @@
 >
 > 本プロジェクトでは、従来の`Initial Vertical Slice`を日本語で**「初期プレイアブル版」**と表記する。
 
+## リンク必須ルール
+
+- `要件ID`は、必ず`Docs/01_Requirements.md`内の該当要件Anchorへ直接移動できるMarkdown Linkにする。
+- `関連Issue`にIssue番号を記載する場合は、必ず該当GitHub IssueのURL Linkにする。
+- Issueがまだ存在しない場合のみ`未割当`と記載する。
+- 関連する要件・設計についても、参照先がファイルとして存在する場合は相対Linkを優先する。
+
+例：
+
+```markdown
+| 要件ID | [`FR-PLAYER-001`](../../01_Requirements.md#fr-player-001) |
+| 関連Issue | [#110](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/110) |
+```
+
 # [要件ID] [要件名]
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `[FR-...]` |
+| 要件ID | [`FR-...`](../../01_Requirements.md#fr-...) |
 | 優先度 | `Must / Should / Could` |
 | 対応範囲 | `初期プレイアブル版 / Post-VS` |
 | 設計状態 | `Draft / Review / Approved / Implemented` |
-| 関連Issue | `未割当 / #xxx` |
+| 関連Issue | `未割当` または [#xxx](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/xxx) |
 | 関連要件・設計 | `[Requirement ID / 相対リンク]` |
 
 ## 2. 目的
