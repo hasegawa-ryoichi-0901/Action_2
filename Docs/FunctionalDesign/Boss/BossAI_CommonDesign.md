@@ -1,111 +1,97 @@
-# Boss AI 共通基本設計
+# BOSS-AI-COMMON Boss AI共通設計
 
-> `FR-BOSS-001`～`FR-BOSS-013`のInitial Vertical Slice Boss AI基本設計に共通する責務・Data・Debug契約を定義する。各FR固有の挙動は個別基本設計を正とし、本書は重複記述を避けるための共通契約とする。
+## 1. 基本情報
+| 項目 | 内容 |
+|---|---|
+| 要件ID | `BOSS-AI-COMMON` |
+| 優先度 | `Must` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
+| 関連Issue | `#125`～`#131` |
+| 関連要件・設計 | `FR-BOSS-001`～`013`, `Docs/06_EnemyAI.md` |
 
-## 1. 目的
+## 2. 目的
+Boss AIのState、Combat Context、Attack Score、行動適応、Combo、Recovery / Counter Windowを同一の判断パイプラインで扱い、選択理由をDebugで追跡可能にする。
 
-Boss AIがPlayerの確定済みCombat Contextを評価し、Attack候補をScore化して行動を選択できること、およびその判断根拠を開発時に確認できることを保証する。
+## 3. 確定仕様・スコープ
+- StateTreeで大状態とPhaseを管理する。
+- C++評価ロジックでAttack候補をScore計算する。
+- Gameplay Abilityで選択Attackを実行する。
+- Initial VSではSword Playerを前提とし、Weapon別評価はPost-VS。
+- 未反映Inputや将来入力をAI判断に使用しない。
+- Debug表示はBoss AI検証責務に含め、Gameplay結果へ影響させない。
 
-## 2. 確定仕様・基本フロー
-
+## 4. 基本フロー
 ```text
-[Combat Context収集]
-      ↓
-[現在Phase / State確認]
-      ↓
-[Attack Candidate列挙]
-      ↓
-[各Candidate Score計算]
-      ↓
-[実行可能Candidateから選択]
-      ↓
-[Gameplay Ability実行]
-      ↓
-[結果 / Action History記録]
+Boss Combat State
+↓
+Combat Context収集
+↓
+Attack候補生成
+↓
+候補ごとScore計算
+↓
+Cooldown / Repetition / Phase等を反映
+↓
+Attack選択
+↓
+Ability実行
+↓
+結果を履歴へ記録
+↓
+次回評価
 ```
 
-参照可能：Player位置、HP / Stamina、Healing状態、実行済みAction History、現在Phase、確定済みGameplay State。
-
-参照しない：未反映Input、Input Buffer内容、次の予定Ability、将来入力予測。
-
-## 3. 責務
-
+## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| StateTree | Boss大状態・Phase遷移 |
-| Combat Context | Player / Stageの確定情報収集 |
+| StateTree | Intro / Combat / Phase / Down / Defeated等の大状態 |
+| Combat Context | Player・Stageの確定済み状態収集 |
 | Attack Evaluator | Candidate Score計算・選択 |
+| Action History | 直近行動・戦闘傾向記録 |
 | Gameplay Ability | 選択Attack実行 |
-| Action History | 実行済み行動・傾向の記録 |
-| Debug Presentation | Context、Score、選択理由の可視化 |
+| Debug Presenter | State / Candidate / Score内訳表示 |
 
-## 4. 状態・Gameplay Tag
+## 6. 状態 / Gameplay Tag
+Boss StateはStateTreeを正とし、Ability / Reactionに必要なGameplay Tagへ同期する。Defeatedは他状態より優先する。
 
-各Boss FRで必要なState / Windowを定義する。DefeatedはPhase Transition、Posture Down、Recovery等より優先する。
-
-## 5. 必要データ
-
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| AttackId | Candidate識別 | Master Data |
-| RequiredPhase | Phase制約 | Master Data |
-| Range条件 | Attack実行範囲 | Master Data |
-| BaseScore | 基本評価値 | Master Data |
-| Context Modifier | Distance / Stamina / Healing / History等の補正 | Master Data |
-| Cooldown | 再使用制約 | Master Data |
-| RepetitionPenalty | 同一行動連続抑制 | Master Data |
-| ComboBranch | 後続Attack候補 | Master Data |
-| Recovery / Counter Window | 反撃可能な隙 | Master Data / Runtime |
+| Boss Phase | 候補切替 | Runtime |
+| Attack Candidate Definitions | Attack候補 | Master Data |
+| Base Score / Modifiers | Score計算 | 調整値 |
+| Cooldown / Repetition Penalty | 連続使用抑制 | 調整値 |
+| Player Distance / Stamina / Healing | Context | Runtime |
+| Recent History / Battle Trend | 適応 | Runtime |
 
-DB / CSV SchemaとReaderは別Architecture Designで定義する。
-
-## 6. Debug — Boss AI基本設計の必須契約
-
-Debugは別Gameplay Featureではなく、Boss AI基本設計の検証責務とする。各FR実装時、そのFRに関連する項目を確認可能にする。
-
-| 項目 | 主な対象要件 |
+## 8. UI / HUD / Animation / Feedback
+| 種別 | 内容 |
 |---|---|
-| Boss State / Current Phase | `FR-BOSS-001/002` |
-| Distance / Distance Score | `FR-BOSS-003` |
-| Healing State / Modifier | `FR-BOSS-005` |
-| Player Stamina / Modifier | `FR-BOSS-006` |
-| Recent Action History / Battle Trend | `FR-BOSS-007` |
-| Candidate List / Base Score / Final Score / Selected Attack | `FR-BOSS-008` |
-| Approach / Retreat / Ranged Frequency補正 | `FR-BOSS-009/010` |
-| Combo Branch条件 / 選択結果 | `FR-BOSS-011` |
-| Recovery / Counter Window State | `FR-BOSS-012/013` |
+| UI / HUD | Boss HPはGameplay HUDへ表示する |
+| Debug | State、Phase、Candidate、Base / Final Score、Modifier内訳、Selected Attackを確認可能にする |
+| Animation | 選択Ability側でAttack Montageを再生する |
 
-Debug要件：
-
-- 最終選択結果だけでなくScore内訳を確認できる。
+## 9. 異常系・終了条件
+- Player参照無効時はAttack評価 / 実行を停止する。
+- Boss Defeated後に新しいCandidateを評価しない。
 - Debug ON/OFFでAI判断結果を変えない。
-- Shipping Gameplay仕様をDebug表示へ依存させない。
-- Invalid Player / DataでもDebug処理からCrashしない。
+- 無効Data / CandidateをScore対象から除外しCrashしない。
 
-## 7. UI / Animation / Feedback
+## 10. 受入条件
+- [ ] Combat Contextから複数Attack候補を評価できる。
+- [ ] Score内訳から選択理由を追跡できる。
+- [ ] Cooldown / Repetition / PhaseをScoreへ反映できる。
+- [ ] Defeated後にAI判断を停止できる。
+- [ ] Debug表示がGameplay結果へ影響しない。
 
-Boss HP HUDはGameplay HUDへ通知する。AI Debugは開発用表示としてGameplay HUDとは分離する。
+## 11. 依存・Issue反映
+### 依存
+- `FR-BOSS-001`～`013`
+- Player Combat / Attribute / History情報
 
-## 8. 異常系・終了条件
+### Issue反映
+- `#125`を親Issueとし、Context、Score、Adaptation、Combo、Windowへ分割する。
 
-- Invalid Target時は新規Attack評価・実行を安全に停止する。
-- Defeated後にCandidate評価・Ability実行を行わない。
-- Cooldown / Candidate不成立時に無効Attackを強制実行しない。
-- Debug参照切れでGameplay本体を停止させない。
-
-## 9. 受入条件
-
-- [ ] Combat Contextから確定済み情報だけを収集できる。
-- [ ] 複数Attack Candidateを評価できる。
-- [ ] Scoreに基づき有効Candidateを選択できる。
-- [ ] 各FRに関連するDebug値とScore内訳を確認できる。
-- [ ] Debug ON/OFFで選択結果が変わらない。
-- [ ] Defeated後にAI評価を停止できる。
-
-## 10. 依存・Issue反映
-
-Boss AI親Issue `#125`および実装Issue `#126`～`#131`は、本共通設計のうち各Issueに関連するDebug・Data・異常系・受入条件を含める。
-
-## 11. 未決事項
-
-なし。Debug表示Layout、表示方式、具体Score値は調整項目とする。
+## 12. 未決事項
+なし

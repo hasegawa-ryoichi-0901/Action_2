@@ -1,55 +1,73 @@
-# FR-BOSS-014 弓で距離を取られた場合に専用接近行動を選択できる
+# FR-BOSS-014 Bowで距離を取られた場合に専用接近行動を選択する
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-BOSS-014` |
 | 優先度 | `Should` |
-| 対応範囲 | `Post-Vertical Slice / Bow Feature` |
+| 対応範囲 | `Post-VS` |
 | 設計状態 | `Draft` |
+| 関連Issue | `未割当` |
+| 関連要件・設計 | `FR-BOSS-004`, `FEATURE-BOW-*`, `BOSS-AI-COMMON` |
 
 ## 2. 目的
+Bow Playerが長距離を維持した場合にBossが専用Gap Closer候補を高く評価できるようにする。
 
-Bowによる遠距離維持だけでBossを一方的に攻略できないよう、遠距離Contextに対応する専用Gap Closerを攻撃評価へ追加する。
-
-## 3. 前提
-
-- Bow Featureが実装済み。
-- Bossの基礎Attack Evaluatorが初期Vertical Sliceで成立済み。
-- `FR-BOSS-004`の装備武器評価が利用可能。
+## 3. 確定仕様・スコープ
+- Bow実装後のPost-VS対象。
+- Equipped WeaponがBowかつRange Trendが長距離の場合にGap Closer候補へ補正を加える。
+- Initial VSのSword Bossを本要件へ依存させない。
 
 ## 4. 基本フロー
-
 ```text
-[Boss Attack Evaluation]
-      ↓
-[Player Weapon == Bow?]
-      +-- No --> [通常評価]
-      ↓
-[Long Range / Line of Sight / Cooldown / Reachability]
-      +-- NG --> [通常評価]
-      ↓
-[Gap Closer Score補正]
-      ↓
-[Select / Execute]
+Weapon = Bow
++ Long Range Trend
+↓
+Gap Closer Modifier適用
+↓
+通常CandidateとScore比較
+↓
+選択時に専用接近Ability実行
 ```
 
-## 5. 公平性
+## 5. 責務
+| 対象 | 責務 |
+|---|---|
+| Weapon Context | Bow判定 |
+| Range Trend | 長距離傾向判定 |
+| Evaluator | Gap Closer補正 |
+| Ability | 専用接近行動 |
 
-- 現在確定済みのWeapon、位置、距離、Range Trendのみを参照する。
-- 未反映入力、次の射撃予定、入力Bufferを参照しない。
-- Gap Closerには認識可能な予備動作を持たせる。
+## 6. 状態 / Gameplay Tag
+Bow装備状態とBoss Phase / Cooldownを利用する。
 
-## 6. 受入条件
+## 7. 必要データ
+| データ | 用途 | 備考 |
+|---|---|---|
+| Bow Weapon Type | 条件 | Runtime / Master Data |
+| Long Range Threshold | Trend判定 | 調整値 |
+| Gap Closer Definition | 行動 | Master Data |
+| Gap Closer Modifier | Score補正 | 調整値 |
 
-- [ ] Bowかつ長距離ContextでGap Closer候補の評価を変更できる。
-- [ ] Sword / AxeではBow専用補正を適用しない。
-- [ ] Cooldown / Reachability不成立時に無理なGap Closerを選択しない。
-- [ ] 初期Vertical SliceのSword Bossには本要件が依存しない。
+## 8. UI / HUD / Animation / Feedback
+専用Gap Closer Animation / VFX / SEをAttack Dataから設定する。DebugでBow補正を表示可能にする。
 
-## 7. 依存
+## 9. 異常系・終了条件
+- Bow未実装 / 無効Data時にCandidateへ追加しない。
+- 距離条件解消後に補正を残さない。
 
-- `FEATURE-BOW-001`～`FEATURE-BOW-005`
+## 10. 受入条件
+- [ ] Bow + Long Range時にGap Closer Scoreを補正できる。
+- [ ] Sword / Axe時にBow専用補正を適用しない。
+- [ ] Debugで補正理由を確認できる。
+
+## 11. 依存・Issue反映
+### 依存
+- Bow Feature
 - `FR-BOSS-004`
-- `FR-BOSS-008`
+
+### Issue反映
+- Bow Post-VS RoadmapでIssue化する。
+
+## 12. 未決事項
+なし

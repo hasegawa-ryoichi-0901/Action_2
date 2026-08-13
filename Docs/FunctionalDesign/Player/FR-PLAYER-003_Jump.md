@@ -5,73 +5,86 @@
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-PLAYER-003` |
-| 要件名 | ジャンプできる |
 | 優先度 | `Must` |
-| 対応範囲 | 初期Vertical Slice |
+| 対応範囲 | `Initial Vertical Slice` |
 | 設計状態 | `Draft` |
+| 関連Issue | `#108`, `#109` |
+| 関連要件・設計 | `FR-PLAYER-004`, `NFR-MAINT-003` |
 
 ## 2. 目的
 
-地形の高低差を越える基本移動を提供する。
+地上から空中へ移行する基本Actionを提供し、Air Attackへ接続する。
 
-## 3. 設計方針
+## 3. 確定仕様・スコープ
 
-Jump入力は`IPlayerInputComponent`を実装する入力Componentからゲームプレイ処理へ配送する。現時点では存在しない`IMovementDriver` / `UMovementAdapterComponent`を前提にしない。
+- Grounded時のみJumpを開始する。
+- Airborne中の再JumpはInitial VSでは行わない。
+- 入力は`IPlayerInputComponent`契約からGameplayへ配送する。
+
+## 4. 基本フロー
 
 ```text
-[Enhanced Input / Jump]
-      ↓
-[IPlayerInputComponent実装]
-      ↓
-[Jump Request]
-      ↓
-[死亡 / 息切れ / 接地等の実行可否]
-      +-- NG --> [Reject / Buffer]
-      ↓
-[Character Jump または UGA_Jump]
-      ↓
-[State.Action.Jumping]
-      ↓
-[Landing]
+Jump Input
+↓
+Grounded確認
+├ No → Reject
+└ Yes
+  ↓
+Jump開始
+  ↓
+Airborne
+  ↓
+Landing
 ```
 
-GASでJumpを管理する場合でも、Input BindingのSetup / Teardownは入力Component側の責務とする。
-
-## 4. 事前条件
-
-- Jump入力Componentが正しくSetupされている。
-- Player / Controller参照が有効。
-- 接地している。
-- `State.Dead`、`State.Action.Exhausted`、Down等の禁止状態ではない。
-
-## 5. 成功・失敗
-
-成功時：
-- Characterが離地する。
-- `State.Action.Jumping`等、戦闘側が必要とする状態を更新する。
-- 着地時にJump状態を解除する。
-
-失敗時：
-- 状態やコストを部分変更しない。
-- 連続入力で多重Jumpを発生させない。
-
-## 6. 責務分割
+## 5. 責務
 
 | 対象 | 責務 |
 |---|---|
-| `IPlayerInputComponent`実装 | Jump入力受付とゲームプレイ要求への配送 |
-| Character / Jump Ability | 実行可否、Jump開始・終了 |
-| CharacterMovement | 実際の鉛直移動・接地判定 |
+| Input層 | Jump入力配送 |
+| Player / Movement | Grounded判定とJump実行 |
 | Animation | Jump / Fall / Land表示 |
 
-## 7. 受入条件
+## 6. 状態 / Gameplay Tag
 
-- [ ] GamepadとKeyboard / Mouseの両方でJumpできる。
-- [ ] 空中で通常のJump入力を再実行して二段Jumpしない。
-- [ ] 息切れ・死亡等の禁止状態ではJumpできない。
-- [ ] 着地後にJump状態が残らない。
-- [ ] Setup再実行でJump入力が重複発火しない。
+Jump専用Tagを必須とはしない。Airborne / GroundedはMovement状態を正とする。
 
-## 8. 未決事項
+## 7. 必要データ
 
-Jumpを最終的にGAS Abilityとして扱うかCharacterのMovement APIとして扱うかは、戦闘状態Tag・空中攻撃・キャンセル制御との整合を確認して実装Issue開始前に確定する。ただしInput Bindingは`IPlayerInputComponent`方針を維持する。
+| データ | 用途 | 備考 |
+|---|---|---|
+| Jump Input | Jump要求 | Runtime |
+| Grounded State | 実行可否 | Runtime |
+| Jump Parameters | Jump高さ等 | 調整値 |
+
+## 8. UI / HUD / Animation / Feedback
+
+| 種別 | 内容 |
+|---|---|
+| Animation | Jump開始、Fall、Landingを表現する |
+
+## 9. 異常系・終了条件
+
+- Airborne中の再入力を拒否する。
+- Death等の禁止状態では開始しない。
+- Landing後にAirborne固有状態を残さない。
+
+## 10. 受入条件
+
+- [ ] Grounded時にJumpできる。
+- [ ] Airborne中の再Jumpを拒否できる。
+- [ ] Landing後に通常移動へ戻れる。
+- [ ] `FR-PLAYER-004`のAir Attack判定へAirborne状態を提供できる。
+
+## 11. 依存・Issue反映
+
+### 依存
+- `FR-PLAYER-001`
+- `FR-PLAYER-004`
+
+### Issue反映
+- `#108`をTracking Parent、`#109`をInput / Grounded実装Issueとして扱う。
+
+## 12. 未決事項
+
+なし

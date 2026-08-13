@@ -1,4 +1,4 @@
-# FR-PLAYER-020 プレイヤーはHPを持ち、HPが0以下になると死亡する
+# FR-PLAYER-020 PlayerはHPを持ちHP0以下で死亡する
 
 ## 1. 基本情報
 
@@ -6,49 +6,101 @@
 |---|---|
 | 要件ID | `FR-PLAYER-020` |
 | 優先度 | `Must` |
-| 対応範囲 | 初期Vertical Slice |
-| 設計状態 | `Review` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
 | 関連Issue | `#82`, `#83` |
-| 関連要件 | `FR-STAGE-008`, `FR-STAGE-012` |
+| 関連要件・設計 | `FR-STAGE-008`～`012`, `FR-SAVE-005`, `Docs/09_SaveCheckpointDeath.md` |
 
-## 2. データ・状態
+## 2. 目的
 
-- `Health`
-- `MaxHealth`
-- `State.Dead`
+Player Damageの終端としてDeath Stateを一意に確定し、Death Animation / DeathDrop / Save / Respawnへ接続する。
 
-HealthはGAS Attributeとして管理する方針です。
+## 3. 確定仕様・スコープ
 
-## 3. 基本フロー
+- Healthが0以下になった時点でDeathを1回だけ確定する。
+- DeathはHit / Stagger / Down等のReactionより優先する。
+- 実行中Combat Actionを終了し通常Gameplay Inputを停止する。
+- Death中もCamera Lookは許可する。
+- Death Animation完了後にDeathDrop処理へ進む。
+
+## 4. 基本フロー
 
 ```text
-[Damage]
-      ↓
-[Health更新]
-      +-- Health > 0 --> [Combat継続]
-      ↓
-[Health <= 0]
-      ↓
-[Death Transition Guard]
-      +-- Already Dead --> [Ignore]
-      ↓
-[State.Dead]
-      +--> Combat Action終了 / Cancel
-      +--> 通常Gameplay入力停止
-      +--> Camera Lookは許可
-      ↓
-[Death Animation]
-      ↓
-[DeathDrop Systemへ通知]
+Damage
+↓
+Health更新
+↓
+Health <= 0?
+├ No → Gameplay継続
+└ Yes
+  ↓
+Death Guard
+  ↓
+State.Dead
+  ↓
+Combat / Gameplay Input停止
+  ↓
+Death Animation
+  ↓
+FR-STAGE-008 / FR-SAVE-005
 ```
 
-Death Animation完了後のDeathDrop、Auto Save、Camera確認、Fade Out、Respawnは`FR-STAGE-008`～`012`および`Docs/09_SaveCheckpointDeath.md`へ委譲します。
+## 5. 責務
 
-## 4. 受入条件
+| 対象 | 責務 |
+|---|---|
+| Player Attribute | Health更新 |
+| Death処理 | Death一意確定・優先順位 |
+| Combat / Input | Action終了・通常Input停止 |
+| Animation | Death Animation完了通知 |
+| DeathDrop / Save | 後続死亡処理 |
 
-- [ ] Health <= 0でDeathへ1回だけ遷移する。
-- [ ] 同Frame複数Hit / OverkillでDeath処理を重複しない。
-- [ ] Attack / Dodge / Heal等を終了・Cancelできる。
-- [ ] Death中は通常Gameplay Actionを開始できない。
-- [ ] Death中もCamera Lookできる。
-- [ ] Death Animation完了EventからDeathDrop処理へ1回だけ接続する。
+## 6. 状態 / Gameplay Tag
+
+| State / Gameplay Tag | 用途 |
+|---|---|
+| `State.Dead` | Player死亡状態 |
+
+## 7. 必要データ
+
+| データ | 用途 | 備考 |
+|---|---|---|
+| Health / MaxHealth | 生存判定 | Runtime / 調整値 |
+| Death Animation / Montage | 死亡表現 | Asset |
+| Death Location | DeathDrop位置 | Runtime |
+
+## 8. UI / HUD / Animation / Feedback
+
+| 種別 | 内容 |
+|---|---|
+| UI / HUD | HPを0へ反映し通常Gameplay HUDの操作要素を停止する |
+| Animation | Death Animation |
+| Camera | Death中もCamera Look可能 |
+
+## 9. 異常系・終了条件
+
+- 同Frame複数DamageでもDeathを重複開始しない。
+- Death後にHeal / Attack / Dodgeを開始しない。
+- Death Animation完了Eventを複数処理しない。
+
+## 10. 受入条件
+
+- [ ] Health>0ではDeathへ遷移しない。
+- [ ] Health<=0でDeathを1回だけ確定する。
+- [ ] DeathがReactionより優先される。
+- [ ] Death中に通常Gameplay Actionを開始できない。
+- [ ] Camera Lookを継続できる。
+- [ ] Death Animation完了からDeathDrop処理へ1回接続できる。
+
+## 11. 依存・Issue反映
+
+### 依存
+- `#62` Damage
+- `#84` DeathDrop生成
+
+### Issue反映
+- `#82`を死亡Loop親Issue、`#83`をHealth0 / Death Stateとして扱う。
+
+## 12. 未決事項
+
+なし

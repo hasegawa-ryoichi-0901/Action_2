@@ -1,85 +1,77 @@
-# FR-STAGE-014 通常敵Defeat時にRewardを獲得する
+# FR-STAGE-014 通常Enemy撃破ごとにRewardを獲得する
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-STAGE-014` |
 | 優先度 | `Must` |
-| 対応範囲 | Initial Vertical Slice |
-| 設計状態 | `Review` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
 | 関連Issue | `#97`, `#99` |
-| 関連設計 | `FR-ENEMY-010`, `FR-STAGE-007` |
+| 関連要件・設計 | `FR-ENEMY-010`, Player Inventory, `Docs/17_MasterDataCsvArchitecture.md` |
 
 ## 2. 目的
+通常Enemy DefeatをUpgrade Material / Gold獲得へ接続し、Weapon Upgrade用Resourceを供給する。
 
-通常敵1体のDefeatをPlayer Inventoryの強化Resource獲得へ接続する。
+## 3. 確定仕様・スコープ
+- Enemy1体のDefeatedにつきRewardを1回だけ付与する。
+- Initial VSではUpgrade Material + Goldを含む。
+- RewardはPlayer Inventoryへ直接加算しWorld Drop Actorを生成しない。
+- `EnemyId → RewardId → 0..N Reward Entry(ItemId / Amount)`の契約を利用する。
+- Reward Entry数にGameplay付与ロジック構造を依存させない。
 
-## 3. 確定仕様・基本フロー
-
+## 4. 基本フロー
 ```text
-[Normal Enemy Defeated]
-      ↓
-[EnemyIdからRewardId取得]
-      ↓
-[RewardIdから0..N Reward Entry取得]
-      ↓
-[各Item / AmountをPlayer Inventoryへ加算]
-      ↓
-[Reward Feedback]
+Enemy Defeated
+↓
+EnemyId → RewardId
+↓
+0..N Reward Entry取得
+↓
+各Item / AmountをPlayer Inventoryへ加算
+↓
+HUD / Feedback更新
 ```
 
-- RewardはEncounter単位ではなくEnemy1体ごとに1回だけ付与する。
-- Initial VSの通常敵RewardにはUpgrade MaterialとGoldを含める。
-- World Drop Actorは生成しない。
-- Gold / Upgrade MaterialはPlayer Inventoryを正本とする。
-- Reward件数にGameplayロジックを依存させない。
-
-## 4. 責務
-
+## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| Enemy Defeat | Reward要求を1回発行する |
-| Reward System | EnemyId→RewardId→0..N Entryを解決する |
-| Player Inventory | Item / Amountを加算する |
-| HUD | Reward取得Feedbackを表示可能にする |
+| Enemy Defeat | Reward通知 |
+| Reward Provider | RewardId解決・Entry取得 |
+| Player Inventory | Item / Gold保持 |
+| HUD | 所持値更新 |
 
-## 5. 状態・Gameplay Tag
+## 6. 状態 / Gameplay Tag
+なし。
 
-本要件固有Tagは必須にしない。同一EnemyのReward付与済み状態を識別できること。
-
-## 6. 必要データ
-
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| EnemyId | Reward参照元 | Master Data |
-| RewardId | Reward Group参照 | Master Data |
-| ItemId | Reward Item識別 | Master Data |
-| Amount | 付与数 | Master Data |
+| EnemyId | Enemy識別 | Master Data |
+| RewardId | Reward集合 | Master Data |
+| ItemId / Amount | 0..N Reward | Master Data |
 
-## 7. UI / Animation / Feedback
+## 8. UI / HUD / Animation / Feedback
+Gold / Upgrade Material所持値をHUDへ反映し、必要に応じ取得Feedbackを表示する。
 
-Gold / Upgrade Material取得をHUDへ通知可能にする。Visualは`FR-UI-002`側で調整する。
+## 9. 異常系・終了条件
+- 多重Defeat通知でRewardを重複付与しない。
+- 無効RewardId / ItemIdでCrashしない。
+- World Drop Actorを生成しない。
 
-## 8. 異常系・終了条件
-
-- Defeated確定前にRewardを付与しない。
-- 同一Enemyの多重Defeat EventでRewardを重複付与しない。
-- RewardId / ItemId不正時にCrashしない。
-
-## 9. 受入条件
-
-- [ ] Enemy1体のDefeatedにつきRewardを1回だけ付与できる。
+## 10. 受入条件
+- [ ] Enemy Defeated後だけRewardを付与できる。
 - [ ] RewardIdから0..N Entryを取得できる。
-- [ ] Upgrade Material / GoldをPlayer Inventoryへ直接加算できる。
-- [ ] World Drop Actorを生成しない。
-- [ ] Reward Entry数を変更してもGameplay付与ロジック構造を変更しない。
-- [ ] 多重Defeat通知でRewardを重複付与しない。
+- [ ] 各RewardをInventoryへ1回加算できる。
+- [ ] Entry数変更で付与ロジックを変更しない。
 
-## 10. 依存・Issue反映
+## 11. 依存・Issue反映
+### 依存
+- `#98` Enemy Defeat
+- Player Inventory
 
-- `#97`, `#99`
+### Issue反映
+- `#97`親、`#99` Reward Provider / Inventory付与として扱う。
 
-## 11. 未決事項
-
-なし。具体Reward量はMaster Data調整項目とする。
+## 12. 未決事項
+なし

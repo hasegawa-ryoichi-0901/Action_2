@@ -1,90 +1,84 @@
-# FR-ENEMY-008 Down中にFatal Attackを受け付ける
+# FR-ENEMY-008 Down中だけFatal Attackを受け付ける
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-ENEMY-008` |
 | 優先度 | `Must` |
-| 対応範囲 | Initial Vertical Slice |
-| 設計状態 | `Review` |
-| 関連Issue | `#123` |
-| 関連設計 | `FR-ENEMY-007`, `FR-PLAYER-022` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
+| 関連Issue | `#123`, `#148` |
+| 関連要件・設計 | `FR-ENEMY-007`, `FR-PLAYER-022` |
 
 ## 2. 目的
+Enemy Down中だけPlayer Fatal Attackの対象となる受付状態・Collision・基準Transformを提供する。
 
-Enemy Down中だけPlayer Fatal Attackを受け付ける範囲と受付状態を提供する。
+## 3. 確定仕様・スコープ
+- Down中のみFatal Attack受付Stateと受付Collisionを有効化する。
+- Player側Actionは`FR-PLAYER-022`が担当する。
+- Fatal Attack基準TransformをPlayer側へ提供する。
+- Down終了 / Defeat / Fatal Attack成立時に受付を無効化する。
 
-## 3. 確定仕様・基本フロー
-
+## 4. 基本フロー
 ```text
-[Enemy Down開始]
-  ↓
-[Window.FatalAttack.Available ON]
-  ↓
-[Fatal Attack受付Collision ON]
-  ↓
-[Playerが受付範囲内へ]
-  ↓
-[FR-PLAYER-022がAttack Inputを評価]
-  ↓
-[Down終了 / Defeat / Fatal成立]
-  ↓
-[受付Window / Collision OFF]
+Enemy Down開始
+↓
+Window.FatalAttack.Available + Collision ON
+↓
+Playerが受付範囲へ
+↓
+FR-PLAYER-022がAction開始
+↓
+Fatal成立 / Down終了 / Defeat
+↓
+Window + Collision OFF
 ```
 
-- Fatal Attack受付はEnemyがDown中の間だけ有効。
-- 受付範囲は専用Collisionで判定する。
-- Player側の入力、位置合わせ、`UGA_FatalAttack`、Montage、Fatal Damageは`FR-PLAYER-022`が担当する。
-
-## 4. 責務
-
+## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| Enemy Down処理 | 受付開始・終了Eventを発行する |
-| Fatal Attack受付Collision | Playerが実行可能範囲内かを判定する |
-| Gameplay State | `Window.FatalAttack.Available`を管理する |
-| Player Fatal Attack | `FR-PLAYER-022`へ委譲 |
+| Enemy Down / Combat | 受付状態Lifecycle |
+| Fatal Collision | Playerが受付範囲内か判定 |
+| Enemy | Fatal基準Transform提供 |
+| Player Fatal Ability | 実際のAttack実行 |
 
-## 5. 状態・Gameplay Tag
-
-| State / Tag | 用途 |
+## 6. 状態 / Gameplay Tag
+| State / Gameplay Tag | 用途 |
 |---|---|
-| `State.Reaction.Downed` | Enemy Down中 |
-| `Window.FatalAttack.Available` | Fatal Attack受付可能 |
+| `State.Reaction.Downed` | 受付前提 |
+| `Window.FatalAttack.Available` | Fatal受付可能 |
 
-## 6. 必要データ
-
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| FatalAttackCollision Shape / Size | 受付範囲 | Enemy / Runtime設定 |
-| FatalAttackPosition / Transform | Player位置合わせ先 | Enemy / Fatal定義 |
-| DownState | 受付開始・終了判定 | Runtime State |
+| Fatal Collision Shape / Size | 受付範囲 | 調整値 |
+| FatalAttack Transform | Player位置合わせ | Runtime / Gameplay Data |
+| Down State | 受付Lifecycle | Runtime |
 
-## 7. UI / Animation / Feedback
+## 8. UI / HUD / Animation / Feedback
+| 種別 | 内容 |
+|---|---|
+| UI / HUD | 受付状態を参照可能とする。専用Promptは必須ではない |
+| Animation | Down AnimationはFR-ENEMY-007 |
 
-- Down中Animationは`FR-ENEMY-007`で必須。
-- Fatal Attack専用Promptを表示するかはVisual調整可能だが、受付状態をGameplay側から取得可能にする。
+## 9. 異常系・終了条件
+- Defeated / Down終了後にCollisionを有効のまま残さない。
+- Fatal成立を二重通知しない。
+- Owner Destroy時にCollision / Windowを解除する。
 
-## 8. 異常系・終了条件
+## 10. 受入条件
+- [ ] Down中だけ受付State / Collisionを有効化できる。
+- [ ] PlayerへFatal Transformを提供できる。
+- [ ] Down終了 / Defeat / Fatal成立で受付を無効化できる。
+- [ ] #148と安全に連携できる。
 
-- Down終了、Defeat、Fatal Attack成立時にCollisionと受付Stateを必ず無効化する。
-- Enemy破棄時にCollision / Tag / Target参照を残さない。
-- 同一Enemyで受付状態を二重開始しない。
+## 11. 依存・Issue反映
+### 依存
+- `FR-ENEMY-007`
+- `FR-PLAYER-022`
 
-## 9. 受入条件
+### Issue反映
+- Enemy側は`#123`、Player Action側は`#148`へ分離する。
 
-- [ ] Down開始時にFatal Attack受付状態になる。
-- [ ] Down中だけ受付Collisionを有効にする。
-- [ ] Playerが受付範囲内か判定できる。
-- [ ] Down終了時に受付を無効化する。
-- [ ] Defeat / Fatal成立時にも受付を無効化する。
-- [ ] Player Fatal Attack実行へ必要なTarget / Transformを提供できる。
-
-## 10. 依存・Issue反映
-
-`#123`はEnemy側Down / Fatal Attack受付までを担当し、Player Actionは独立Issueへ分離する。
-
-## 11. 未決事項
-
-なし。Collisionサイズ、Prompt表示方法は調整項目とする。
+## 12. 未決事項
+なし

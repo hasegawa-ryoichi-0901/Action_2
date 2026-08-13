@@ -1,68 +1,75 @@
-# NFR-MAINT-004 Moverを検証・採用しても戦闘システムへ固有依存を持ち込まない
+# NFR-MAINT-004 Mover固有依存をCombatへ持ち込まない
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `NFR-MAINT-004` |
-| 要件種別 | 非機能要件 / 保守性 |
 | 優先度 | `Must` |
-| 対応範囲 | Architecture Rule |
+| 対応範囲 | `Initial Vertical Slice / 将来Mover検証` |
 | 設計状態 | `Draft` |
+| 関連Issue | `#139` |
+| 関連要件・設計 | `FR-PLAYER-001`, `Docs/07_ClassDesign.md` |
 
 ## 2. 目的
+現在のCharacterMovement利用を維持しつつ、将来Moverを検証する場合にもCombat SystemをMover固有APIへ結合させない。
 
-初期Vertical SliceのCharacterMovement実装を不要な抽象化で複雑化せず、将来Moverを採用した場合にもCombat / Ability / InputへMover固有型やAPIを拡散させない。
+## 3. 確定仕様・スコープ
+- Initial VSではCharacterMovementを現行Movement実装として利用する。
+- 未使用の`IMovementDriver`、`UMovementAdapterComponent`等を先行導入しない。
+- Combat / Abilityは「移動要求」というGameplay上の責務を持ち、Mover固有型・固有APIを直接参照しない。
+- Mover採用の必要性が確認された時点でのみ境界を追加設計する。
 
-## 3. 現在の方針
-
+## 4. 基本フロー
 ```text
-Move Input
-    ↓
-UPlayerMoveInputComponent
-    ↓
-APawn::AddMovementInput
-    ↓
-CharacterMovement
+Combat / Abilityが移動補正を要求
+↓
+現在のPlayer Movement契約へ要求
+↓
+CharacterMovementで実行
+
+将来Mover採用時
+↓
+Gameplay契約を維持
+↓
+Movement実装側だけ差し替え可能にする
 ```
 
-現時点では`IMovementDriver`、`UMovementAdapterComponent`、`UMoverDriver`等を実装前提としない。
+## 5. 責務
+| 対象 | 責務 |
+|---|---|
+| Combat / Ability | Gameplay上の移動要求 |
+| Player Movement | 具体Movement実行 |
+| 将来Adapter | 必要性確定後のみ実装差分吸収 |
 
-## 4. Mover評価時の規則
+## 6. 状態 / Gameplay Tag
+なし。
 
-Moverを評価する場合、まず実際に解決したい問題を明示する。
+## 7. 必要データ
+| データ | 用途 | 備考 |
+|---|---|---|
+| Movement Request Parameters | Dodge / Attack移動補正 | Runtime / 調整値 |
+| Current Movement Backend | 実装確認 | Architecture |
 
-- Root Motion / Motion Warping連携
-- Dodge / Jumpの表現
-- 入力応答性
-- 斜面・段差
-- 性能
-- Debug / Shipping安定性
+## 8. UI / HUD / Animation / Feedback
+なし。
 
-採用メリットが確認された場合のみ、必要最小限のMovement境界を設計する。
+## 9. 異常系・終了条件
+- Initial VSのためだけに未使用抽象層を追加しない。
+- Combat ClassのPublic APIにMover固有型を露出しない。
+- 将来Mover検証で既存Combat Ruleを書き換える前提にしない。
 
-## 5. 禁止する依存
+## 10. 受入条件
+- [ ] Initial VSをCharacterMovementで成立させられる。
+- [ ] Combat / AbilityがMover固有APIへ直接依存しない。
+- [ ] 不要なMovement Adapterを先行実装しない。
+- [ ] 将来差し替える境界を説明できる。
 
-Mover採用時も以下をCombat / Ability / Inputの公開契約へ直接持ち込まない。
+## 11. 依存・Issue反映
+### 依存
+- `FR-PLAYER-001`
 
-- Mover固有ClassをCombat APIの引数・戻り値へ露出する
-- Mover固有Headerを多数のCombat Classからincludeする
-- Mover固有状態をCombat Gameplay Tagの代替にする
-- Moverの採否によってAttack / Dodge / Targetingの呼び出し側を全面修正する
+### Issue反映
+- `#139`へInput抽象化とは別観点としてMovement依存境界を反映する。
 
-## 6. 受入条件
-
-### 現在
-
-- [ ] CharacterMovementでVertical Sliceの移動・Jump・Dodgeを成立させられる。
-- [ ] 未実装のMovement abstractionを必須依存にしない。
-
-### Mover採用時
-
-- [ ] Combat / Ability側へMover固有型が拡散しない。
-- [ ] Mover不採用へ戻す場合の変更箇所をMovement境界付近へ限定できる。
-- [ ] Mover導入理由と比較結果を設計判断として記録する。
-
-## 7. 未決事項
-
-Moverを実際に評価する時期と採否。初期Vertical SliceのIssue作成・実装を停止するBlockerにはしない。
+## 12. 未決事項
+なし

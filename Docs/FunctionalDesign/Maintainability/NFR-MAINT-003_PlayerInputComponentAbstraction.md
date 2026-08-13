@@ -1,55 +1,83 @@
-# NFR-MAINT-003 プレイヤー入力コンポーネントをIPlayerInputComponentで抽象化する
+# NFR-MAINT-003 Player InputをIPlayerInputComponentで抽象化する
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `NFR-MAINT-003` |
 | 優先度 | `Must` |
-| 対応範囲 | 初期Vertical Slice |
-| 設計状態 | `Review` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
+| 関連Issue | `#139` |
+| 関連要件・設計 | `FR-PLAYER-002`, `Docs/05_GASDesign.md`, `Docs/07_ClassDesign.md` |
 
 ## 2. 目的
+`ABasePlayer`を具体Input Component型から分離し、Input Setup / TeardownとGameplay要求配送を共通契約で管理する。
 
-`ABasePlayer`がMove、Look、Combat等の個別入力Componentへ直接依存せず、入力追加時のPlayerクラス変更とBinding重複を抑える。
+## 3. 確定仕様・スコープ
+- `ABasePlayer`はInput Componentを`IPlayerInputComponent`契約で管理する。
+- Setup / Teardown / Input Tag / Pressed Stateの共通契約を維持する。
+- Duplicate Input Tagを設定不備として検知する。
+- Component粒度は固定しない。1 Action 1 Component / 複数Action集約のどちらも仕様・Gameplay Tag・GAS・Lifecycle・テスト容易性に応じて選択可能とする。
+- Component粒度の決定をAction Issue作成・実装開始の前提条件にしない。
 
-## 3. 確定仕様
-
+## 4. 基本フロー
 ```text
-ABasePlayer
-  ↓ discovers / manages
-IPlayerInputComponent
-  ↓ implemented by
-UBasePlayerInputComponent派生
-  ↓
-Gameplay Request / Movement / Camera / ASC
+SetupPlayerInputComponent
+↓
+Playerに接続されたInput Component取得
+↓
+IPlayerInputComponent契約として登録
+↓
+Input Tag重複検証
+↓
+Setup / Binding
+
+再Setup / UnPossessed / EndPlay
+↓
+Teardown
 ```
 
-- `ABasePlayer`は入力Componentを`IPlayerInputComponent`契約で管理する。
-- InputAction / InputTag / Pressed State / Setup / Teardownを共通契約とする。
-- Duplicate Input Tagは設定エラーとして拒否する。
-- Setup再実行、UnPossessed、EndPlayで古いBindingを残さない。
-- Gameplay RuleをInterfaceへ集約しない。
-- **Component粒度は意図的に固定しない。** `1 Action = 1 Component`でも複数Action集約でもよく、Gameplay Tag、GAS、責務、Lifecycle、テスト容易性を見て仕様ごとに決定する。
-- Component粒度の決定をAction Issue作成・実装開始のBlockerにはしない。
+## 5. 責務
+| 対象 | 責務 |
+|---|---|
+| ABasePlayer | Interface経由の収集・登録・Lifecycle |
+| IPlayerInputComponent | 共通Input契約 |
+| Input実装 | 個別入力受付・Gameplay Request変換 |
+| Gameplay System | Inputの具体Component型を意識せず要求を処理 |
 
-## 4. 必要データ
+## 6. 状態 / Gameplay Tag
+Input Tagを入力識別へ利用する。Gameplay状態Tagとは用途を分離する。
 
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| InputAction | Enhanced Input Binding | Asset |
-| Input Gameplay Tag | 入力識別・配送 | Gameplay Tag |
+| Input Action | Enhanced Input受付 | Asset |
+| Input Tag | 入力識別 | Config |
+| Pressed State | 押下状態 | Runtime |
+| Binding Handles | Teardown | Runtime |
 
-## 5. 受入条件
+## 8. UI / HUD / Animation / Feedback
+なし。
 
-- [ ] `ABasePlayer`が具体Input Component型の分岐を増やさずSetupできる。
-- [ ] Duplicate Input Tagを検出できる。
-- [ ] Setup再実行でBindingが重複しない。
-- [ ] UnPossessed / EndPlay後に古いBindingが残らない。
-- [ ] `IsPressed()`がInput Eventと同期する。
-- [ ] Gameplay Ruleが`IPlayerInputComponent`へ混入しない。
-- [ ] Component粒度をAction Issueの前提条件にしない。
+## 9. 異常系・終了条件
+- Duplicate Input Tagを黙って上書きしない。
+- Setup再実行前に古いBindingをTeardownする。
+- Owner / InputComponent無効時にCrashしない。
+- UnPossessed / EndPlay後にBindingを残さない。
 
-## 6. 未決事項
+## 10. 受入条件
+- [ ] ABasePlayerが具体Input Component型へ直接依存しない。
+- [ ] Setup / Teardown契約を統一できる。
+- [ ] Duplicate Input Tagを検知できる。
+- [ ] Component粒度を仕様に応じて変更できる。
+- [ ] Input再Setupで重複発火しない。
 
-なし。Component構成は各機能の実装時に臨機応変に判断する。
+## 11. 依存・Issue反映
+### 依存
+- 現行`IPlayerInputComponent` / `UBasePlayerInputComponent`
+
+### Issue反映
+- `#139`へ抽象化、Lifecycle、Component粒度非固定を反映する。
+
+## 12. 未決事項
+なし

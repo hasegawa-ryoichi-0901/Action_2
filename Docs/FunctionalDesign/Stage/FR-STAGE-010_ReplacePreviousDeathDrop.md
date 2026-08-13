@@ -1,88 +1,72 @@
-# FR-STAGE-010 DeathDrop回収前に再死亡すると旧DeathDropを消失させる
+# FR-STAGE-010 未回収DeathDropを残して再死亡した場合に置き換える
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-STAGE-010` |
 | 優先度 | `Must` |
-| 対応範囲 | Initial Vertical Slice |
-| 設計状態 | `Review` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
 | 関連Issue | `#82`, `#86` |
-| 関連設計 | `FR-STAGE-008`, `FR-STAGE-009`, `FR-SAVE-005` |
+| 関連要件・設計 | `FR-STAGE-008`, `FR-STAGE-009` |
 
 ## 2. 目的
+未回収DeathDropを複数残さず、再死亡時に以前のResourceを永久消失させるDark Souls型ループを成立させる。
 
-未回収DeathDropを最大1つに限定し、回収前の再死亡で旧DeathDropと格納Resourceを永久消失させる。
+## 3. 確定仕様・スコープ
+- 未回収DeathDropが存在する状態で再死亡した場合、旧DeathDrop本体と格納内容をすべて消失させる。
+- 旧内容を新Dropへ引き継がない。
+- 再死亡時点のPlayer InventoryからMaterial100% / Gold100%だけを新Dropへ移す。
+- 常に未回収DeathDropは最大1つとする。
 
-## 3. 確定仕様・基本フロー
-
+## 4. 基本フロー
 ```text
-[Player再死亡]
-      ↓
-[未回収DeathDropあり？]
-      +-- Yes --> [旧DeathDrop本体を消去]
-                   [旧Drop内Upgrade Material / Goldを永久消失]
-      ↓
-[現在Player Inventoryの所持量を取得]
-      +--> Upgrade Material 100%
-      +--> Gold 100%
-      ↓
-[新DeathDropを今回の死亡地点へ生成]
-      ↓
-[座標・内容確定]
-      ↓
-[Auto Save]
+Player再死亡
+↓
+旧Active DeathDropあり?
+├ No → 通常DeathDrop生成
+└ Yes → 旧本体 / 内容を完全消失
+          ↓
+現在Inventoryから新Drop生成
 ```
 
-- 旧DeathDropの内容を新DeathDropへ引き継がない。
-- World上の未回収DeathDropは最大1つ。
-- Gold / Upgrade Materialの正本はPlayer Inventory。
-
-## 4. 責務
-
+## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| DeathDrop管理 | 旧Drop検出・完全消失・新Drop登録 |
-| Player Inventory | 新Dropへ移す現在所持Resourceを提供する |
-| Save System | 新Drop確定状態を保存する |
+| DeathDrop Manager / Flow | 旧Drop識別・消失 |
+| Player Inventory | 新Drop移動元 |
+| Save | 旧Drop消失と新Drop状態保存 |
 
-## 5. 状態・Gameplay Tag
+## 6. 状態 / Gameplay Tag
+Active DeathDropを1件だけ進行状態として保持する。
 
-本要件固有Tagは必須にしない。Active DeathDropを一意に識別できること。
-
-## 6. 必要データ
-
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| ActiveDeathDrop識別 | 旧Drop検出 | Runtime / Save |
-| StoredUpgradeMaterial | 旧Drop消失 / 新Drop格納 | Save対象 |
-| StoredGold | 旧Drop消失 / 新Drop格納 | Save対象 |
-| DeathDropTransform | 新Drop位置 | Save対象 |
+| Active DeathDrop Reference / Id | 旧Drop識別 | Runtime / Save |
+| Stored Resource | 消失対象 | Runtime / Save |
+| New Death Transform | 新Drop位置 | Runtime |
 
-## 7. UI / Animation / Feedback
+## 8. UI / HUD / Animation / Feedback
+旧Drop消失の専用UIは必須としない。新Dropは死亡フローでCamera確認する。
 
-旧DeathDrop消失の専用UIは必須としない。死亡フローのCamera確認へ接続する。
+## 9. 異常系・終了条件
+- 旧Drop内容をInventoryへ返却しない。
+- 旧Dropと新Dropを同時Activeにしない。
+- Save / Load後もActive Dropを1つだけ復元する。
 
-## 8. 異常系・終了条件
+## 10. 受入条件
+- [ ] 再死亡時に旧Drop本体 / 内容を完全消失できる。
+- [ ] 旧内容を新Dropへ合算しない。
+- [ ] 新Dropは現在Inventory分だけで生成できる。
+- [ ] Active Dropが最大1つに保たれる。
 
-- 旧Drop消失前に旧内容をPlayer Inventoryへ戻さない。
-- 新Dropへ旧Drop内容を合算しない。
-- 同一死亡Eventで複数の新Dropを生成しない。
+## 11. 依存・Issue反映
+### 依存
+- `FR-STAGE-008`, `FR-SAVE-005`
 
-## 9. 受入条件
+### Issue反映
+- `#86`へ旧Drop消失 / 一意性 / Save復元を反映する。
 
-- [ ] World上の未回収DeathDropを最大1つにできる。
-- [ ] 再死亡時に旧DeathDrop本体と格納Resourceを完全消失できる。
-- [ ] 新DeathDropは再死亡時点のPlayer Inventory所持量だけから生成する。
-- [ ] Upgrade Material 100%とGold 100%を新Dropへ移せる。
-- [ ] Save / Load後も同じルールを維持できる。
-
-## 10. 依存・Issue反映
-
-- `#82`, `#86`, `#90`
-- `FR-SAVE-005`
-
-## 11. 未決事項
-
-なし。
+## 12. 未決事項
+なし

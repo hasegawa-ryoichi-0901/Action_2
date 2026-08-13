@@ -1,107 +1,81 @@
-# FR-BOSS-015 HPが0以下になるとBoss Defeatedへ遷移する
+# FR-BOSS-015 HP0以下でBossをDefeatする
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-BOSS-015` |
 | 優先度 | `Must` |
-| 対応範囲 | Initial Vertical Slice |
-| 設計状態 | `Review` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
 | 関連Issue | `#100`, `#101` |
-| 関連設計 | `FR-BOSS-016`, `FR-SAVE-004`, `FR-STAGE-013`, `FR-UI-001` |
+| 関連要件・設計 | `FR-BOSS-016`, `FR-SAVE-004`, `FR-STAGE-013` |
 
 ## 2. 目的
+Boss戦終了条件を一意に確定し、Reward、Auto Save、Clear Area、Ending、Titleへ正しい順序で接続する。
 
-Boss戦の終了条件を一意にし、Defeat後のReward、Auto Save、Clear Area、Ending、Titleまでを重複なく接続する。
+## 3. 確定仕様・スコープ
+- Health<=0でBoss Defeatedを1回だけ確定する。
+- DefeatedはPhase Transition / Down / Recoveryより優先する。
+- AI評価・Attack Abilityを停止する。
+- `Defeated → Gold → 初回固有Item → Reward確定 → Auto Save → Clear Area → Clear Trigger → Ending → Title`を確定順序とする。
+- Boss撃破直後にEndingへ自動遷移しない。
 
-## 3. 確定仕様・基本フロー
-
+## 4. 基本フロー
 ```text
-[Boss HP <= 0]
-      ↓
-[Boss Defeated]
-      +--> Attack Ability停止
-      +--> StateTree / Evaluator停止
-      +--> 新規Attack評価停止
-      ↓
-[Gold付与]
-      ↓
-[初回固有Item付与]
-      ↓
-[Reward確定]
-      ↓
-[Auto Save]
-      ↓
-[PlayerがClear Areaへ移動]
-      ↓
-[Clear Trigger]
-      ↓
-[Skippable Ending]
-      ↓
-[Title]
+Boss Health <= 0
+↓
+Defeated
+↓
+AI / Ability停止
+↓
+FR-BOSS-016 Reward
+↓
+FR-SAVE-004 Auto Save
+↓
+FR-STAGE-013 Clear Area / Ending / Title
 ```
 
-- DefeatedはPhase Transition、Posture Down、Recoveryより優先する。
-- Boss撃破直後にEndingへ自動遷移しない。
-- Reward確定前にBoss Reward Saveを発行しない。
-- Stage Clear自体では追加Auto Saveを行わない。
-
-## 4. 責務
-
+## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| Boss Attribute / Combat | HP更新、Defeated確定、Ability停止 |
-| Boss AI | StateTree / Evaluator / Attack選択停止 |
-| Reward | Gold / 初回固有ItemをPlayer Inventoryへ付与 |
-| Save | Reward確定後Auto Save |
-| Stage Progression | Save完了後Clear Area / Triggerを進行可能にする |
-| UI / Flow | Ending終了 / Skip後にTitleへ戻す |
+| Boss Combat | Defeated一意確定 |
+| AI / Ability | 行動停止 |
+| Reward | Gold / Unique Item付与 |
+| Save | Reward確定後保存 |
+| Stage Progression | Clear Trigger以降 |
 
-## 5. 状態・Gameplay Tag
+## 6. 状態 / Gameplay Tag
+DefeatedをBoss終端状態として扱う。
 
-| State / Tag | 用途 |
-|---|---|
-| Boss Defeated State | Boss戦終了の正本 |
-
-## 6. 必要データ
-
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| Boss RewardId | Reward取得 | Master Data |
-| First Defeat Item状態 | 初回固有Item重複防止 | Save Data |
-| Clear Trigger参照 /状態 | Defeat後のStage進行 | Runtime / Map |
+| Health | Defeat判定 | Runtime |
+| BossId / RewardId | Reward接続 | Master Data |
+| Clear Progress State | 後続解放 | Runtime |
 
-## 7. UI / Animation / Feedback
+## 8. UI / HUD / Animation / Feedback
+Boss HP表示を終了し、Defeat Animation / Feedbackを設定可能にする。EndingはStage側が担当する。
 
-- Boss HP HUDを終了させる。
-- Defeat Animation / VFX / SEはAsset調整可能。
-- EndingはClear Trigger進入後に開始しSkip可能とする。
+## 9. 異常系・終了条件
+- 同Frame複数HitでDefeatedを重複確定しない。
+- Defeated後にPhase2 / Attack評価を開始しない。
+- Reward / Save完了前にClear Triggerを有効化しない。
 
-## 8. 異常系・終了条件
+## 10. 受入条件
+- [ ] Health0でDefeatedを1回だけ確定できる。
+- [ ] AI / Abilityを停止できる。
+- [ ] Reward → Save → Stage Progressionの順序を維持できる。
+- [ ] Boss撃破直後にEndingへ入らない。
 
-- 同Frame複数Hit / OverkillでもDefeatedを1回だけ確定する。
-- Defeated後にPhase2 / Attack / AI評価へ戻らない。
-- Reward / Save / Clear Trigger要求を重複発行しない。
-
-## 9. 受入条件
-
-- [ ] HP>0ではDefeatedへ遷移しない。
-- [ ] HP<=0で1回だけDefeatedへ遷移する。
-- [ ] Defeated後にAttack Ability / AI評価を停止する。
-- [ ] Gold→初回固有Item→Reward確定の順で処理できる。
-- [ ] Reward確定後にAuto Saveする。
-- [ ] Auto Save後にClear Areaへ進行できる。
-- [ ] Clear TriggerからEndingを開始できる。
-- [ ] Ending終了 / Skip後にTitleへ戻る。
-- [ ] Stage Clearで追加Auto Saveしない。
-
-## 10. 依存・Issue反映
-
-- `#100` Boss Defeat / Reward
-- `#103` Boss Reward Auto Save
+## 11. 依存・Issue反映
+### 依存
+- `#102` Reward
+- `#103` Auto Save
 - `#105` Stage Clear
 
-## 11. 未決事項
+### Issue反映
+- `#101`へDefeated状態と停止処理、親`#100`へ後続順序を反映する。
 
-なし。Defeat Animationの具体Asset・尺、Clear Area表現は調整項目とする。
+## 12. 未決事項
+なし

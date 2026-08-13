@@ -1,43 +1,71 @@
-# FR-SAVE-003 CheckpointでManual Saveできる
+# FR-SAVE-003 Checkpoint MenuからManual Saveできる
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-SAVE-003` |
-| 優先度 | `Must` |
-| 対応範囲 | 初期Vertical Slice |
-| 設計状態 | `Review` |
+| 優度 | `Must` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
+| 関連Issue | `#89` |
+| 関連要件・設計 | `FR-STAGE-003`, `FR-SAVE-001`, `FR-SAVE-002` |
 
 ## 2. 目的
+PlayerがCheckpoint Menu滞在中に任意のタイミングで現在進行状態を保存できるようにする。
 
-Auto Saveとは別に、PlayerがCheckpoint Menuから任意のタイミングで進行保存を要求できるようにする。
+## 3. 確定仕様・スコープ
+- Manual SaveはCheckpoint Menuからのみ実行可能。
+- Checkpoint外からManual Saveは提供しない。
+- Progress Slotは`FR-SAVE-001`と同じ1 Slotを使用する。
+- Weapon Upgrade完了自体はAuto Saveしないため、必要ならManual Saveできる。
 
-## 3. 基本フロー
-
+## 4. 基本フロー
 ```text
-[Checkpoint Menu Open]
-      ↓
-[Manual Save選択]
-      ↓
-[保存可能状態確認]
-      +-- NG --> [理由を通知 / 状態変更なし]
-      ↓
-[Save Request]
-      ↓
-[Save完了通知]
+Checkpoint Menu
+↓
+Manual Save選択
+↓
+Current Progress Snapshot
+↓
+Save Request
+↓
+Result表示
 ```
 
-## 4. 制約
+## 5. 責務
+| 対象 | 責務 |
+|---|---|
+| Checkpoint Menu | Manual Save操作 |
+| Save基盤 | Snapshot保存・結果通知 |
 
-- 初期Vertical SliceではCheckpoint Menu以外からManual Saveできない。
-- Weapon Upgrade完了自体はAuto Save契機ではない。
-- Manual Save実行時は現在の確定済み進行状態を保存対象にする。
-- 保存形式・JSON・Steam Cloud方式は別Architecture Designで扱う。
+## 6. 状態 / Gameplay Tag
+なし。
 
-## 5. 受入条件
+## 7. 必要データ
+| データ | 用途 | 備考 |
+|---|---|---|
+| Checkpoint Menu Active | 実行可否 | Runtime |
+| Progress Snapshot | 保存対象 | Runtime |
 
-- [ ] Checkpoint MenuからManual Saveを要求できる。
-- [ ] Checkpoint外ではManual Saveできない。
-- [ ] 保存中の重複要求を安全に処理できる。
-- [ ] 成功・失敗をPlayerへ通知できる。
+## 8. UI / HUD / Animation / Feedback
+Manual Save項目、Save中 / 成功 / 失敗Feedbackを表示する。
+
+## 9. 異常系・終了条件
+- Checkpoint Menu外ではRequestを拒否する。
+- Save中に連打して重複Saveしない。
+
+## 10. 受入条件
+- [ ] Checkpoint MenuからManual Saveできる。
+- [ ] Checkpoint外では実行できない。
+- [ ] Save結果をUIへ表示できる。
+
+## 11. 依存・Issue反映
+### 依存
+- `#88` Save基盤
+- `#91` Checkpoint
+
+### Issue反映
+- `#89`へManual Save導線も含める。
+
+## 12. 未決事項
+なし

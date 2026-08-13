@@ -1,48 +1,69 @@
-# FR-BOSS-004 プレイヤーの装備武器を評価する
+# FR-BOSS-004 Player装備Weaponを評価する
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-BOSS-004` |
 | 優先度 | `Should` |
-| 対応範囲 | `Post-Vertical Slice / 複数武器実装後` |
+| 対応範囲 | `Post-VS` |
 | 設計状態 | `Draft` |
+| 関連Issue | `未割当` |
+| 関連要件・設計 | `FR-PLAYER-008`, `FR-BOSS-014`, `BOSS-AI-COMMON` |
 
 ## 2. 目的
+Axe / Bow追加後にPlayer装備WeaponをBoss Attack評価へ反映し、武器ごとに異なる対処を選択可能にする。
 
-Axe / Bow追加後、プレイヤー武器による戦闘距離・防御手段・行動傾向の差をBoss攻撃評価へ反映する。
+## 3. 確定仕様・スコープ
+- Initial VSではSword固定のため評価対象外。
+- Post-VSで確定済みEquipped Weapon TypeだけをContextへ使用する。
+- 未反映Weapon Change Inputは参照しない。
 
-## 3. 初期Vertical Slice
-
-初期Vertical SliceはSword固定のため、Weapon Modifierによる分岐をBoss完成条件にしない。Boss AIは距離、Player Stamina、Healing State、行動履歴等のSword環境で成立させる。
-
-## 4. Post-Vertical Sliceフロー
-
+## 4. 基本フロー
 ```text
-[Attack Evaluation Context]
-      ↓
-[Equipped Weapon Id / Type]
-      ↓
-[BossAttackDefinition.PlayerWeaponModifiers]
-      ↓
-[Attack Score補正]
-      ↓
-[Select Attack]
+Combat Context更新
+↓
+Equipped Weapon取得
+↓
+Weapon Modifier取得
+↓
+Attack Candidate Scoreへ反映
 ```
 
-Bow時の専用Gap Closerは`FR-BOSS-014`へ委譲する。
+## 5. 責務
+| 対象 | 責務 |
+|---|---|
+| Player Weapon System | 現在装備を公開 |
+| Boss Context | Weapon Type取得 |
+| Evaluator | Weapon Modifier適用 |
 
-## 5. 受入条件
+## 6. 状態 / Gameplay Tag
+Weapon状態はEquipped Weaponを正とし、必要なWeapon Tagへ同期する。
 
-- [ ] Sword / Axe / Bowを識別してScore Modifierへ反映できる。
-- [ ] Weapon情報未取得時に不正なScoreを適用しない。
-- [ ] 未反映の入力や将来の武器変更予定を参照しない。
-- [ ] Sword固定の初期Vertical Sliceで本要件未実装でもBoss戦が成立する。
+## 7. 必要データ
+| データ | 用途 | 備考 |
+|---|---|---|
+| Equipped Weapon Type | Context | Runtime |
+| Weapon Modifier | Score補正 | Master Data |
 
-## 6. 依存
+## 8. UI / HUD / Animation / Feedback
+Gameplay表示は不要。DebugでWeapon TypeとModifierを表示可能にする。
 
-- Axe / Bow Future Feature
-- `FR-BOSS-008`
-- `FR-BOSS-014`
-- `FBossAttackDefinition.PlayerWeaponModifiers`
+## 9. 異常系・終了条件
+- 未実装Weapon Typeは中立Modifierとして安全に扱う。
+- Weapon参照無効でCrashしない。
+
+## 10. 受入条件
+- [ ] Post-VSで装備Weaponを取得できる。
+- [ ] Weapon ModifierをAttack Scoreへ反映できる。
+- [ ] Debugで評価内容を確認できる。
+
+## 11. 依存・Issue反映
+### 依存
+- Axe / Bow実装
+- `FR-PLAYER-008`
+
+### Issue反映
+- Post-VS RoadmapでIssue化する。
+
+## 12. 未決事項
+なし

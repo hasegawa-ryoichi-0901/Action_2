@@ -1,126 +1,86 @@
-# FR-UI-001 Title / Start Flowを実装する
+# FR-UI-001 Title / Start Flowを提供する
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-UI-001` |
 | 優先度 | `Must` |
-| 対応範囲 | Initial Vertical Slice |
-| 設計状態 | `Review` |
-| 関連Issue | 未割当 |
-| 関連設計 | `FR-STAGE-001`, `FR-STAGE-002`, `FR-SAVE-001-006`, `FR-STAGE-013` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
+| 関連Issue | `#150` |
+| 関連要件・設計 | `FR-STAGE-001`, `FR-STAGE-013`, `FR-SAVE-001`, `FR-SAVE-006` |
 
 ## 2. 目的
-
-ゲーム起動からTitle、New Game / Continue / Load Game、Ending後のTitle復帰までの入口と出口を一意にする。
+Game BootからTitle、New Game / Continue / Load / Config / Exit、およびEnding後のTitle復帰までを一貫したStart Flowとして提供する。
 
 ## 3. 確定仕様・スコープ
-
-ゲーム起動時は次の順で遷移する。
-
-```text
-[Game Boot]
-  ↓
-[Intro]
-  ↓
-[Title]
-```
-
-Titleには次を表示する。
-
-- Continue
-- Load Game
-- New Game
-- Config
-- Exit
-
-各導線は次で確定する。
-
-- `New Game` → Tutorial Text → Tutorial → Play Start
-- `Continue` → 現在の進行Save DataからPlay Start
-- `Load Game` → Save Data選択 → Play Start
-- `Config` → Config画面
-- `Exit` → Game終了
-- `Ending`終了 / Skip → Titleへ復帰
-
-Initial Vertical Sliceの進行Saveは1スロットであるため、Load Game画面の選択対象は現在存在するSave Dataとする。将来複数スロット化してもTitle Flow自体は変更しない。
+- `Game Boot → Intro → Title`とする。
+- Title項目はContinue / Load Game / New Game / Config / Exit。
+- New Gameは`Tutorial Text → Tutorial → Play Start`へ進む。
+- Continueは現在の進行SaveをLoadしてPlay Startする。
+- Load GameはSave Data選択画面を開き選択後にLoadする。
+- Configは設定画面、ExitはGame終了。
+- Ending終了 / Skip後はTitleへ戻る。
 
 ## 4. 基本フロー
-
 ```text
-[Game Boot]
-  ↓
-[Intro]
-  ↓
-[Title]
-  ├─ Continue → [Load Current Save] → [Play Start]
-  ├─ Load Game → [Save Data Select] → [Load] → [Play Start]
-  ├─ New Game → [Tutorial Text] → [Tutorial] → [Play Start]
-  ├─ Config → [Config]
-  └─ Exit → [Quit]
+Game Boot → Intro → Title
 
-[Ending Complete / Skip]
-  ↓
-[Title]
+Title
+├ Continue → Save Load → Play Start
+├ Load Game → Save選択 → Load → Play Start
+├ New Game → Tutorial Text → Tutorial
+├ Config → Config UI
+└ Exit → Game終了
+
+Ending Complete / Skip → Title
 ```
 
 ## 5. 責務
-
 | 対象 | 責務 |
 |---|---|
-| Title UI | Menu表示、選択入力、各Flowへの要求 |
-| Game Flow / GameMode相当 | Boot / Intro / Title / Gameplay / Endingの遷移管理 |
-| Save System | Continue / Load Game用Save存在確認とLoad |
-| Config System | Config画面と設定反映 |
+| Boot / Frontend Flow | Intro / Title状態管理 |
+| Title UI | 5項目操作 |
+| Save System | Continue / Load |
+| Config | 設定画面 |
+| Stage / Ending | Title復帰通知 |
 
-## 6. 状態・Gameplay Tag
-
-Gameplay Tagでの管理は必須にしない。Game Flow Stateとして`Intro / Title / Loading / Gameplay / Ending`を識別できること。
+## 6. 状態 / Gameplay Tag
+Frontend / Gameplay状態はFlow Stateとして管理する。Gameplay Tagは必須としない。
 
 ## 7. 必要データ
-
 | データ | 用途 | 備考 |
 |---|---|---|
-| Intro Content | Boot後Intro表示 | UI / Asset |
+| Intro Content | 起動Intro | Asset |
 | Title Menu Definition | Menu項目 | UI Data |
-| Save Summary | Continue / Load Game表示 | Save Runtime Data |
-| New Game Initial State | New Game開始状態 | Gameplay / Save Data |
+| Save Summary | Continue / Load表示 | Runtime / Save |
+| New Game Initial State | 初期進行 | Gameplay Data |
 
 ## 8. UI / HUD / Animation / Feedback
-
-| 種別 | 内容 |
-|---|---|
-| UI | Continue / Load Game / New Game / Config / Exit |
-| Feedback | 選択、決定、戻る、Load失敗等の最低限Feedback |
-| Camera / Animation | Intro / Title演出はAsset調整可能 |
+Title Menu、Load Data選択、Config画面、Introを提供する。Gameplay HUDはTitle表示中に残さない。
 
 ## 9. 異常系・終了条件
-
-- Save Dataが存在しない場合はContinueを実行しない。
-- Load失敗時はTitle / Load Game画面へ安全に戻れる。
-- New Game開始を多重実行しない。
-- EndingからTitleへ戻る際にGameplay入力・残存Widget・一時Stateを残さない。
+- SaveなしではContinueを実行不可にする。
+- Load失敗時にTitle / Load UIへ戻れる。
+- New Game / Loadを多重開始しない。
+- Ending→TitleでGameplay HUD / Input /一時Stateを残さない。
 
 ## 10. 受入条件
-
-- [ ] Boot → Intro → Titleの順で遷移する。
-- [ ] Titleに5項目を表示できる。
-- [ ] New GameからTutorial Text / Tutorialへ遷移できる。
-- [ ] Continueから現在のSave Dataを読みPlay Startできる。
-- [ ] Load GameからSave Dataを選択してPlay Startできる。
-- [ ] Configを開ける。
-- [ ] Exitでゲームを終了できる。
-- [ ] Ending終了 / Skip後にTitleへ戻れる。
+- [ ] Boot→Intro→Titleへ遷移できる。
+- [ ] Titleの5項目を選択できる。
+- [ ] New Game→Tutorialへ進める。
+- [ ] Continue / LoadからPlay Startできる。
+- [ ] Ending後Titleへ戻れる。
 - [ ] Saveなし / Load失敗で進行不能にならない。
 
 ## 11. 依存・Issue反映
+### 依存
+- `#87` Save
+- `#132`, `#133`
+- `#107` Ending
 
-- Save System
-- Tutorial
-- Stage Clear / Ending
-- Config
+### Issue反映
+- `#150`へFrontend Flow全体を反映する。
 
 ## 12. 未決事項
-
-なし。TitleのVisual、Intro尺、Transition Animationは調整項目とする。
+なし

@@ -5,117 +5,87 @@
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-PLAYER-001` |
-| 要件名 | 三人称視点で移動できる |
-| 要件種別 | 機能要件 |
 | 優先度 | `Must` |
-| 対応範囲 | 初期Vertical Slice |
+| 対応範囲 | `Initial Vertical Slice` |
 | 設計状態 | `Draft` |
-| 関連設計 | `FR-PLAYER-002`, `FR-PLAYER-021`, `NFR-MAINT-003` |
+| 関連Issue | `#110` |
+| 関連要件・設計 | `FR-PLAYER-002`, `FR-PLAYER-021`, `NFR-MAINT-003`, `Docs/07_ClassDesign.md` |
 
 ## 2. 目的
 
-カメラ方向を基準とした応答性の高い三人称移動を提供する。
+三人称アクションの基礎として、Camera方向を基準にPlayerを安定して移動できるようにする。
 
-## 3. 設計方針
+## 3. 確定仕様・スコープ
 
-現行実装を正とし、存在しない`IMovementDriver` / `UMovementAdapterComponent`を前提にしない。
+- Camera Yawを基準に前後左右の移動方向を算出する。
+- 現行実装では`ABasePlayer`とCharacterMovementを利用する。
+- 入力受付は`IPlayerInputComponent`契約を経由する。
+- Moverや未実装Movement Adapterを前提にしない。
+
+## 4. 基本フロー
 
 ```text
-[Enhanced Input / IA_Move]
-      ↓
-[ABasePlayer::SetupPlayerInputComponent]
-      ↓
-[IPlayerInputComponent]
-      ↓
-[UPlayerMoveInputComponent]
-      ↓
-[Move(FInputActionValue)]
-      ↓
-[Controller YawからForward / Right算出]
-      ↓
-[APawn::AddMovementInput]
-      ↓
-[CharacterMovement]
+Move Input
+↓
+IPlayerInputComponent経由で受付
+↓
+Controller / Camera Yawから方向算出
+↓
+AddMovementInput
+↓
+CharacterMovementで移動
 ```
 
-## 4. 事前条件
-
-- `UPlayerMoveInputComponent`がPlayerへアタッチされている。
-- `FTaggedInputAction`に有効なInputAction / InputTagが設定されている。
-- `ABasePlayer`が有効なControllerを保持している。
-- Inputが無効化されていない。
-- 死亡等で移動を禁止する場合はGameplay状態側から入力または移動要求を拒否する。
-
-## 5. 基本フロー
-
-1. `ABasePlayer::SetupPlayerInputComponent`が入力Componentを収集する。
-2. `IPlayerInputComponent::Setup()`でEnhanced InputへBindingする。
-3. Move入力から2D軸を取得する。
-4. ControllerのYawだけを使用してForward / Rightを算出する。
-5. `AddMovementInput`へ要求する。
-6. CharacterMovementが移動結果を反映する。
-
-## 6. 異常系・ライフサイクル
-
-- OwnerがPawnでない場合は処理しない。
-- Controllerが無効な場合は処理しない。
-- InputTag重複時は重複Componentを登録しない。
-- `SetupPlayerInputComponent`再実行前に既存BindingをTeardownする。
-- UnPossessed / EndPlay時にBindingとMapping Contextを解除する。
-
-## 7. 責務分割
+## 5. 責務
 
 | 対象 | 責務 |
 |---|---|
-| `ABasePlayer` | Input Component発見・登録・Setup/Teardown、Mapping Context |
-| `IPlayerInputComponent` | 入力Componentの共通契約 |
-| `UBasePlayerInputComponent` | TaggedInputAction、押下状態、Binding共通処理 |
-| `UPlayerMoveInputComponent` | Move入力解釈、カメラYaw基準の方向算出、移動要求 |
-| CharacterMovement | 実際のCharacter移動 |
-| Animation | 移動速度等からLocomotionを表示 |
+| Input層 | 移動入力の受付・配送 |
+| Player | 移動方向の算出と移動要求 |
+| CharacterMovement | 実際の移動処理 |
 
-## 8. インターフェース
+## 6. 状態 / Gameplay Tag
 
-本要件の入力Componentは`IPlayerInputComponent`を実装する。
+なし。通常移動そのものはGAS状態として管理しない。
 
-```cpp
-const FTaggedInputAction& GetTaggedInputAction() const;
-bool IsPressed() const;
-void Setup(UInputComponent& InputComponent);
-void Teardown();
-```
+## 7. 必要データ
 
-移動固有処理を`IPlayerInputComponent`へ追加しない。
+| データ | 用途 | 備考 |
+|---|---|---|
+| Move Input Vector | 前後左右入力 | Runtime |
+| Controller Yaw | Camera基準方向 | Runtime |
+| Movement Parameters | 移動速度等 | 調整値 |
 
-## 9. データ
+## 8. UI / HUD / Animation / Feedback
 
-- InputAction / InputTag：`FTaggedInputAction`
-- Mapping Context：`ABasePlayer::DefaultMappingContext`
-- 移動速度・加減速等：CharacterMovementまたは将来の調整データ
+| 種別 | 内容 |
+|---|---|
+| Animation | 移動速度・方向をAnim側へ渡してLocomotionへ反映する |
+| Camera | `FR-PLAYER-021`の三人称Cameraを基準にする |
+
+## 9. 異常系・終了条件
+
+- Controller無効時は移動方向計算を行わず安全に終了する。
+- Input再SetupでBindingを重複させない。
+- Death等の入力禁止状態では上位の入力制御に従う。
 
 ## 10. 受入条件
 
-- [ ] Keyboard / MouseでカメラYaw基準に前後左右移動できる。
-- [ ] Gamepadで同等に移動できる。
-- [ ] Controller未取得時にクラッシュしない。
-- [ ] Setup再実行でMove入力が重複発火しない。
-- [ ] UnPossessed / EndPlay後に古いBindingが残らない。
-- [ ] `ABasePlayer`が`UPlayerMoveInputComponent`の具体型を個別登録しなくてもInterface経由でSetupできる。
+- [ ] Camera向きを基準に前後左右へ移動できる。
+- [ ] Gamepad / Keyboard-Mouseで同等に移動できる。
+- [ ] Input再Setup後も1入力1回の移動要求になる。
+- [ ] Controller無効時にCrashしない。
 
-## 11. テスト観点
+## 11. 依存・Issue反映
 
-- 通常移動
-- 斜め入力
-- カメラ回転後の移動方向
-- Controller無効
-- Input Disable / Enable
-- Possess再実行
-- InputTag重複
+### 依存
+- `FR-PLAYER-002`
+- `FR-PLAYER-021`
+- `NFR-MAINT-003`
+
+### Issue反映
+- `#110`へ移動方向、Input Lifecycle、CharacterMovement利用方針を反映する。
 
 ## 12. 未決事項
 
-Moverは初期Vertical Sliceの必須要件ではない。具体的メリットを確認できた場合のみPost-Prototypeで評価し、必要ならMovement境界を追加する。
-
-## 13. Issue分割方針
-
-既に実装済みのMove入力基盤は新規Issueとして再実装しない。今後のIssueは本受入条件との差分または不足テストのみを対象とする。
+なし

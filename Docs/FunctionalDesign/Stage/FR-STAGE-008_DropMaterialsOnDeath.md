@@ -1,92 +1,80 @@
 # FR-STAGE-008 死亡時にInventory ResourceをDeathDropへ移す
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-STAGE-008` |
 | 優先度 | `Must` |
-| 対応範囲 | Initial Vertical Slice |
-| 設計状態 | `Review` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
 | 関連Issue | `#82`, `#84` |
-| 関連設計 | `FR-STAGE-009`, `FR-STAGE-010`, `FR-SAVE-005`, `FR-STAGE-012` |
+| 関連要件・設計 | `FR-PLAYER-020`, `FR-STAGE-009`, `FR-STAGE-010`, `FR-SAVE-005` |
 
 ## 2. 目的
+Player死亡にResource損失リスクを設け、未回収DeathDropの回収ループを成立させる。
 
-死亡時にPlayer Inventoryが所持する回収対象Resourceを全量DeathDropへ移し、回収前の再死亡にリスクを持たせる。
+## 3. 確定仕様・スコープ
+- Death Animation完了後にDeathDrop処理へ進む。
+- 旧未回収DeathDropが存在する場合は本体と中身を完全消失させる。
+- Player InventoryのUpgrade Material 100%とGold 100%を新しい1つのDeathDropへ移す。
+- 新DeathDropを死亡座標に生成する。
+- 位置・格納内容確定後、Camera確認より前にAuto Saveする。
 
-## 3. 確定仕様・基本フロー
-
+## 4. 基本フロー
 ```text
-[Death Animation完了]
-      ↓
-[旧DeathDropあり？]
-      +-- Yes --> [旧DeathDrop本体・格納Resourceを完全消失]
-      ↓
-[Player Inventory取得]
-      +--> Upgrade Material 100%
-      +--> Gold 100%
-      ↓
-[死亡座標へ新DeathDrop生成]
-      ↓
-[死亡座標・格納内容確定]
-      ↓
-[Auto Save]
-      ↓
-[Camera確認]
+Death Animation完了
+↓
+旧DeathDropあり? → 完全消失
+↓
+Inventory Material100% + Gold100%を移動
+↓
+死亡座標へDeathDrop生成
+↓
+位置 / 内容確定
+↓
+Auto Save
 ```
 
-- Gold / Upgrade Materialの正本はPlayer Inventory。
-- Goldの割合消失は行わない。
-- DeathDrop確定後、Camera確認・Respawnより前にAuto Saveする。
-
-## 4. 責務
-
+## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| Player Inventory | Gold / Upgrade Materialの正本 |
-| DeathDrop処理 | Resource全量移動、旧Drop消失、新Drop生成 |
-| Save System | DeathDrop座標・内容確定後にAuto Save |
+| Player Inventory | Resource正本・移動元 |
+| DeathDrop | Resource格納・位置保持 |
+| Death Flow | 生成順序管理 |
+| Save | 確定後Snapshot保存 |
 
-## 5. 状態・Gameplay Tag
+## 6. 状態 / Gameplay Tag
+Player `State.Dead`を前提とする。DeathDrop Active状態は進行Runtime / Save Stateとして管理する。
 
-本要件固有Tagは必須にしない。Death処理の多重実行を防止できる状態を持つこと。
-
-## 6. 必要データ
-
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| UpgradeMaterialAmount | DeathDrop格納量 | Player Inventory Runtime |
-| GoldAmount | DeathDrop格納量 | Player Inventory Runtime |
-| DeathDropTransform | 復元位置 | Save対象 |
-| DeathDropContent | 格納Resource | Save対象 |
+| Upgrade Material Amount | 格納 | Runtime |
+| Gold Amount | 格納 | Runtime |
+| Death Transform | Drop生成位置 | Runtime |
+| Existing DeathDrop State | 旧Drop消失判定 | Runtime / Save |
 
-## 7. UI / Animation / Feedback
+## 8. UI / HUD / Animation / Feedback
+DeathDrop ActorをCameraで確認可能にする。Inventory HUDは移動後のGold / Materialへ更新する。
 
-- Death Animation完了後に生成する。
-- CameraからDeathDropを確認できるフローへ接続する。
+## 9. 異常系・終了条件
+- Resourceを複製・負値化しない。
+- 旧Dropの中身を新Dropへ合算しない。
+- Death1回につき新Dropを1つだけ生成する。
 
-## 8. 異常系・終了条件
+## 10. 受入条件
+- [ ] Material / Goldを100% InventoryからDropへ移せる。
+- [ ] 旧未回収Dropを完全消失できる。
+- [ ] 死亡座標に新Dropを1つ生成できる。
+- [ ] 確定後にAuto Saveへ接続できる。
 
-- Resource移動前後で複製・負値を発生させない。
-- 旧DeathDropがある場合は新Drop生成前に旧内容を完全消失させる。
-- 同一Deathで新DeathDropを複数生成しない。
+## 11. 依存・Issue反映
+### 依存
+- `#83` Death State
+- `#90` DeathDrop Auto Save
 
-## 9. 受入条件
+### Issue反映
+- `#84`へResource移動、旧Drop消失、Transform、Save接続を反映する。
 
-- [ ] Death Animation完了後に処理を開始する。
-- [ ] Upgrade Material 100%をInventoryからDeathDropへ移せる。
-- [ ] Gold 100%をInventoryからDeathDropへ移せる。
-- [ ] 旧未回収DeathDropがあれば本体・内容を完全消失させる。
-- [ ] 死亡地点に新DeathDropを1つだけ生成する。
-- [ ] DeathDrop座標・内容確定後にAuto Save要求を1回発行する。
-- [ ] Resource複製・負値が発生しない。
-
-## 10. 依存・Issue反映
-
-- `#82`, `#84`, `#90`
-- `FR-SAVE-005`
-
-## 11. 未決事項
-
-なし。DeathDrop表示Assetは調整項目とする。
+## 12. 未決事項
+なし

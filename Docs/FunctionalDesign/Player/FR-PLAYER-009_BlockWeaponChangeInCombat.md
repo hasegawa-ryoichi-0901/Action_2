@@ -6,36 +6,80 @@
 |---|---|
 | 要件ID | `FR-PLAYER-009` |
 | 優先度 | `Should` |
-| 対応範囲 | `Post-Vertical Slice / 複数武器実装後` |
+| 対応範囲 | `Post-VS` |
 | 設計状態 | `Draft` |
+| 関連Issue | `未割当` |
+| 関連要件・設計 | `FR-PLAYER-008`, `Docs/04_WeaponSystem.md` |
 
 ## 2. 目的
 
-複数武器導入後に、戦闘途中の装備切替によるAbility・Animation・状態不整合を防ぐ。
+武器ごとの戦闘特性を維持し、戦闘途中の即時切替によるAbility / Animation / Balanceの不整合を防ぐ。
 
-## 3. 方針
+## 3. 確定仕様・スコープ
 
-初期Vertical Sliceは剣のみのため武器変更自体を提供せず、本要件は実質的に成立する。Axe / Bow追加後、Checkpoint Weapon Menuからのみ武器変更を許可する。
+- 武器変更はCheckpoint Menuからのみ行う。
+- Combat状態中の変更要求は拒否する。
+- Initial VSはSword固定のため実質的な変更処理はPost-VS。
 
-## 4. 実行可否
+## 4. 基本フロー
 
-武器変更要求時に少なくとも以下を確認する。
+```text
+Weapon Change Request
+↓
+Checkpoint Menuからの要求?
+├ No → Reject
+└ Yes
+  ↓
+Combat中?
+├ Yes → Reject
+└ No → FR-PLAYER-008へ
+```
 
-- Checkpoint Menu内であること
-- Attack / Dodge / Parry / Heal等の戦闘Ability実行中でないこと
-- Combat状態として定義した禁止Tagが存在しないこと
-- Death / Down等の不正状態でないこと
+## 5. 責務
 
-## 5. 受入条件
+| 対象 | 責務 |
+|---|---|
+| Weapon System | 武器変更可否判定 |
+| Combat State | Combat中かを提供 |
+| Checkpoint | 正規変更導線を提供 |
 
-- [ ] 通常戦闘中に武器変更できない。
-- [ ] Boss戦闘中に武器変更できない。
-- [ ] Checkpointの許可状態では変更できる。
-- [ ] 拒否された変更でAbilityや武器Dataが部分更新されない。
-- [ ] 初期Vertical Sliceでは複数武器機能がなくても影響しない。
+## 6. 状態 / Gameplay Tag
 
-## 6. 依存
+Combat中を識別する既存Gameplay Stateを利用する。専用Tagの新設は必須としない。
 
+## 7. 必要データ
+
+| データ | 用途 | 備考 |
+|---|---|---|
+| Combat State | 変更禁止判定 | Runtime |
+| Current WeaponId | 現在武器 | Runtime |
+
+## 8. UI / HUD / Animation / Feedback
+
+| 種別 | 内容 |
+|---|---|
+| UI / HUD | Combat中はWeapon Change項目を無効化または拒否表示する |
+
+## 9. 異常系・終了条件
+
+- Combat状態解除前に変更を開始しない。
+- Weapon Change中にCombatへ入る競合を発生させない。
+
+## 10. 受入条件
+
+- [ ] Combat中の武器変更を拒否できる。
+- [ ] Checkpointかつ非Combat時のみ変更処理へ進める。
+- [ ] 拒否で装備状態が部分変更されない。
+
+## 11. 依存・Issue反映
+
+### 依存
 - `FR-PLAYER-008`
 - `FR-STAGE-006`
-- Axe / Bow Future Feature
+
+### Issue反映
+- Post-VS Roadmap作成時に`FR-PLAYER-008`と依存関係を持つ実装Issueへ展開する。
+
+## 12. 未決事項
+
+なし

@@ -1,85 +1,77 @@
 # FR-SAVE-002 Checkpoint Rest確定後にAuto Saveする
 
 ## 1. 基本情報
-
 | 項目 | 内容 |
 |---|---|
 | 要件ID | `FR-SAVE-002` |
 | 優先度 | `Must` |
-| 対応範囲 | Initial Vertical Slice |
-| 設計状態 | `Review` |
+| 対応範囲 | `Initial Vertical Slice` |
+| 設計状態 | `Draft` |
 | 関連Issue | `#89` |
-| 関連設計 | `FR-STAGE-003`, `FR-STAGE-004`, `FR-STAGE-005` |
+| 関連要件・設計 | `FR-STAGE-003`～`005`, `FR-SAVE-001` |
 
 ## 2. 目的
+Checkpoint利用後のActiveCheckpoint・回復・Enemy Respawn状態を一貫したSnapshotとして保存する。
 
-Checkpoint利用時の再開地点とRest後状態を同じSnapshotとして保存する。
+## 3. 確定仕様・スコープ
+- `Interaction → ActiveCheckpoint更新 → Menu Open → Rest処理確定 → Auto Save`の順とする。
+- Checkpoint接近だけではSaveしない。
+- Rest処理はHP / Stamina Full、Healing Item補充、Normal Enemy Respawnを含む。
+- 同一InteractionでAuto Saveを重複発行しない。
 
-## 3. 確定仕様・基本フロー
-
+## 4. 基本フロー
 ```text
-[Interaction]
-      ↓
-[ActiveCheckpoint更新]
-      ↓
-[Menu Open]
-      ↓
-[Rest処理確定]
-      +--> HP Full
-      +--> Stamina Full
-      +--> Healing Item補充
-      +--> Normal Enemy Respawn
-      ↓
-[Auto Save]
+Checkpoint Interaction
+↓
+ActiveCheckpoint更新
+↓
+Menu Open
+↓
+Rest確定
+↓
+Progress Snapshot
+↓
+Auto Save
 ```
 
-- Checkpointへ接近しただけではSaveしない。
-- Menu Openだけを単独契機とせず、Rest処理まで確定したSnapshotを保存する。
-- 同一Checkpoint利用でAuto Save要求を重複発行しない。
-
-## 4. 責務
-
+## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| Checkpoint / Rest | ActiveCheckpointとRest完了を通知する |
-| Save System | Snapshot作成、保存、多重要求制御 |
-| UI / HUD | Save状態を表示する |
+| Checkpoint | 順序管理・Save Request発行 |
+| Rest処理 | 保存前の回復 / Respawn状態確定 |
+| Save基盤 | Snapshot保存 |
 
-## 5. 状態・Gameplay Tag
+## 6. 状態 / Gameplay Tag
+なし。
 
-本要件固有Tagは必須にしない。Save中 / 完了 / 失敗状態を通知できること。
-
-## 6. 必要データ
-
+## 7. 必要データ
 | データ | 用途 | 備考 |
 |---|---|---|
-| ActiveCheckpointId | Load / Respawn地点 | Progress Save |
-| Player Rest後状態 | HP / Stamina / Healing等の整合確認 | Runtime / Progress Save |
-| Inventory / Progress Data | 現在進行保存 | Player / Stage Data |
+| ActiveCheckpointId | Respawn地点 | Runtime / Save |
+| Player Rest State | HP / Stamina / Heal | Runtime |
+| Enemy Reset State | Respawn結果 | Runtime |
 
-## 7. UI / Animation / Feedback
+## 8. UI / HUD / Animation / Feedback
+Save中 / 成功 / 失敗をHUDへ通知可能にする。
 
-- Save中 / 完了 / 失敗を`FR-UI-002`へ通知可能にする。
+## 9. 異常系・終了条件
+- Rest完了前にSnapshotを保存しない。
+- 同一Menu Open / Interactionで重複Saveしない。
+- Save失敗してもCheckpoint MenuからRecovery可能にする。
 
-## 8. 異常系・終了条件
+## 10. 受入条件
+- [ ] Rest確定後だけAuto Saveできる。
+- [ ] ActiveCheckpoint更新済み状態を保存できる。
+- [ ] 接近だけではSaveしない。
+- [ ] 重複Saveを防止できる。
 
-- Rest確定前にSaveしない。
-- 同一Interactionで重複Saveしない。
-- Save失敗でもCheckpoint Runtime状態を不整合にしない。
+## 11. 依存・Issue反映
+### 依存
+- `#91` Checkpoint
+- `#88` Save基盤
 
-## 9. 受入条件
+### Issue反映
+- `#89`へ確定順序とSnapshot条件を反映する。
 
-- [ ] Checkpoint接近だけではSaveしない。
-- [ ] ActiveCheckpoint更新後にMenuをOpenできる。
-- [ ] Rest処理確定後にAuto Saveを1回要求できる。
-- [ ] 保存Snapshotが更新後ActiveCheckpointを含む。
-- [ ] Save成功 / 失敗をUIへ通知できる。
-- [ ] 同一利用でSaveを重複発火しない。
-
-## 10. 依存・Issue反映
-
-- `#89`, `#91`
-
-## 11. 未決事項
-
-なし。
+## 12. 未決事項
+なし
