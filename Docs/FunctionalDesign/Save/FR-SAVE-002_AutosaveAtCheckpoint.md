@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-SAVE-002` |
+| 要件ID | [`FR-SAVE-002`](../../01_Requirements.md#fr-save-002) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#89` |
-| 関連要件・設計 | `FR-STAGE-003`～`005`, `FR-SAVE-001` |
+| 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#89](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/89) |
+| 関連要件・設計 | [`FR-STAGE-003`](../../01_Requirements.md#fr-stage-003)～[`005`](../../01_Requirements.md#fr-stage-005), [`FR-SAVE-001`](../../01_Requirements.md#fr-save-001) |
 
 ## 2. 目的
 Checkpoint利用後のActiveCheckpoint・回復・Enemy Respawn状態を一貫したSnapshotとして保存する。
@@ -67,11 +67,11 @@ Save中 / 成功 / 失敗をHUDへ通知可能にする。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#91` Checkpoint
-- `#88` Save基盤
+- [#91 Checkpoint](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/91)
+- [#88 Save基盤](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/88)
 
 ### Issue反映
-- `#89`へ確定順序とSnapshot条件を反映する。
+- [#89](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/89)へ確定順序とSnapshot条件を反映する。
 
 ## 12. 未決事項
 なし

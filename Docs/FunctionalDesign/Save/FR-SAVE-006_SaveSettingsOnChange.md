@@ -3,15 +3,15 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-SAVE-006` |
+| 要件ID | [`FR-SAVE-006`](../../01_Requirements.md#fr-save-006) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#104` |
-| 関連要件・設計 | `FR-UI-001`, `FR-SAVE-001` |
+| 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#104](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/104) |
+| 関連要件・設計 | [`FR-UI-001`](../../01_Requirements.md#fr-ui-001), [`FR-SAVE-001`](../../01_Requirements.md#fr-save-001) |
 
 ## 2. 目的
-Config変更を進行Saveとは独立して保存し、次回起動時にも設定を維持する。
+Config変更をProgress Saveとは独立して保存し、次回起動時にも設定を維持する。
 
 ## 3. 確定仕様・スコープ
 - Settings変更時に設定Saveを行う。
@@ -64,7 +64,7 @@ Config UIへ保存結果を必要に応じ表示する。
 - Config UI
 
 ### Issue反映
-- `#104`へSettings Snapshot / Save / Loadを反映する。
+- [#104](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/104)へSettings Snapshot / Save / Loadを反映する。
 
 ## 12. 未決事項
 なし

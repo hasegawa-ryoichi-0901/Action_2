@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-SAVE-004` |
+| 要件ID | [`FR-SAVE-004`](../../01_Requirements.md#fr-save-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#103` |
-| 関連要件・設計 | `FR-BOSS-015`, `FR-BOSS-016`, `FR-STAGE-013` |
+| 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#103](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/103) |
+| 関連要件・設計 | [`FR-BOSS-015`](../../01_Requirements.md#fr-boss-015), [`FR-BOSS-016`](../../01_Requirements.md#fr-boss-016), [`FR-STAGE-013`](../../01_Requirements.md#fr-stage-013) |
 
 ## 2. 目的
 Boss DefeatとReward取得を同一進行状態として保存し、その後のClear Trigger進行と整合させる。
@@ -66,11 +66,11 @@ Save中 / 成功 / 失敗をHUDへ通知可能にする。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#102` Boss Reward
-- `#88` Save基盤
+- [#102 Boss Reward](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/102)
+- [#88 Save基盤](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/88)
 
 ### Issue反映
-- `#103`へReward後SaveとClear接続を反映する。
+- [#103](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/103)へReward後SaveとClear接続を反映する。
 
 ## 12. 未決事項
 なし

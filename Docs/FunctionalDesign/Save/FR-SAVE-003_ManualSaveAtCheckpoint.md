@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-SAVE-003` |
-| 優度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 要件ID | [`FR-SAVE-003`](../../01_Requirements.md#fr-save-003) |
+| 優先度 | `Must` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#89` |
-| 関連要件・設計 | `FR-STAGE-003`, `FR-SAVE-001`, `FR-SAVE-002` |
+| 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#89](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/89) |
+| 関連要件・設計 | [`FR-STAGE-003`](../../01_Requirements.md#fr-stage-003), [`FR-SAVE-001`](../../01_Requirements.md#fr-save-001), [`FR-SAVE-002`](../../01_Requirements.md#fr-save-002) |
 
 ## 2. 目的
 PlayerがCheckpoint Menu滞在中に任意のタイミングで現在進行状態を保存できるようにする。
@@ -61,11 +61,11 @@ Manual Save項目、Save中 / 成功 / 失敗Feedbackを表示する。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#88` Save基盤
-- `#91` Checkpoint
+- [#88 Save基盤](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/88)
+- [#91 Checkpoint](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/91)
 
 ### Issue反映
-- `#89`へManual Save導線も含める。
+- [#89](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/89)へManual Save導線も含める。
 
 ## 12. 未決事項
 なし

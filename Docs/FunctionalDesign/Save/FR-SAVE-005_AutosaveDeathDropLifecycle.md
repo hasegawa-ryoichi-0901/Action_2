@@ -3,15 +3,15 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-SAVE-005` |
+| 要件ID | [`FR-SAVE-005`](../../01_Requirements.md#fr-save-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#90` |
-| 関連要件・設計 | `FR-STAGE-008`～`010`, `FR-STAGE-012`, `Docs/18_SaveJsonArchitecture.md` |
+| 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#90](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/90) |
+| 関連要件・設計 | [`FR-STAGE-008`](../../01_Requirements.md#fr-stage-008)～[`010`](../../01_Requirements.md#fr-stage-010), [`FR-STAGE-012`](../../01_Requirements.md#fr-stage-012), [Save JSON Architecture](../../18_SaveJsonArchitecture.md) |
 
 ## 2. 目的
-DeathDropの位置・格納Resource・回収状態を進行Saveへ含め、再起動後も死亡回収ループを維持する。
+DeathDropの位置・格納Resource・回収状態をProgress Saveへ含め、再起動後も死亡回収Loopを維持する。
 
 ## 3. 確定仕様・スコープ
 - 新DeathDropの死亡座標・Material100%・Gold100%が確定した直後にAuto Saveする。
@@ -77,10 +77,13 @@ Save中 / 成功 / 失敗をHUDへ通知する。DeathDrop自体のWorld表示�
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#84`, `#86`, `#88`
+- [#84 DeathDrop生成](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/84)
+- [#86 DeathDrop回収 / 旧Drop消失](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/86)
+- [#88 Save基盤](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/88)
+- [#154 JSON Save Architecture](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154)
 
 ### Issue反映
-- `#90`へ生成 / 回収 / 復元契約を反映する。
+- [#90](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/90)へ生成 / 回収 / 復元契約を反映する。
 
 ## 12. 未決事項
 なし

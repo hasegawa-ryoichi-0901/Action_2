@@ -3,19 +3,19 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-SAVE-007` |
+| 要件ID | [`FR-SAVE-007`](../../01_Requirements.md#fr-save-007) |
 | 優先度 | `Should` |
 | 対応範囲 | `Post-VS` |
 | 設計状態 | `Draft` |
 | 関連Issue | `未割当` |
-| 関連要件・設計 | `FR-SAVE-001`～`006`, `Docs/18_SaveJsonArchitecture.md` |
+| 関連要件・設計 | [`FR-SAVE-001`](../../01_Requirements.md#fr-save-001)～[`006`](../../01_Requirements.md#fr-save-006), [Save JSON Architecture](../../18_SaveJsonArchitecture.md) |
 
 ## 2. 目的
-ローカルSave仕様が安定した後、Steam公開版で進行 / 設定SaveをCloud同期可能にする。
+Local Save仕様が安定した後、Steam公開版でProgress / Settings SaveをCloud同期可能にする。
 
 ## 3. 確定仕様・スコープ
-- Initial VS対象外。
-- ローカルSave / Load契約を正とし、その上にSteam Cloud同期を追加する。
+- 初期プレイアブル版対象外。
+- Local Save / Load契約を正とし、その上にSteam Cloud同期を追加する。
 - Cloud固有APIをGameplay Systemへ直接依存させない。
 
 ## 4. 基本フロー
@@ -73,4 +73,4 @@ Local Save契約へ復元
 ## 12. 未決事項
 | 未決事項 | Issue作成前に確定必須 | 理由 |
 |---|---|---|
-| Local / Cloud競合時の採用Policy | Yes | Player Data損失リスクがあるため |
+| Local / Cloud競合時の採用Policy | Yes | Player Data損失Riskがあるため |
