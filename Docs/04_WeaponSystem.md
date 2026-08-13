@@ -2,31 +2,32 @@
 
 ## 1. 開発スコープ
 
-### 初期Vertical Slice
+### 初期プレイアブル版
 
-初期Vertical Sliceでは**剣のみ**を実装します。複数武器切り替え、斧、弓は完成条件に含めません。
+初期プレイアブル版では**Swordのみ**を実装します。複数Weapon切替、Axe、Bowは完成条件に含めません。
 
-### Post-Vertical Slice
+### Post-VS
 
-Vertical Slice完成後の4～6カ月目を目安に斧と弓を追加し、チェックポイントで武器変更可能にします。
+初期プレイアブル版完成後の4～6カ月目を目安にAxeとBowを追加し、CheckpointでWeapon Change可能にします。
 
 ## 2. 共通仕様
 
-- 最終的な武器構成は剣、斧、弓の3種類。
-- 初期Vertical Sliceは剣のみ。
-- 複数武器実装後はチェックポイントで変更可能。
-- 戦闘中は変更不可。
-- 各武器は共通の武器定義・攻撃定義・Ability連携を利用する。
-- 攻撃力、体勢削り、スタミナコスト、怯み耐性をデータ化する。
-- 強化は3段階候補。
-- 武器強化には**強化素材とGoldの両方**を使用する。
-- Goldの用途は武器強化のみ。
-- 武器強化はCheckpoint Menuからのみ実行できる。
-- 強化素材・Goldの必要量はゲームデータで管理する。
+- 最終的なWeapon構成はSword、Axe、Bowの3種類。
+- 初期プレイアブル版はSwordのみ。
+- 複数Weapon実装後はCheckpointで変更可能。
+- Combat中は変更不可。
+- 各Weaponは共通のWeapon Definition・Attack Definition・Ability連携を利用する。
+- Attack Power、Posture Damage、Stamina Cost、Stagger Resistance等をData化する。
+- Upgradeは3段階候補。
+- Weapon Upgradeには**Upgrade MaterialとGoldの両方**を使用する。
+- Goldの用途はWeapon Upgradeのみ。
+- Weapon UpgradeはCheckpoint Menuからのみ実行できる。
+- Upgrade Material / Goldの必要量はGameplay Dataで管理する。
+- Gold / Upgrade Materialの正本はPlayer Inventoryとする。
 
-## 3. 共通アクション構成
+## 3. 共通Action構成
 
-初期Vertical Sliceでは剣で戦闘基盤を成立させ、斧・弓は同じ基盤を利用して追加します。
+初期プレイアブル版ではSwordでCombat基盤を成立させ、Axe / Bowは同じ基盤を利用して追加します。
 
 - Light Attack
 - Heavy Attack
@@ -38,17 +39,17 @@ Vertical Slice完成後の4～6カ月目を目安に斧と弓を追加し、チ�
 
 Light Attack、Heavy Attack、Combo AttackはIssue管理上それぞれ別Action / Featureとして扱います。ActionとActorComponentの数を一致させることは前提としません。
 
-## 4. 剣 — Vertical Slice対象
+## 4. Sword — 初期プレイアブル版対象
 
 ### 役割
 
 - 標準的な速度
 - 高い対応力
-- パリィ可能
-- 比較的短い硬直
-- ジャスト回避後の高速接近反撃
+- Parry可能
+- 比較的短いRecovery
+- Perfect Dodge後の高速接近Counter
 
-### コンボ
+### Combo
 
 ```text
 Light 1
@@ -67,37 +68,37 @@ Perfect Dodge Counter
 Fatal Attack
 ```
 
-## 5. 斧 — Post-Vertical Slice Feature
+## 5. Axe — Post-VS Feature
 
 関連要件：`FR-PLAYER-017`、`FEATURE-AXE-001`～`FEATURE-AXE-005`。
 
-- 低速・高威力・高い体勢削り・高い怯み耐性。
+- 低速・高威力・高Posture Damage・高Stagger Resistance。
 - Guard / Receive。
-- 一部攻撃にSuper Armor候補。
+- 一部AttackにSuper Armor候補。
 - 3段Light Combo、Charge Attack、Dodge Attack、Perfect Dodge Counterを追加候補とする。
 
-## 6. 弓 — Post-Vertical Slice Feature
+## 6. Bow — Post-VS Feature
 
 関連要件：`FEATURE-BOW-001`～`FEATURE-BOW-006`、`FR-BOSS-014`。
 
-- 遠距離攻撃。
+- Ranged Attack。
 - 通常時はSoft Lock。
-- 構え時は肩越し照準。
+- Aim時はShoulder Camera。
 - 通常射撃は弾数無制限候補で、射撃ごとにStaminaを消費。
-- Weak Point、距離減衰を持つ。
+- Weak Point、Distance Falloffを持つ。
 - 遠距離維持に対してBossは専用Gap Closerを使用する。
 
-Projectile / Line Trace等の最終方式はPost-Vertical Sliceのプロトタイプで決定します。
+Projectile / Line Trace等の最終方式はPost-VS Prototypeで決定します。
 
-## 7. 武器強化
+## 7. Weapon Upgrade
 
 ```text
 Level 1
   +--> 初期性能
 
 Level 2
-  +--> 攻撃力上昇
-  +--> 体勢削り性能上昇
+  +--> Attack Power上昇
+  +--> Posture Damage上昇
 
 Level 3
   +--> 固有Skill解放候補
@@ -114,11 +115,13 @@ Level 3
 [Upgrade Material Cost確認]
       +-- 不足 --> [Reject]
       ↓
-[両Resourceを消費]
+[両ResourceをPlayer Inventoryから消費]
       ↓
 [Weapon Level / Parameter更新]
 ```
 
-武器強化そのものをAuto Save契機にはしません。進行Saveは`Docs/09_SaveCheckpointDeath.md`で定義した契機に従います。
+Weapon UpgradeそのものをAuto Save契機にはしません。進行Saveは`Docs/09_SaveCheckpointDeath.md`で定義した契機に従います。
+
+関連Inventory基盤: [#153](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/153)
 
 ### [戻る](../README.md#ドキュメント一覧)
