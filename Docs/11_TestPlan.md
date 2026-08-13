@@ -7,9 +7,10 @@
 - Light Attack / Heavy Attack / Combo Attack
 - Dodge Action（Roll / Back Step / Invincible / Perfect Result）
 - Stamina消費・回復・Exhausted
+- Healing Item消費・中断
 - Player Health / Death
 - Enemy / Boss Health / Defeat
-- Upgrade Material / Gold所持値
+- Upgrade Material / Gold / Unique Item Inventory
 - Weapon Upgrade Cost判定
 - DeathDrop生成・回収・再死亡
 - Checkpoint / Save Request
@@ -65,7 +66,7 @@ TC-DODGE-005
 - Dodge中にEnemy Collisionを通過しない。
 - Perfect Dodge専用Inputが存在しない。
 
-## 4. Attack
+## 4. Attack / Reaction / Healing
 
 - Light Attack単体でInput → Ability → Stamina → Montage → Hit → Damageが成立する。
 - Heavy AttackはLightとは別Input / Actionとして成立する。
@@ -73,6 +74,25 @@ TC-DODGE-005
 - Hitbox Active Window外ではDamageを発生させない。
 - 同一Swingで不正な多重Hitを発生させない。
 - Cancel / Death後にAttack Tag、Collision、Input Bufferが残らない。
+- Player ReactionはHit / Stagger / DownをAttack Dataの内部蓄積値から判定し、蓄積値をHUDへ表示しない。
+- Health<=0ではReactionよりDeathを優先する。
+
+```text
+TC-HEAL-001
+前提 : Healing Item=1
+操作 : Heal Input → Heal Animation開始
+期待 : Animation開始直後にHealing Itemが0になる
+
+TC-HEAL-002
+前提 : Healing Itemを消費済み / Heal Animation中
+操作 : Enemy Attackで被弾
+期待 : Healを中断するがHealing Itemを返却しない
+
+TC-HEAL-003
+前提 : Heal要求後、Animation開始前
+操作 : Actionが中断
+期待 : Healing Itemを消費しない
+```
 
 ## 5. LockOn / Camera
 
@@ -90,14 +110,14 @@ TC-DODGE-005
 
 - HP0でDefeatedへ1回だけ遷移する。
 - AI / Attack Ability / 攻撃枠を終了する。
-- Enemy1体につきUpgrade MaterialとGoldを1回だけ直接加算する。
+- Enemy1体につきUpgrade MaterialとGoldを1回だけPlayer Inventoryへ直接加算する。
 - Reward World Dropを生成しない。
 
 ### Boss
 
 - HP0でDefeatedへ1回だけ遷移する。
 - AI / Abilityを停止する。
-- Goldを直接加算する。
+- GoldをPlayer Inventoryへ直接加算する。
 - 初回討伐時のみ固有収集ItemをInventoryへ直接付与する。
 - 通常のUpgrade Materialを付与しない。
 - Reward確定後にAuto Saveする。
@@ -108,17 +128,17 @@ TC-DODGE-005
 TC-DEATH-001
 前提 : Material=100, Gold=1000
 操作 : Player死亡
-期待 : Death Animation後、DeathDropにMaterial=100、Gold=700を格納し、Gold=300は消失する
+期待 : Death Animation後、Player InventoryのMaterial=100、Gold=1000を新DeathDropへ全量移動し、Inventory側は0になる
 
 TC-DEATH-002
 前提 : 未回収DeathDrop Aあり
 操作 : Player再死亡
-期待 : A本体とA内部Resourceが完全消失し、現在所持Resourceから新DeathDrop Bを生成する
+期待 : A本体とA内部Resourceが完全消失し、現在Inventory所持Resourceから新DeathDrop Bを生成する
 
 TC-DEATH-003
 前提 : 未回収DeathDropあり
 操作 : DeathDrop回収
-期待 : 格納Material / Goldを全量返却しDropを消去、直後にAuto Saveする
+期待 : 格納Material / Goldを全量Player Inventoryへ返却しDropを消去、直後にAuto Saveする
 ```
 
 - DeathDrop位置・内容確定後にAuto Saveし、その後Camera確認・Fade Outへ進む。
@@ -126,13 +146,29 @@ TC-DEATH-003
 - 未設定ならPlayerStartへRespawnする。
 - Respawn時にHP / Stamina / Healing Itemを全回復する。
 - 通常敵を復活させる。
-- Save/Load後も未回収DeathDropを1つだけ復元できる。
+- Save / Load後も未回収DeathDropを1つだけ復元できる。
 
 ## 8. Checkpoint / Weapon Upgrade
 
+確定順序：
+
+```text
+Interaction
+↓
+ActiveCheckpoint更新
+↓
+Menu Open
+↓
+Rest処理確定
+├ HP / Stamina Full
+├ Healing Item補充
+└ Normal Enemy Respawn
+↓
+Auto Save
+```
+
 - Checkpointへ近づくだけではSaveしない。
-- Checkpointを操作してMenu Openした時にActiveCheckpoint更新後の状態をAuto Saveする。
-- Checkpoint利用でHP / Stamina回復、Healing Item補充、通常敵復活を確認する。
+- Rest処理が確定する前にCheckpoint Auto Saveを発行しない。
 - Checkpoint MenuからManual Saveできる。
 - Weapon UpgradeはCheckpointでのみ可能。
 - GoldまたはUpgrade Material不足時は両Resourceを消費しない。
@@ -149,14 +185,14 @@ TC-DEATH-003
 - 通常終了 / SkipのどちらでもTitleへ戻る。
 - Stage Clear自体では追加Auto Saveしない。
 
-## 10. Save
+## 10. Save / Corrupt Save
 
 確認する進行Auto Save契機：
 
-- Checkpoint Menu Open
-- DeathDrop生成内容確定
-- DeathDrop回収完了
-- Boss Reward付与完了
+- Checkpoint Rest処理確定後
+- DeathDrop生成内容確定後
+- DeathDrop回収完了後
+- Boss Reward付与完了後
 
 追加確認：
 
@@ -165,8 +201,11 @@ TC-DEATH-003
 - Weapon Upgrade / Stage Clearでは不要なAuto Saveが発生しない
 - 同一EventからSave Requestが重複発火しない
 - 保存失敗時にGameplay状態を破壊しない
+- Corrupt SaveをRuntimeへ部分適用しない
+- Corrupt Saveだけを削除し、New Game開始可能状態へ戻る
+- 初期プレイアブル版ではBackupから自動復旧しない
 
-JSON / Steam Cloud等の永続化方式固有テストは別Architecture Design作成後に追加します。
+JSON永続化固有の詳細テストはSave Architecture確定後に追加します。
 
 ## 11. 性能・品質
 
@@ -174,6 +213,6 @@ JSON / Steam Cloud等の永続化方式固有テストは別Architecture Design�
 - Boss Phase2でFrame Timeを確認する。
 - 長時間PlayでMemory増加を確認する。
 - Shipping Buildで最終確認する。
-- Gamepad / Keyboard-Mouse双方でInitial Vertical Sliceを完走する。
+- Gamepad / Keyboard-Mouse双方で初期プレイアブル版を完走する。
 
 ### [戻る](../README.md#ドキュメント一覧)
