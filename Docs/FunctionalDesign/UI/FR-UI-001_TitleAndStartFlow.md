@@ -3,11 +3,11 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-UI-001` |
+| 要件ID | [`FR-UI-001`](../../01_Requirements.md#fr-ui-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#150` |
+| 関連Issue | [#150](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/150) |
 | 関連要件・設計 | `FR-STAGE-001`, `FR-STAGE-013`, `FR-SAVE-001`, `FR-SAVE-006` |
 
 ## 2. 目的
@@ -62,6 +62,7 @@ Title Menu、Load Data選択、Config画面、Introを提供する。Gameplay HU
 ## 9. 異常系・終了条件
 - SaveなしではContinueを実行不可にする。
 - Load失敗時にTitle / Load UIへ戻れる。
+- Corrupt SaveはGameplayへ適用せず削除し、New Gameを開始できる状態へ戻す。
 - New Game / Loadを多重開始しない。
 - Ending→TitleでGameplay HUD / Input /一時Stateを残さない。
 
@@ -70,17 +71,18 @@ Title Menu、Load Data選択、Config画面、Introを提供する。Gameplay HU
 - [ ] Titleの5項目を選択できる。
 - [ ] New Game→Tutorialへ進める。
 - [ ] Continue / LoadからPlay Startできる。
+- [ ] Corrupt Save削除後にNew Game可能状態へ戻れる。
 - [ ] Ending後Titleへ戻れる。
-- [ ] Saveなし / Load失敗で進行不能にならない。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#87` Save
-- `#132`, `#133`
-- `#107` Ending
+- [#87 Save](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87)
+- [#132 Tutorial Text](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/132)
+- [#133 Tutorial](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/133)
+- [#107 Ending → Title](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/107)
 
 ### Issue反映
-- `#150`へFrontend Flow全体を反映する。
+- [#150](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/150)へFrontend Flow全体を反映する。
 
 ## 12. 未決事項
 なし
