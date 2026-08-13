@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-MAINT-005` |
+| 要件ID | [`NFR-MAINT-005`](../../01_Requirements.md#nfr-maint-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#140` |
-| 関連要件・設計 | `Docs/03_CombatSystem.md`, `Docs/05_GASDesign.md` |
+| 関連Issue | [#140](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/140) |
+| 関連要件・設計 | [Combat System](../../03_CombatSystem.md), [GAS Design](../../05_GASDesign.md) |
 
 ## 2. 目的
 Attack、Dodge、Parry、Healing、Reaction等の状態を個別boolへ分散させず、System間で共通解釈できるGameplay Tagへ整理する。
@@ -68,7 +68,7 @@ HUD / Animationは必要なGameplay Tag / Eventを参照して表示を切り替
 - GAS / Gameplay Tag基盤
 
 ### Issue反映
-- `#140`で主要TagとLifecycleを横断監査する。
+- [#140](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/140)で主要TagとLifecycleを横断監査する。
 
 ## 12. 未決事項
 なし

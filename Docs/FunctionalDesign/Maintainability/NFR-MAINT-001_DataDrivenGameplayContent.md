@@ -3,21 +3,21 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-MAINT-001` |
+| 要件ID | [`NFR-MAINT-001`](../../01_Requirements.md#nfr-maint-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#137` |
-| 関連要件・設計 | `Docs/08_DataDesign.md`, `Docs/17_MasterDataCsvArchitecture.md` |
+| 関連Issue | [#137](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/137), [#155](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/155) |
+| 関連要件・設計 | [Data Design](../../08_DataDesign.md), [Master Data / CSV Architecture](../../17_MasterDataCsvArchitecture.md) |
 
 ## 2. 目的
-Weapon、Attack、Enemy、Ability、Reward等の差分・調整値をGameplay Codeの分岐へ固定せず、データ追加・変更で拡張できる構造を維持する。
+Weapon、Attack、Enemy、Ability、Reward等の差分・調整値をGameplay Codeの分岐へ固定せず、Data追加・変更で拡張できる構造を維持する。
 
 ## 3. 確定仕様・スコープ
-- 各FRはGameplay上必要なデータを`必要データ`欄へ明示する。
-- Gameplay Systemは必要データをProvider / Definition等の契約から取得し、具体的なCSV ReaderやDB Schemaへ直接依存しない。
+- 各FRはGameplay上必要なDataを`必要データ`欄へ明示する。
+- Gameplay Systemは必要DataをProvider / Definition等の契約から取得し、具体的なCSV ReaderやDB Schemaへ直接依存しない。
 - ID、必須参照、値域、重複等を検証可能にする。
-- Master Dataの具体SchemaとCSV読込Architectureは別ドキュメントで定義する。
+- Master Dataの具体SchemaとCSV読込Architectureは別Documentで定義する。
 
 ## 4. 基本フロー
 ```text
@@ -35,7 +35,7 @@ Gameplay処理へ利用
 ## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| 各FR基本設計 | 必要データを定義する |
+| 各FR基本設計 | 必要Dataを定義する |
 | Gameplay System | Data契約を利用して処理する |
 | Data Provider / Definition | Data取得境界を提供する |
 | Validation | 欠損・重複・不正値を検知する |
@@ -62,17 +62,18 @@ Gameplay UIは各FRが担当する。開発時はData Validation Errorを確認�
 
 ## 10. 受入条件
 - [ ] Weapon / Attack / Enemy / Reward等の調整値をGameplay Code変更なしで変更できる。
-- [ ] 各FRが必要データを明示している。
+- [ ] 各FRが必要Dataを明示している。
 - [ ] Gameplay側が具体的なCSV Readerへ直接依存しない。
 - [ ] 必須Data欠損・重複・不正値を検出できる。
 
 ## 11. 依存・Issue反映
 ### 依存
 - 各Gameplay FRの`必要データ`
-- `Docs/17_MasterDataCsvArchitecture.md`
+- [#155 Master Data / CSV Architecture](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/155)
 
 ### Issue反映
-- `#137`へData契約、Validation、読込方式非依存を反映する。
+- [#137](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/137)へData契約・Validation・読込方式非依存を反映する。
+- [#155](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/155)で具体的なMaster Data読込Architectureを確定する。
 
 ## 12. 未決事項
 なし

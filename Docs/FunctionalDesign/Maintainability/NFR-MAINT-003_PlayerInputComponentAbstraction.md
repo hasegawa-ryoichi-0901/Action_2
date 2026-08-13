@@ -3,12 +3,12 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-MAINT-003` |
+| 要件ID | [`NFR-MAINT-003`](../../01_Requirements.md#nfr-maint-003) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#139` |
-| 関連要件・設計 | `FR-PLAYER-002`, `Docs/05_GASDesign.md`, `Docs/07_ClassDesign.md` |
+| 関連Issue | [#139](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/139) |
+| 関連要件・設計 | [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002), [GAS Design](../../05_GASDesign.md), [Class Design](../../07_ClassDesign.md) |
 
 ## 2. 目的
 `ABasePlayer`を具体Input Component型から分離し、Input Setup / TeardownとGameplay要求配送を共通契約で管理する。
@@ -17,7 +17,7 @@
 - `ABasePlayer`はInput Componentを`IPlayerInputComponent`契約で管理する。
 - Setup / Teardown / Input Tag / Pressed Stateの共通契約を維持する。
 - Duplicate Input Tagを設定不備として検知する。
-- Component粒度は固定しない。1 Action 1 Component / 複数Action集約のどちらも仕様・Gameplay Tag・GAS・Lifecycle・テスト容易性に応じて選択可能とする。
+- Component粒度は固定しない。1 Action 1 Component / 複数Action集約のどちらも仕様・Gameplay Tag・GAS・Lifecycle・Test容易性に応じて選択可能とする。
 - Component粒度の決定をAction Issue作成・実装開始の前提条件にしない。
 
 ## 4. 基本フロー
@@ -77,7 +77,7 @@ Input Tagを入力識別へ利用する。Gameplay状態Tagとは用途を分離
 - 現行`IPlayerInputComponent` / `UBasePlayerInputComponent`
 
 ### Issue反映
-- `#139`へ抽象化、Lifecycle、Component粒度非固定を反映する。
+- [#139](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/139)へ抽象化、Lifecycle、Component粒度非固定を反映する。
 
 ## 12. 未決事項
 なし

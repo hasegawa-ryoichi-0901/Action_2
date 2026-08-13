@@ -3,20 +3,20 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-MAINT-006` |
+| 要件ID | [`NFR-MAINT-006`](../../01_Requirements.md#nfr-maint-006) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#141` |
-| 関連要件・設計 | `NFR-PERF-005`, `NFR-PERF-006` |
+| 関連Issue | [#141](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/141) |
+| 関連要件・設計 | [`NFR-PERF-005`](../../01_Requirements.md#nfr-perf-005), [`NFR-PERF-006`](../../01_Requirements.md#nfr-perf-006) |
 
 ## 2. 目的
-不要な毎Frame処理を削減し、Actor数やSystem増加によるGame Thread負荷と保守コストを抑える。
+不要な毎Frame処理を削減し、Actor数やSystem増加によるGame Thread負荷と保守Costを抑える。
 
 ## 3. 確定仕様・スコープ
 - Event、Delegate、Timer、Ability Task、StateTree / Behavior Tree更新等で代替できる処理は常時Tickを使用しない。
 - Tickが必要な処理は理由・有効期間・停止条件を明確にする。
-- 非アクティブ時はTick無効化 / 頻度低減を検討する。
+- 非Active時はTick無効化 / 頻度低減を検討する。
 - 毎Frameの全Actor検索を前提にしない。
 
 ## 4. 基本フロー
@@ -52,13 +52,13 @@ Event / Timer等で代替可能?
 なし。開発時はProfiler / Stat結果で確認する。
 
 ## 9. 異常系・終了条件
-- Owner非アクティブ / Destroy後にTickを継続しない。
+- Owner非Active / Destroy後にTickを継続しない。
 - Event処理とTick処理で同じ更新を二重実行しない。
 
 ## 10. 受入条件
 - [ ] 常時Tickを使用する箇所に必要性を説明できる。
 - [ ] Event / Timerで代替可能な毎Frame処理を排除できる。
-- [ ] 非アクティブ時に不要Tickを停止できる。
+- [ ] 非Active時に不要Tickを停止できる。
 - [ ] Tick負荷をProfilingで確認できる。
 
 ## 11. 依存・Issue反映
@@ -66,7 +66,7 @@ Event / Timer等で代替可能?
 - Performance計測環境
 
 ### Issue反映
-- `#141`でTick利用箇所を監査する。
+- [#141](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/141)でTick利用箇所を監査する。
 
 ## 12. 未決事項
 なし
