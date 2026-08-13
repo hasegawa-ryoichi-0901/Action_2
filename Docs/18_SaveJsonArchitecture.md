@@ -15,6 +15,8 @@ Gameplay基本設計で確定したSave / Load上の挙動と、JSONの具体Sch
 
 Playerは最後のActiveCheckpoint、未設定時はPlayerStartから再開する。
 
+Save破損を検出した場合は、破損SaveをGameplayへ適用せず削除し、New Gameを開始できる状態へ戻す。初期プレイアブル版ではBackupからの自動復旧は行わない。
+
 ## 3. 境界
 
 ```text
@@ -39,17 +41,40 @@ Gameplay SystemはJSONキー名・JSON Library・File Layoutへ直接依存し�
 
 Weapon Upgrade完了、Stage Clear、Clear Trigger進入自体は進行Auto Save契機にしない。
 
-## 5. 未確定事項
+## 5. 確定している破損Saveの扱い
 
-以下は本Architectureで後続決定する。
+```text
+Save Load
+↓
+Validation
+├ Valid → Runtimeへ復元
+└ Corrupt / Invalid
+   ↓
+Runtimeへ適用しない
+   ↓
+破損Saveを削除
+   ↓
+Title / Load側へ失敗通知
+   ↓
+New Game開始可能状態
+```
+
+- 正常Saveを誤って削除しない。
+- 破損Saveの一部だけをRuntimeへ適用しない。
+- 削除後は旧Save由来のRuntime状態を残さない。
+- 初期プレイアブル版ではBackup復旧を行わない。
+
+## 6. 後続Architecture設計事項
+
+以下は具体実装時に本Architectureで決定する。
 
 - JSON Schema
 - Version field
 - Migration方式
-- Atomic Write / Backup方式
-- Corrupt Save検出・Fallback
+- Atomic Write方式
+- Corrupt Save検出方式
 - Serializer / Deserializer実装
 - File Path / Slot Nameの物理表現
 - Steam Cloud連携
 
-具体実装はGameplay FRの挙動確定Blockerにはしない。
+これらの具体実装方式は、Gameplay基本設計で確定済みのSave挙動を変更しない範囲で決定する。
