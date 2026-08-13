@@ -4,16 +4,16 @@
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-010` |
+| 要件ID | [`FR-PLAYER-010`](../../01_Requirements.md#fr-player-010) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#58`, `#67`, `#71` |
-| 関連要件・設計 | `FR-PLAYER-011`, `FR-PLAYER-012`, `Docs/03_CombatSystem.md`, `Docs/05_GASDesign.md` |
+| 関連Issue | [#58](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/58), [#67](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/67), [#71](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/71) |
+| 関連要件・設計 | [`FR-PLAYER-011`](../../01_Requirements.md#fr-player-011), [`FR-PLAYER-012`](../../01_Requirements.md#fr-player-012), [Combat System](../../03_CombatSystem.md), [GAS Design](../../05_GASDesign.md) |
 
 ## 2. 目的
 
-Swordの基本攻撃としてLight / Heavyを独立Actionで成立させ、受付Window内の入力によりCombo Branchへ接続する。
+Sword基本AttackとしてLight / Heavyを独立Actionで成立させ、受付Window内InputによりCombo Branchへ接続する。
 
 ## 3. 確定仕様・スコープ
 
@@ -22,7 +22,7 @@ Swordの基本攻撃としてLight / Heavyを独立Actionで成立させ、受�
 - Commitment中は許可されていないCancelを拒否する。
 - 定義されたCancel Window内のみCancelを許可する。
 - Active Window内だけHitを有効化する。
-- Combo受付Window内の次入力をInput Bufferへ保存し後続Attackを選択する。
+- Combo受付Window内の次InputをInput Bufferへ保存し後続Attackを選択する。
 
 ## 4. 基本フロー
 
@@ -38,7 +38,7 @@ Commitment
 Active + Hit Window
 ↓
 Recovery
-├ Combo Window入力あり → 次Attack
+├ Combo Window Inputあり → 次Attack
 └ なし → Neutral
 ```
 
@@ -48,7 +48,7 @@ Recovery
 |---|---|
 | Input層 | Light / Heavy要求配送 |
 | GAS / Attack Ability | Phase、Cost、Cancel、Montage制御 |
-| Input Buffer | Combo入力の保存・有効期限・消費 |
+| Input Buffer | Combo Input保存・有効期限・消費 |
 | Animation | Hit / Combo / Cancel Window通知 |
 | Damage基盤 | Health / Posture Damage反映 |
 
@@ -58,7 +58,7 @@ Recovery
 |---|---|
 | `State.Action.Attacking` | Attack実行中 |
 | `Window.Hitbox.Active` | Hit有効期間 |
-| `Window.Combo.AcceptInput` | Combo入力受付 |
+| `Window.Combo.AcceptInput` | Combo Input受付 |
 | `Window.Cancel.Dodge` | Dodge Cancel可能期間の例 |
 
 ## 7. 必要データ
@@ -67,7 +67,7 @@ Recovery
 |---|---|---|
 | AttackId | Attack識別 | Master Data |
 | Montage / Section | Attack Animation | Asset |
-| Startup / Commitment / Active / Recovery | Phase timing | 調整値 |
+| Startup / Commitment / Active / Recovery | Phase Timing | 調整値 |
 | Cancel Window | Cancel可否 | 調整値 |
 | Combo Window / Branch | 後続Attack | Gameplay Data |
 | Stamina Cost | Cost | 調整値 |
@@ -94,21 +94,21 @@ Recovery
 - [ ] 4 Phaseを区別できる。
 - [ ] Commitment中の禁止Cancelを拒否できる。
 - [ ] Active Window外でHitしない。
-- [ ] Combo Window内入力から定義済みBranchへ遷移できる。
+- [ ] Combo Window内Inputから定義済みBranchへ遷移できる。
 - [ ] Cancel / Death後に一時状態が残らない。
 
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#59` ASC
-- `#60` GameplayTag
-- `#61` Stamina
-- `#62` Damage
-- `#63` Hit Collision
-- `#64` Montage Event
+- [#59 ASC](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/59)
+- [#60 GameplayTag](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/60)
+- [#61 Stamina](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/61)
+- [#62 Damage](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/62)
+- [#63 Hit Collision](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/63)
+- [#64 Montage Event](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/64)
 
 ### Issue反映
-- `#58` Light、`#67` Heavy、`#71` Comboを親Issueとして実装単位を分離する。
+- [#58](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/58) Light、[#67](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/67) Heavy、[#71](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/71) Comboを親Issueとして実装単位を分離する。
 
 ## 12. 未決事項
 

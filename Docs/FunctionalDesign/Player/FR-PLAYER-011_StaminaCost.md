@@ -1,19 +1,19 @@
-# FR-PLAYER-011 攻撃と回避でStaminaを消費する
+# FR-PLAYER-011 AttackとDodgeでStaminaを消費する
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-011` |
+| 要件ID | [`FR-PLAYER-011`](../../01_Requirements.md#fr-player-011) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#61` |
-| 関連要件・設計 | `FR-PLAYER-010`, `FR-PLAYER-012`, `FR-PLAYER-013`, `FR-PLAYER-019`, `Docs/05_GASDesign.md` |
+| 関連Issue | [#61](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/61) |
+| 関連要件・設計 | [`FR-PLAYER-010`](../../01_Requirements.md#fr-player-010), [`FR-PLAYER-012`](../../01_Requirements.md#fr-player-012), [`FR-PLAYER-013`](../../01_Requirements.md#fr-player-013), [`FR-PLAYER-019`](../../01_Requirements.md#fr-player-019), [GAS Design](../../05_GASDesign.md) |
 
 ## 2. 目的
 
-Attack / Dodgeの連続使用にResource制約を設け、Action選択へリスクと間隔を与える。
+Attack / Dodgeの連続使用にResource制約を設け、Action選択へRiskと間隔を与える。
 
 ## 3. 確定仕様・スコープ
 
@@ -80,10 +80,10 @@ Current Stamina >= Cost?
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#59`, `#60`
+- [#59](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/59), [#60](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/60)
 
 ### Issue反映
-- `#61`をAttack / Dodgeで共有するStamina基盤として扱う。
+- [#61](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/61)をAttack / Dodgeで共有するStamina基盤として扱う。
 
 ## 12. 未決事項
 

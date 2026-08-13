@@ -1,25 +1,25 @@
-# FR-PLAYER-009 戦闘中は武器を変更できない
+# FR-PLAYER-009 Combat中はWeaponを変更できない
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-009` |
+| 要件ID | [`FR-PLAYER-009`](../../01_Requirements.md#fr-player-009) |
 | 優先度 | `Should` |
 | 対応範囲 | `Post-VS` |
 | 設計状態 | `Draft` |
 | 関連Issue | `未割当` |
-| 関連要件・設計 | `FR-PLAYER-008`, `Docs/04_WeaponSystem.md` |
+| 関連要件・設計 | [`FR-PLAYER-008`](../../01_Requirements.md#fr-player-008), [Weapon System](../../04_WeaponSystem.md) |
 
 ## 2. 目的
 
-武器ごとの戦闘特性を維持し、戦闘途中の即時切替によるAbility / Animation / Balanceの不整合を防ぐ。
+WeaponごとのCombat特性を維持し、Combat途中の即時切替によるAbility / Animation / Balance不整合を防ぐ。
 
 ## 3. 確定仕様・スコープ
 
-- 武器変更はCheckpoint Menuからのみ行う。
+- Weapon変更はCheckpoint Menuからのみ行う。
 - Combat状態中の変更要求は拒否する。
-- Initial VSはSword固定のため実質的な変更処理はPost-VS。
+- 初期プレイアブル版はSword固定のため実質的な変更処理はPost-VS。
 
 ## 4. 基本フロー
 
@@ -39,7 +39,7 @@ Combat中?
 
 | 対象 | 責務 |
 |---|---|
-| Weapon System | 武器変更可否判定 |
+| Weapon System | Weapon変更可否判定 |
 | Combat State | Combat中かを提供 |
 | Checkpoint | 正規変更導線を提供 |
 
@@ -52,7 +52,7 @@ Combat中を識別する既存Gameplay Stateを利用する。専用Tagの新設
 | データ | 用途 | 備考 |
 |---|---|---|
 | Combat State | 変更禁止判定 | Runtime |
-| Current WeaponId | 現在武器 | Runtime |
+| Current WeaponId | Current Weapon | Runtime |
 
 ## 8. UI / HUD / Animation / Feedback
 
@@ -67,15 +67,15 @@ Combat中を識別する既存Gameplay Stateを利用する。専用Tagの新設
 
 ## 10. 受入条件
 
-- [ ] Combat中の武器変更を拒否できる。
+- [ ] Combat中のWeapon変更を拒否できる。
 - [ ] Checkpointかつ非Combat時のみ変更処理へ進める。
-- [ ] 拒否で装備状態が部分変更されない。
+- [ ] Rejectで装備状態が部分変更されない。
 
 ## 11. 依存・Issue反映
 
 ### 依存
-- `FR-PLAYER-008`
-- `FR-STAGE-006`
+- [`FR-PLAYER-008`](../../01_Requirements.md#fr-player-008)
+- [`FR-STAGE-006`](../../01_Requirements.md#fr-stage-006)
 
 ### Issue反映
 - Post-VS Roadmap作成時に`FR-PLAYER-008`と依存関係を持つ実装Issueへ展開する。
