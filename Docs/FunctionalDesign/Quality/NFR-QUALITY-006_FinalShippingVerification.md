@@ -3,15 +3,15 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-QUALITY-006` |
+| 要件ID | [`NFR-QUALITY-006`](../../01_Requirements.md#nfr-quality-006) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#146` |
-| 関連要件・設計 | `NFR-QUALITY-001`～`005`, `NFR-PERF-*` |
+| 関連Issue | [#146](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/146) |
+| 関連要件・設計 | [`NFR-QUALITY-001`](../../01_Requirements.md#nfr-quality-001)～[`005`](../../01_Requirements.md#nfr-quality-005), Performance要件 |
 
 ## 2. 目的
-Editor / Development環境だけでなく、実際に提出するShipping BuildでInitial VS全体が成立することを最終確認する。
+Editor / Development環境だけでなく、実際に提出するShipping Buildで初期プレイアブル版全体が成立することを最終確認する。
 
 ## 3. 確定仕様・スコープ
 - Shipping Buildを生成して実機環境で通しPlayする。
@@ -25,7 +25,7 @@ Shipping Build生成
 ↓
 起動 / Title確認
 ↓
-両入力デバイスで通しPlay
+両Input Deviceで通しPlay
 ↓
 Save / Load / Death / Boss / Ending確認
 ↓
@@ -62,16 +62,16 @@ Shipping BuildでDebug専用表示に依存せず、必要UI / HUD / Endingが�
 ## 10. 受入条件
 - [ ] Shipping Buildを生成・起動できる。
 - [ ] New GameからEnding後Titleまで完走できる。
-- [ ] 両入力デバイスで主要操作できる。
+- [ ] 両Input Deviceで主要操作できる。
 - [ ] 既知Crash / 進行不能Bugが0件である。
 - [ ] Performance最低目標を確認できる。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `#111`, `#135`, `#136`, `#142`, `#143`, `#144`, `#145`
+- [#111](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/111), [#135](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/135), [#136](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/136), [#142](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/142), [#143](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/143), [#144](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/144), [#145](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/145)
 
 ### Issue反映
-- `#146`をInitial VS最終Release Gateとする。
+- [#146](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/146)を初期プレイアブル版最終Release Gateとする。
 
 ## 12. 未決事項
 なし

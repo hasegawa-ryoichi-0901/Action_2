@@ -3,18 +3,18 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-QUALITY-002` |
+| 要件ID | [`NFR-QUALITY-002`](../../01_Requirements.md#nfr-quality-002) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#143` |
-| 関連要件・設計 | `Docs/11_TestPlan.md`, `NFR-QUALITY-006` |
+| 関連Issue | [#143](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/143) |
+| 関連要件・設計 | [Test Plan](../../11_TestPlan.md), [`NFR-QUALITY-006`](../../01_Requirements.md#nfr-quality-006) |
 
 ## 2. 目的
 通常操作・異常系・Lifecycle境界で再現する既知CrashをRelease Buildへ残さない。
 
 ## 3. 確定仕様・スコープ
-- Initial VSの主要Gameplay LoopとUI / Save / Level遷移を対象にCrash確認を行う。
+- 初期プレイアブル版の主要Gameplay LoopとUI / Save / Level遷移を対象にCrash確認を行う。
 - UObject / Actor無効参照、Delegate / Timer / Binding解除漏れ、Level遷移中処理を重点確認する。
 - 再現可能な既知Crashが存在する状態をRelease完了としない。
 
@@ -58,10 +58,10 @@ Crash発生?
 
 ## 11. 依存・Issue反映
 ### 依存
-- Initial VS全System
+- 初期プレイアブル版全System
 
 ### Issue反映
-- `#143`をShipping前のCrash Gateとして扱う。
+- [#143](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/143)をShipping前のCrash Gateとして扱う。
 
 ## 12. 未決事項
 なし

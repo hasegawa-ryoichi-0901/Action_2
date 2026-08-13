@@ -3,15 +3,15 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-QUALITY-004` |
+| 要件ID | [`NFR-QUALITY-004`](../../01_Requirements.md#nfr-quality-004) |
 | 優先度 | `Must` |
 | 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#144` |
-| 関連要件・設計 | `FR-SAVE-001`～`006`, `Docs/18_SaveJsonArchitecture.md` |
+| 関連Issue | [#144](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/144), [#154](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154) |
+| 関連要件・設計 | [`FR-SAVE-001`](../../01_Requirements.md#fr-save-001)～[`006`](../../01_Requirements.md#fr-save-006), [Save JSON Architecture](../../18_SaveJsonArchitecture.md) |
 
 ## 2. 目的
-読込不能・不正形式のSave Dataを正常進行データとして適用せず、Crashや部分的なRuntime破損を防ぐ。
+読込不能・不正形式のSave Dataを正常進行Dataとして適用せず、Crashや部分的なRuntime破損を防ぐ。
 
 ## 3. 確定仕様・スコープ
 - Save読込時に形式・Version・必須Data等を検証可能にする。
@@ -78,11 +78,12 @@ New Game開始可能状態へ戻る
 
 ## 11. 依存・Issue反映
 ### 依存
-- Save JSON Architecture
-- Title / Start Flow
+- [#154 Save JSON Architecture](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154)
+- [#150 Title / Start Flow](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/150)
 
 ### Issue反映
-- `#144`へ破損検出、非適用、破損Save削除、New Game復帰を反映する。
+- [#144](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/144)へ破損検出、非適用、破損Save削除、New Game復帰を反映する。
+- [#154](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154)でValidation / Storage側Architectureを確定する。
 
 ## 12. 未決事項
 なし

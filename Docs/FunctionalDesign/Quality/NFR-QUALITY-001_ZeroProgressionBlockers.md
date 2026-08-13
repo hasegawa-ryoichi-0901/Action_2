@@ -3,18 +3,18 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-QUALITY-001` |
+| 要件ID | [`NFR-QUALITY-001`](../../01_Requirements.md#nfr-quality-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#142` |
-| 関連要件・設計 | `Docs/11_TestPlan.md`, Initial VS全機能要件 |
+| 関連Issue | [#142](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/142) |
+| 関連要件・設計 | [Test Plan](../../11_TestPlan.md), 初期プレイアブル版全機能要件 |
 
 ## 2. 目的
 TitleからEnding後のTitle復帰まで、Playerが通常操作で進行できなくなる不具合を残さない。
 
 ## 3. 確定仕様・スコープ
-- Initial VSの必須進行経路を通しテストする。
+- 初期プレイアブル版の必須進行経路を通しTestする。
 - Death / Respawn、Checkpoint、Boss Defeat、Reward Save、Clear Trigger、Ending、Title復帰を重点確認する。
 - 進行不能が再現した場合はRelease Gateを通過させない。
 
@@ -71,10 +71,10 @@ Title
 
 ## 11. 依存・Issue反映
 ### 依存
-- Initial VS主要Gameplay機能
+- 初期プレイアブル版主要Gameplay機能
 
 ### Issue反映
-- `#142`をRelease前の進行確認Issueとして扱う。
+- [#142](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/142)をRelease前の進行確認Issueとして扱う。
 
 ## 12. 未決事項
 なし

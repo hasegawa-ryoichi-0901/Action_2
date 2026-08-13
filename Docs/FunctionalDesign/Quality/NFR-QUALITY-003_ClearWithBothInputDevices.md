@@ -3,21 +3,21 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-QUALITY-003` |
+| 要件ID | [`NFR-QUALITY-003`](../../01_Requirements.md#nfr-quality-003) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#111` |
-| 関連要件・設計 | `FR-PLAYER-002`, `FR-UI-001`, `FR-STAGE-013` |
+| 関連Issue | [#111](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/111) |
+| 関連要件・設計 | [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002), [`FR-UI-001`](../../01_Requirements.md#fr-ui-001), [`FR-STAGE-013`](../../01_Requirements.md#fr-stage-013) |
 
 ## 2. 目的
-入力デバイスの違いで操作不能・進行不能になる機能がないことを、通しClearで確認する。
+Input Deviceの違いで操作不能・進行不能になる機能がないことを、通しClearで確認する。
 
 ## 3. 確定仕様・スコープ
 - GamepadだけでTitleからStage Clear / Title復帰まで操作確認する。
 - Keyboard-Mouseだけでも同じ通し確認を行う。
 - Move / Look / Jump / Combat / LockOn / Target Switch / Heal / Checkpoint / UI操作を含める。
-- デバイス差でGameplay Ruleを変更しない。
+- Device差でGameplay Ruleを変更しない。
 
 ## 4. 基本フロー
 ```text
@@ -35,9 +35,9 @@ Clear確認
 ## 5. 責務
 | 対象 | 責務 |
 |---|---|
-| Input Mapping | 両デバイス割当 |
-| Gameplay | デバイス非依存Rule |
-| Test | 両デバイス通し検証 |
+| Input Mapping | 両Device割当 |
+| Gameplay | Device非依存Rule |
+| Test | 両Device通し検証 |
 
 ## 6. 状態 / Gameplay Tag
 なし。
@@ -50,25 +50,25 @@ Clear確認
 | Device Result | 結果記録 | Test Evidence |
 
 ## 8. UI / HUD / Animation / Feedback
-Title / Checkpoint / Config等のUIを両デバイスで操作可能にする。操作表示を切り替える場合もGameplay Ruleは変更しない。
+Title / Checkpoint / Config等のUIを両Deviceで操作可能にする。操作表示を切り替える場合もGameplay Ruleは変更しない。
 
 ## 9. 異常系・終了条件
-- デバイス変更後にMapping / Bindingを重複させない。
-- 一方のデバイスでしか実行できない必須Actionを残さない。
+- Device変更後にMapping / Bindingを重複させない。
+- 一方のDeviceでしか実行できない必須Actionを残さない。
 
 ## 10. 受入条件
-- [ ] GamepadのみでInitial VSをClearできる。
-- [ ] Keyboard-MouseのみでInitial VSをClearできる。
+- [ ] Gamepadのみで初期プレイアブル版をClearできる。
+- [ ] Keyboard-Mouseのみで初期プレイアブル版をClearできる。
 - [ ] 両方で必須UIを操作できる。
-- [ ] デバイス差によるGameplay Rule分岐がない。
+- [ ] Device差によるGameplay Rule分岐がない。
 
 ## 11. 依存・Issue反映
 ### 依存
-- `FR-PLAYER-002`
-- Initial VS全操作
+- [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002)
+- 初期プレイアブル版全操作
 
 ### Issue反映
-- 重複Issueを作らず`#111`で機能要件と品質確認を統合する。
+- 重複Issueを作らず[#111](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/111)で機能要件と品質確認を統合する。
 
 ## 12. 未決事項
 なし

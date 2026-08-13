@@ -3,18 +3,18 @@
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `NFR-QUALITY-005` |
+| 要件ID | [`NFR-QUALITY-005`](../../01_Requirements.md#nfr-quality-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#145` |
-| 関連要件・設計 | `NFR-QUALITY-002`, `NFR-QUALITY-006` |
+| 関連Issue | [#145](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/145) |
+| 関連要件・設計 | [`NFR-QUALITY-002`](../../01_Requirements.md#nfr-quality-002), [`NFR-QUALITY-006`](../../01_Requirements.md#nfr-quality-006) |
 
 ## 2. 目的
-繰り返し戦闘・Death / Respawn・Level / UI遷移等で不要Object / Delegate / Asset参照が蓄積し続けないことを確認する。
+繰り返しCombat・Death / Respawn・Level / UI遷移等で不要Object / Delegate / Asset参照が蓄積し続けないことを確認する。
 
 ## 3. 確定仕様・スコープ
-- Initial VSの代表Loopを複数回繰り返してMemory推移を確認する。
+- 初期プレイアブル版の代表Loopを複数回繰り返してMemory推移を確認する。
 - Enemy Respawn、DeathDrop、Ability / Montage、UI、Save / Load等の繰り返し箇所を重点確認する。
 - 一時的な増加と回収されない継続増加を区別する。
 
@@ -64,10 +64,10 @@ GC / 状態安定後を比較
 
 ## 11. 依存・Issue反映
 ### 依存
-- Initial VS通しPlay可能状態
+- 初期プレイアブル版通しPlay可能状態
 
 ### Issue反映
-- `#145`でLong Play Memory Testを実施する。
+- [#145](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/145)でLong Play Memory Testを実施する。
 
 ## 12. 未決事項
 なし
