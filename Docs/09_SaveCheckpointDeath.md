@@ -2,12 +2,13 @@
 
 ## 1. セーブ方針
 
-- 進行データは1スロット。
-- 設定データは進行データとは別の保存契機を持つ。
+- Progress Saveは1 Slot。
+- Settings DataはProgress Saveとは別のSave契機を持つ。
 - 保存媒体、JSON Schema、Steam Cloud同期などの永続化Architectureは別設計で定義する。
-- 本ドキュメントではゲーム上の保存契機と復元要件だけを確定する。
+- 本ドキュメントではゲーム上のSave契機とRestore要件を確定する。
+- JSON永続化Architectureは[#154](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154)で確定する。
 
-## 2. 進行データのAuto Save契機
+## 2. Progress Auto Save契機
 
 Auto Saveは次のタイミングに限定する。
 
@@ -70,14 +71,14 @@ Weapon UpgradeはCheckpoint Menuでのみ実行する。GoldとUpgrade Material�
       ↓
 [Fade Out]
       ↓
-[Active Checkpoint / 未設定時PlayerStartへRespawn]
+[ActiveCheckpoint / 未設定時PlayerStartへRespawn]
       ↓
 [HP / Stamina Full + Healing Item補充 + Normal Enemy Respawn]
       ↓
 [Fade In / Gameplay再開]
 ```
 
-DeathDropはダークソウル系の回収ループと同様に、死亡時点の対象Resourceを全量失うリスクを持つ。Goldの割合消失は行わない。
+DeathDropは死亡時点のUpgrade MaterialとGoldを全量回収対象へ移す。割合消失は行わない。
 
 ## 6. DeathDrop回収
 
@@ -103,22 +104,22 @@ DeathDropはダークソウル系の回収ループと同様に、死亡時点�
 - Gold格納量
 - 未回収状態
 
-Playerは最後のActiveCheckpoint、未設定時はPlayerStartから再開する。DeathDrop座標・内容はJSONへ保存する方針だが、JSON構造・Versioning・Reader / Writerは別Architecture Designで定義する。
+Playerは最後のActiveCheckpoint、未設定時はPlayerStartから再開する。DeathDrop座標・内容はJSONへ保存する方針だが、JSON構造・Versioning・Reader / Writerは[`Docs/18_SaveJsonArchitecture.md`](18_SaveJsonArchitecture.md)で定義する。
 
-## 8. Inventory
+## 8. Player Inventory
 
-次の所持データはPlayer Inventoryを正本とする。
+次の所持DataはPlayer Inventoryを正本とする。
 
 - Gold
 - Upgrade Material
 - Boss Unique Item
 - Inventory系所持Item
 
-Enemy Reward、Boss Reward、Weapon Upgrade、DeathDrop、HUD、Saveは同じInventory状態を参照・更新する。
+Enemy Reward、Boss Reward、Weapon Upgrade、DeathDrop、HUD、Saveは同じInventory状態を参照・更新する。共通実装は[#153](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/153)で管理する。
 
 ## 9. Enemy Reward
 
-通常敵1体のDefeatごとにReward Masterから0..N件のReward Itemを取得し、Player Inventoryへ直接付与する。World Drop Actorは生成しない。
+Normal Enemy1体のDefeatごとにReward Masterから0..N件のReward Entryを取得し、Player Inventoryへ直接付与する。World Drop Actorは生成しない。
 
 ## 10. Boss Reward / Save
 
@@ -138,7 +139,7 @@ Enemy Reward、Boss Reward、Weapon Upgrade、DeathDrop、HUD、Saveは同じInv
 [Clear Areaへ進行可能]
 ```
 
-初期Vertical SliceではBoss再戦を実装しない。
+初期プレイアブル版ではBoss Replayを実装しない。
 
 ## 11. Stage Clear
 
@@ -156,14 +157,17 @@ Enemy Reward、Boss Reward、Weapon Upgrade、DeathDrop、HUD、Saveは同じInv
 
 Stage Clear自体では追加Auto Saveを行わない。
 
-## 12. TitleからのLoad
+## 12. TitleからのLoad / Corrupt Save
 
-- Continue: 現在の進行Saveを読みPlay Startする。
+- Continue: 現在のProgress Saveを読みPlay Startする。
 - Load Game: Save Data選択画面を経由してLoadする。
-- Initial Vertical Sliceは1スロットのため、選択可能な進行Saveは現在存在する1件を基本とする。
+- 初期プレイアブル版は1 Slotのため、選択可能なProgress Saveは現在存在する1件を基本とする。
+- Corrupt / Invalid SaveはRuntimeへ部分適用しない。
+- Corrupt Saveを削除し、New Gameを開始できる状態へ戻す。
+- 初期プレイアブル版ではBackupからの自動復旧を行わない。
 
 ## 13. Settings / Steam Cloud
 
-設定変更時は進行Saveとは独立して設定データを保存する。Steam CloudはPost-Vertical Sliceで追加する。
+Settings変更時はProgress Saveとは独立してSettings Dataを保存する。Steam CloudはPost-VSで追加する。
 
 ### [戻る](../README.md#ドキュメント一覧)
