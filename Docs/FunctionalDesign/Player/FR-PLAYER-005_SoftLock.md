@@ -1,25 +1,25 @@
-# FR-PLAYER-005 ソフトロックを使用できる
+# FR-PLAYER-005 Soft Lockを使用できる
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-005` |
+| 要件ID | [`FR-PLAYER-005`](../../01_Requirements.md#fr-player-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#113` |
-| 関連要件・設計 | `FR-PLAYER-006`, `FR-PLAYER-010`, `Docs/03_CombatSystem.md` |
+| 関連Issue | [#113](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/113) |
+| 関連要件・設計 | [`FR-PLAYER-006`](../../01_Requirements.md#fr-player-006), [`FR-PLAYER-010`](../../01_Requirements.md#fr-player-010), [Combat System](../../03_CombatSystem.md) |
 
 ## 2. 目的
 
-Manual LockOnを使用していない通常戦闘でも、近傍の有効Enemyへ攻撃方向を補正して操作負荷を下げる。
+Manual LockOnを使用していない通常Combatでも、近傍の有効EnemyへAttack方向を補正して操作負荷を下げる。
 
 ## 3. 確定仕様・スコープ
 
 - Attack開始時に近傍の有効Target候補からSoft Lock対象を選ぶ。
 - Manual LockOn中はManual Targetを優先する。
-- Targetが存在しない場合はPlayer入力 / 向きを維持する。
+- Targetが存在しない場合はPlayer Input / 向きを維持する。
 - Defeated / 無効Targetを候補にしない。
 - 補正距離・角度は調整可能とする。
 
@@ -34,7 +34,7 @@ Manual LockOn中?
   ↓
 Soft Lock候補検索
   ├ なし → 現在方向を維持
-  └ あり → 最適候補へ攻撃方向補正
+  └ あり → 最適候補へAttack方向補正
 ```
 
 ## 5. 責務
@@ -47,7 +47,7 @@ Soft Lock候補検索
 
 ## 6. 状態 / Gameplay Tag
 
-Soft Lock専用の常駐状態Tagは必須としない。Target有効性はEnemy状態を参照する。
+Soft Lock専用の常駐State Tagは必須としない。Target有効性はEnemy状態を参照する。
 
 ## 7. 必要データ
 
@@ -69,7 +69,7 @@ Soft Lock専用の常駐状態Tagは必須としない。Target有効性はEnemy
 
 ## 10. 受入条件
 
-- [ ] Manual LockOnなしで有効Targetへ攻撃方向を補正できる。
+- [ ] Manual LockOnなしで有効TargetへAttack方向を補正できる。
 - [ ] 候補なしではPlayer方向を維持する。
 - [ ] Defeated / Invalid Targetを選択しない。
 - [ ] Manual LockOn中はManual Targetを優先する。
@@ -77,11 +77,11 @@ Soft Lock専用の常駐状態Tagは必須としない。Target有効性はEnemy
 ## 11. 依存・Issue反映
 
 ### 依存
-- `FR-PLAYER-006`
-- `FR-PLAYER-010`
+- [`FR-PLAYER-006`](../../01_Requirements.md#fr-player-006)
+- [`FR-PLAYER-010`](../../01_Requirements.md#fr-player-010)
 
 ### Issue反映
-- `#113`へ候補条件、Manual Lock優先、補正調整値を反映する。
+- [#113](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/113)へ候補条件、Manual Lock優先、補正調整値を反映する。
 
 ## 12. 未決事項
 

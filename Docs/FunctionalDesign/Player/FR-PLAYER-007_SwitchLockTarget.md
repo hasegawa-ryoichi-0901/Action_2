@@ -1,15 +1,15 @@
-# FR-PLAYER-007 ロックオン対象を切り替えられる
+# FR-PLAYER-007 LockOn対象を切り替えられる
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-007` |
+| 要件ID | [`FR-PLAYER-007`](../../01_Requirements.md#fr-player-007) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#79`, `#80`, `#81` |
-| 関連要件・設計 | `FR-PLAYER-006`, `FR-PLAYER-021` |
+| 関連Issue | [#79](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/79), [#80](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/80), [#81](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/81) |
+| 関連要件・設計 | [`FR-PLAYER-006`](../../01_Requirements.md#fr-player-006), [`FR-PLAYER-021`](../../01_Requirements.md#fr-player-021) |
 
 ## 2. 目的
 
@@ -48,7 +48,7 @@ LockOn中確認
 
 ## 6. 状態 / Gameplay Tag
 
-Manual LockOn中であることを実行条件とする。Target Switch専用の継続状態Tagは不要。
+Manual LockOn中であることを実行条件とする。Target Switch専用の継続State Tagは不要。
 
 ## 7. 必要データ
 
@@ -69,8 +69,8 @@ Manual LockOn中であることを実行条件とする。Target Switch専用の
 ## 9. 異常系・終了条件
 
 - 候補なしではCurrent Targetを維持する。
-- Switch中にCurrent Targetが死亡した場合は`FR-PLAYER-006`のUnlock規則を優先する。
-- Input再Setupで左右入力を重複Bindingしない。
+- Switch中にCurrent Targetが死亡した場合は`FR-PLAYER-006`のUnlock Ruleを優先する。
+- Input再Setupで左右Inputを重複Bindingしない。
 
 ## 10. 受入条件
 
@@ -82,10 +82,10 @@ Manual LockOn中であることを実行条件とする。Target Switch専用の
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#75` Manual LockOn
+- [#75 Manual LockOn](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/75)
 
 ### Issue反映
-- `#79`を親Issue、`#80`をInput、`#81`を候補選択 / Target更新として扱う。
+- [#79](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/79)を親Issue、[#80](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/80)をInput、[#81](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/81)を候補選択 / Target更新として扱う。
 
 ## 12. 未決事項
 

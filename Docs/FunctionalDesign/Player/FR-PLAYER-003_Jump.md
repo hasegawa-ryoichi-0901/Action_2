@@ -1,25 +1,25 @@
-# FR-PLAYER-003 ジャンプできる
+# FR-PLAYER-003 Jumpできる
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-003` |
+| 要件ID | [`FR-PLAYER-003`](../../01_Requirements.md#fr-player-003) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#108`, `#109` |
-| 関連要件・設計 | `FR-PLAYER-004`, `NFR-MAINT-003` |
+| 関連Issue | [#108](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/108), [#109](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/109) |
+| 関連要件・設計 | [`FR-PLAYER-004`](../../01_Requirements.md#fr-player-004), [`NFR-MAINT-003`](../../01_Requirements.md#nfr-maint-003) |
 
 ## 2. 目的
 
-地上から空中へ移行する基本Actionを提供し、Air Attackへ接続する。
+GroundedからAirborneへ移行する基本Actionを提供し、Air Attackへ接続する。
 
 ## 3. 確定仕様・スコープ
 
 - Grounded時のみJumpを開始する。
-- Airborne中の再JumpはInitial VSでは行わない。
-- 入力は`IPlayerInputComponent`契約からGameplayへ配送する。
+- Airborne中の再Jumpは初期プレイアブル版では行わない。
+- Inputは`IPlayerInputComponent`契約からGameplayへ配送する。
 
 ## 4. 基本フロー
 
@@ -41,7 +41,7 @@ Landing
 
 | 対象 | 責務 |
 |---|---|
-| Input層 | Jump入力配送 |
+| Input層 | Jump Input配送 |
 | Player / Movement | Grounded判定とJump実行 |
 | Animation | Jump / Fall / Land表示 |
 
@@ -65,7 +65,7 @@ Jump専用Tagを必須とはしない。Airborne / GroundedはMovement状態を�
 
 ## 9. 異常系・終了条件
 
-- Airborne中の再入力を拒否する。
+- Airborne中の再Inputを拒否する。
 - Death等の禁止状態では開始しない。
 - Landing後にAirborne固有状態を残さない。
 
@@ -79,11 +79,11 @@ Jump専用Tagを必須とはしない。Airborne / GroundedはMovement状態を�
 ## 11. 依存・Issue反映
 
 ### 依存
-- `FR-PLAYER-001`
-- `FR-PLAYER-004`
+- [`FR-PLAYER-001`](../../01_Requirements.md#fr-player-001)
+- [`FR-PLAYER-004`](../../01_Requirements.md#fr-player-004)
 
 ### Issue反映
-- `#108`をTracking Parent、`#109`をInput / Grounded実装Issueとして扱う。
+- [#108](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/108)をTracking Parent、[#109](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/109)をInput / Grounded実装Issueとして扱う。
 
 ## 12. 未決事項
 

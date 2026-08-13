@@ -1,23 +1,23 @@
-# FR-PLAYER-004 空中攻撃を実行できる
+# FR-PLAYER-004 Air Attackを実行できる
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-004` |
+| 要件ID | [`FR-PLAYER-004`](../../01_Requirements.md#fr-player-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#112` |
-| 関連要件・設計 | `FR-PLAYER-003`, `FR-PLAYER-010`, `FR-PLAYER-011`, `Docs/03_CombatSystem.md` |
+| 関連Issue | [#112](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/112) |
+| 関連要件・設計 | [`FR-PLAYER-003`](../../01_Requirements.md#fr-player-003), [`FR-PLAYER-010`](../../01_Requirements.md#fr-player-010), [`FR-PLAYER-011`](../../01_Requirements.md#fr-player-011), [Combat System](../../03_CombatSystem.md) |
 
 ## 2. 目的
 
-Jump後の空中状態から攻撃へ派生できるようにし、三次元的な戦闘選択肢を提供する。
+Jump後のAirborne状態からAttackへ派生できるようにし、三次元的なCombat選択肢を提供する。
 
 ## 3. 確定仕様・スコープ
 
-- Airborne中のみ剣のAir Attackを開始できる。
+- Airborne中のみSwordのAir Attackを開始できる。
 - Stamina Costを適用する。
 - Attack Montage、Hit Window、Damageは既存Combat共有基盤へ接続する。
 - Grounded時は通常のLight / Heavyへ混入させない。
@@ -91,11 +91,11 @@ Landing or Ability End
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#58` Light Attack共有基盤
-- `#108` Jump
+- [#58 Light Attack共有基盤](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/58)
+- [#108 Jump](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/108)
 
 ### Issue反映
-- `#112`へAirborne判定、Cost、Montage、Hit Window、Cleanupを反映する。
+- [#112](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/112)へAirborne判定、Cost、Montage、Hit Window、Cleanupを反映する。
 
 ## 12. 未決事項
 

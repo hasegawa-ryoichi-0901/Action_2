@@ -4,22 +4,22 @@
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-001` |
+| 要件ID | [`FR-PLAYER-001`](../../01_Requirements.md#fr-player-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#110` |
-| 関連要件・設計 | `FR-PLAYER-002`, `FR-PLAYER-021`, `NFR-MAINT-003`, `Docs/07_ClassDesign.md` |
+| 関連Issue | [#110](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/110) |
+| 関連要件・設計 | [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002), [`FR-PLAYER-021`](../../01_Requirements.md#fr-player-021), [`NFR-MAINT-003`](../../01_Requirements.md#nfr-maint-003), [Class Design](../../07_ClassDesign.md) |
 
 ## 2. 目的
 
-三人称アクションの基礎として、Camera方向を基準にPlayerを安定して移動できるようにする。
+三人称Actionの基礎として、Camera方向を基準にPlayerを安定して移動できるようにする。
 
 ## 3. 確定仕様・スコープ
 
 - Camera Yawを基準に前後左右の移動方向を算出する。
 - 現行実装では`ABasePlayer`とCharacterMovementを利用する。
-- 入力受付は`IPlayerInputComponent`契約を経由する。
+- Input受付は`IPlayerInputComponent`契約を経由する。
 - Moverや未実装Movement Adapterを前提にしない。
 
 ## 4. 基本フロー
@@ -40,7 +40,7 @@ CharacterMovementで移動
 
 | 対象 | 責務 |
 |---|---|
-| Input層 | 移動入力の受付・配送 |
+| Input層 | 移動Inputの受付・配送 |
 | Player | 移動方向の算出と移動要求 |
 | CharacterMovement | 実際の移動処理 |
 
@@ -52,7 +52,7 @@ CharacterMovementで移動
 
 | データ | 用途 | 備考 |
 |---|---|---|
-| Move Input Vector | 前後左右入力 | Runtime |
+| Move Input Vector | 前後左右Input | Runtime |
 | Controller Yaw | Camera基準方向 | Runtime |
 | Movement Parameters | 移動速度等 | 調整値 |
 
@@ -67,24 +67,24 @@ CharacterMovementで移動
 
 - Controller無効時は移動方向計算を行わず安全に終了する。
 - Input再SetupでBindingを重複させない。
-- Death等の入力禁止状態では上位の入力制御に従う。
+- Death等のInput禁止状態では上位のInput制御に従う。
 
 ## 10. 受入条件
 
 - [ ] Camera向きを基準に前後左右へ移動できる。
 - [ ] Gamepad / Keyboard-Mouseで同等に移動できる。
-- [ ] Input再Setup後も1入力1回の移動要求になる。
+- [ ] Input再Setup後も1 Input 1回の移動要求になる。
 - [ ] Controller無効時にCrashしない。
 
 ## 11. 依存・Issue反映
 
 ### 依存
-- `FR-PLAYER-002`
-- `FR-PLAYER-021`
-- `NFR-MAINT-003`
+- [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002)
+- [`FR-PLAYER-021`](../../01_Requirements.md#fr-player-021)
+- [`NFR-MAINT-003`](../../01_Requirements.md#nfr-maint-003)
 
 ### Issue反映
-- `#110`へ移動方向、Input Lifecycle、CharacterMovement利用方針を反映する。
+- [#110](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/110)へ移動方向、Input Lifecycle、CharacterMovement利用方針を反映する。
 
 ## 12. 未決事項
 

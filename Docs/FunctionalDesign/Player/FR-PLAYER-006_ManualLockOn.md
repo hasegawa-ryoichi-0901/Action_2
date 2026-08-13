@@ -1,15 +1,15 @@
-# FR-PLAYER-006 手動ロックオンを使用できる
+# FR-PLAYER-006 Manual LockOnを使用できる
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-006` |
+| 要件ID | [`FR-PLAYER-006`](../../01_Requirements.md#fr-player-006) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#75`, `#76`, `#77`, `#78` |
-| 関連要件・設計 | `FR-PLAYER-007`, `FR-PLAYER-021` |
+| 関連Issue | [#75](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/75), [#76](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/76), [#77](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/77), [#78](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/78) |
+| 関連要件・設計 | [`FR-PLAYER-007`](../../01_Requirements.md#fr-player-007), [`FR-PLAYER-021`](../../01_Requirements.md#fr-player-021) |
 
 ## 2. 目的
 
@@ -17,8 +17,8 @@ Playerが明示的にEnemyをTargetとして固定し、CameraとCombatが同じ
 
 ## 3. 確定仕様・スコープ
 
-- LockOn入力で有効Targetを選択してLockする。
-- LockOn中に同じLockOn入力を再度押すと解除する。
+- LockOn Inputで有効Targetを選択してLockする。
+- LockOn中に同じLockOn Inputを再度押すと解除する。
 - LockOn中のみCameraがTargetへ追従し、通常Camera Lookを無効化する。
 - Current Targetが死亡 / 無効化した場合は自動でLockを解除し、別Targetへ自動切替しない。
 
@@ -51,7 +51,7 @@ Unlock
 
 ## 6. 状態 / Gameplay Tag
 
-LockOn状態はTargeting SystemのCurrent Target有無を正とする。必要なら状態Tagへ同期する。
+LockOn状態はTargeting SystemのCurrent Target有無を正とする。必要ならState Tagへ同期する。
 
 ## 7. 必要データ
 
@@ -76,8 +76,8 @@ LockOn状態はTargeting SystemのCurrent Target有無を正とする。必要�
 
 ## 10. 受入条件
 
-- [ ] LockOn入力で有効TargetをLockできる。
-- [ ] 同じ入力でUnlockできる。
+- [ ] LockOn Inputで有効TargetをLockできる。
+- [ ] 同じInputでUnlockできる。
 - [ ] Lock中はCamera Lookを無効化してTarget追従できる。
 - [ ] Target死亡時に自動Unlockできる。
 - [ ] Unlock後にCamera Lookが復帰する。
@@ -85,11 +85,11 @@ LockOn状態はTargeting SystemのCurrent Target有無を正とする。必要�
 ## 11. 依存・Issue反映
 
 ### 依存
-- `FR-PLAYER-007`
-- `FR-PLAYER-021`
+- [`FR-PLAYER-007`](../../01_Requirements.md#fr-player-007)
+- [`FR-PLAYER-021`](../../01_Requirements.md#fr-player-021)
 
 ### Issue反映
-- `#75`を親Issueとして`#76`～`#78`へ候補選択、Camera、死亡解除を分割する。
+- [#75](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/75)を親Issueとして[#76](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/76)～[#78](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/78)へ候補選択、Camera、死亡解除を分割する。
 
 ## 12. 未決事項
 
