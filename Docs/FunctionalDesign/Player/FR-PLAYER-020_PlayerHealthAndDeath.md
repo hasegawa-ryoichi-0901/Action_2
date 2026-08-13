@@ -4,16 +4,16 @@
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-020` |
+| 要件ID | [`FR-PLAYER-020`](../../01_Requirements.md#fr-player-020) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#82`, `#83` |
-| 関連要件・設計 | `FR-STAGE-008`～`012`, `FR-SAVE-005`, `Docs/09_SaveCheckpointDeath.md` |
+| 関連Issue | [#82](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/82), [#83](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/83) |
+| 関連要件・設計 | [`FR-STAGE-008`](../../01_Requirements.md#fr-stage-008)～[`FR-STAGE-012`](../../01_Requirements.md#fr-stage-012), [`FR-SAVE-005`](../../01_Requirements.md#fr-save-005), [Save / Checkpoint / Death](../../09_SaveCheckpointDeath.md) |
 
 ## 2. 目的
 
-Player Damageの終端としてDeath Stateを一意に確定し、Death Animation / DeathDrop / Save / Respawnへ接続する。
+Player Damage終端としてDeath Stateを一意に確定し、Death Animation / DeathDrop / Save / Respawnへ接続する。
 
 ## 3. 確定仕様・スコープ
 
@@ -95,11 +95,11 @@ FR-STAGE-008 / FR-SAVE-005
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#62` Damage
-- `#84` DeathDrop生成
+- [#62 Damage](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/62)
+- [#84 DeathDrop生成](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/84)
 
 ### Issue反映
-- `#82`を死亡Loop親Issue、`#83`をHealth0 / Death Stateとして扱う。
+- [#82](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/82)をDeath Loop親Issue、[#83](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/83)をHealth0 / Death Stateとして扱う。
 
 ## 12. 未決事項
 

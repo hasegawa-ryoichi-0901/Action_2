@@ -4,16 +4,16 @@
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-018` |
+| 要件ID | [`FR-PLAYER-018`](../../01_Requirements.md#fr-player-018) |
 | 優先度 | `Must` |
 | 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#116` |
-| 関連要件・設計 | `FR-STAGE-005`, `FR-PLAYER-020`, `FR-BOSS-005` |
+| 関連Issue | [#116](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/116) |
+| 関連要件・設計 | [`FR-STAGE-005`](../../01_Requirements.md#fr-stage-005), [`FR-PLAYER-020`](../../01_Requirements.md#fr-player-020), [`FR-BOSS-005`](../../01_Requirements.md#fr-boss-005) |
 
 ## 2. 目的
 
-回数制限付き回復を戦闘Resourceとして提供し、Checkpoint / Respawnの補充とBoss AIのHealing State評価へ接続する。
+回数制限付きHealをCombat Resourceとして提供し、Checkpoint / Respawn補充とBoss AIのHealing State評価へ接続する。
 
 ## 3. 確定仕様・スコープ
 
@@ -50,7 +50,7 @@ Animation継続
 
 | 対象 | 責務 |
 |---|---|
-| Heal Ability | 実行可否、Healing State、Animation開始後のItem消費、回復適用 |
+| Heal Ability | 実行可否、Healing State、Animation開始後のItem消費、Heal適用 |
 | Player Resource | Healing Item Count管理 |
 | Checkpoint / Respawn | Item補充 |
 | Boss AI | Healing State参照 |
@@ -68,7 +68,7 @@ Animation継続
 | MaxHealingItemCount | 最大所持 | 調整値 |
 | CurrentHealingItemCount | 残数 | Runtime |
 | Heal Amount | HP回復量 | 調整値 |
-| Heal Montage / Duration | Action timing | Asset / 調整値 |
+| Heal Montage / Duration | Action Timing | Asset / 調整値 |
 | Item Consumption Timing | Animation開始直後に1個消費 | 確定仕様 |
 
 ## 8. UI / HUD / Animation / Feedback
@@ -100,11 +100,11 @@ Animation継続
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#59` Player ASC
-- `#91` Checkpoint
+- [#59 Player ASC](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/59)
+- [#91 Checkpoint](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/91)
 
 ### Issue反映
-- `#116`へAnimation開始直後のItem消費、中断時非返却、補充、Boss AI参照を反映する。
+- [#116](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/116)へAnimation開始直後のItem消費、中断時非返却、補充、Boss AI参照を反映する。
 
 ## 12. 未決事項
 

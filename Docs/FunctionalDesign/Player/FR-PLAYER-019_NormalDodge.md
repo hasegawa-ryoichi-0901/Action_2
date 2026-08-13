@@ -1,29 +1,29 @@
-# FR-PLAYER-019 通常Dodgeを実行できる
+# FR-PLAYER-019 Normal Dodgeを実行できる
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-019` |
+| 要件ID | [`FR-PLAYER-019`](../../01_Requirements.md#fr-player-019) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#52`～`#57` |
-| 関連要件・設計 | `FR-PLAYER-011`, `FR-PLAYER-014`, `Docs/03_CombatSystem.md` |
+| 関連Issue | [#52](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/52), [#53](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/53), [#54](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/54), [#55](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/55), [#56](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/56), [#57](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/57) |
+| 関連要件・設計 | [`FR-PLAYER-011`](../../01_Requirements.md#fr-player-011), [`FR-PLAYER-014`](../../01_Requirements.md#fr-player-014), [Combat System](../../03_CombatSystem.md) |
 
 ## 2. 目的
 
-Playerの基本回避Actionとして、移動入力に応じたRoll / Back StepとDamage回避Windowを提供する。
+Player基本Dodge Actionとして、Move Inputに応じたRoll / Back StepとDamage回避Windowを提供する。
 
 ## 3. 確定仕様・スコープ
 
 - Input TagはDodgeのみ。
-- 移動入力がある場合は現在の移動入力方向へRollする。
-- 移動入力がない場合はCharacter後方へBack Stepする。
+- Move Inputがある場合は現在のMove Input方向へRollする。
+- Move Inputがない場合はCharacter後方へBack Stepする。
 - Grounded時のみ開始し、Air Dodgeは行わない。
 - Enemy Collisionを通過しない。
 - Dodge中はInvincible Windowを持つ。
-- Perfect Dodgeは同一Actionの結果で`FR-PLAYER-014`が扱う。
+- Perfect Dodgeは同一ActionのResultで`FR-PLAYER-014`が扱う。
 
 ## 4. 基本フロー
 
@@ -32,8 +32,8 @@ Dodge Input
 ↓
 Grounded / Stamina / 禁止状態確認
 ↓
-移動入力あり?
-├ Yes → 入力方向Roll
+Move Inputあり?
+├ Yes → Input方向Roll
 └ No → Back Step
 ↓
 Dodge State + Invincible Window
@@ -47,8 +47,8 @@ Animation終了 / Cancel
 
 | 対象 | 責務 |
 |---|---|
-| Input層 | Dodge入力配送 |
-| Dodge Ability | Cost、状態、Window |
+| Input層 | Dodge Input配送 |
+| Dodge Ability | Cost、State、Window |
 | Movement / Animation | Roll / Back Step移動と表現 |
 | Collision | Enemyを通過しない物理制約 |
 
@@ -74,7 +74,7 @@ Animation終了 / Cancel
 
 | 種別 | 内容 |
 |---|---|
-| Animation | 移動入力ありRoll、なしBack Step |
+| Animation | Move InputありRoll、なしBack Step |
 | VFX / SE | Normal Dodgeは必要最小限。Perfectは`FR-PLAYER-014`で区別する |
 
 ## 9. 異常系・終了条件
@@ -82,11 +82,11 @@ Animation終了 / Cancel
 - Airborne / Death / Down / Exhausted等の禁止状態で開始しない。
 - Enemy CollisionをDodge中も無効化しない。
 - End / CancelでDodge Tag、Invincible、Windowを解除する。
-- 多重入力でDodgeを重複開始しない。
+- 多重InputでDodgeを重複開始しない。
 
 ## 10. 受入条件
 
-- [ ] 移動入力ありで入力方向Roll、なしでBack Stepできる。
+- [ ] Move InputありでInput方向Roll、なしでBack Stepできる。
 - [ ] Grounded時だけ開始できる。
 - [ ] Enemy Collisionを通過しない。
 - [ ] Invincible Window中の対象Damageを無効化できる。
@@ -95,11 +95,11 @@ Animation終了 / Cancel
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#61` Stamina
-- `FR-PLAYER-014`
+- [#61 Stamina](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/61)
+- [`FR-PLAYER-014`](../../01_Requirements.md#fr-player-014)
 
 ### Issue反映
-- `#52`を親IssueとしてInput、Ability、Movement、Window、Resultへ分割する。
+- [#52](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/52)を親Issueとして[#53](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/53)～[#57](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/57)へInput、Ability、Movement、Window、Resultを分割する。
 
 ## 12. 未決事項
 

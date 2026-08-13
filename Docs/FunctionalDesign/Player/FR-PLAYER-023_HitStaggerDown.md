@@ -4,21 +4,21 @@
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-023` |
+| 要件ID | [`FR-PLAYER-023`](../../01_Requirements.md#fr-player-023) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#149` |
-| 関連要件・設計 | `FR-PLAYER-020`, Enemy / Boss Attack Data, `Docs/03_CombatSystem.md` |
+| 関連Issue | [#149](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/149) |
+| 関連要件・設計 | [`FR-PLAYER-020`](../../01_Requirements.md#fr-player-020), Enemy / Boss Attack Data, [Combat System](../../03_CombatSystem.md) |
 
 ## 2. 目的
 
-Enemy / Boss Attackの重さをPlayer Reactionへ反映し、軽いHitからDownまで段階的な被弾結果を実現する。
+Enemy / Boss Attackの重さをPlayer Reactionへ反映し、軽いHitからDownまで段階的な被弾Resultを実現する。
 
 ## 3. 確定仕様・スコープ
 
 - Player ReactionはHit / Stagger / Downの3段階とする。
-- 通常Enemy / Bossの各Attack DataにPlayer Reaction用蓄積値を持たせる。
+- Normal Enemy / Bossの各Attack DataにPlayer Reaction用蓄積値を持たせる。
 - 被弾ごとに内部蓄積値へ加算してReactionを判定する。
 - 蓄積値はPlayer HUDへ表示しない。
 - DeathはすべてのReactionより優先する。
@@ -54,7 +54,7 @@ Recovery / Reset Rule
 | Attack Data | Reaction蓄積値提供 |
 | Player Reaction | 内部値蓄積・Threshold判定 |
 | Animation | Hit / Stagger / Down表現 |
-| Death処理 | Reactionより優先して死亡確定 |
+| Death処理 | Reactionより優先してDeath確定 |
 
 ## 6. 状態 / Gameplay Tag
 
@@ -99,11 +99,11 @@ Recovery / Reset Rule
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#62` Damage / Hit Result
-- `#83` Player Death
+- [#62 Damage / Hit Result](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/62)
+- [#83 Player Death](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/83)
 
 ### Issue反映
-- `#149`へAttack Data、内部蓄積、3 Reaction、Death優先を反映する。
+- [#149](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/149)へAttack Data、内部蓄積、3 Reaction、Death優先を反映する。
 
 ## 12. 未決事項
 

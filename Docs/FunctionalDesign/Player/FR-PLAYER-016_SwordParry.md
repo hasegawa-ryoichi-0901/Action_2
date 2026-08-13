@@ -4,16 +4,16 @@
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-016` |
+| 要件ID | [`FR-PLAYER-016`](../../01_Requirements.md#fr-player-016) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#115` |
-| 関連要件・設計 | `FR-BOSS-013`, `Docs/03_CombatSystem.md`, `Docs/05_GASDesign.md` |
+| 関連Issue | [#115](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/115) |
+| 関連要件・設計 | [`FR-BOSS-013`](../../01_Requirements.md#fr-boss-013), [Combat System](../../03_CombatSystem.md), [GAS Design](../../05_GASDesign.md) |
 
 ## 2. 目的
 
-Swordの防御Actionとして、Parry可能Attackを受付Window内で弾き、Enemy / Bossへ反撃可能な隙を作る。
+Sword防御Actionとして、Parry可能Attackを受付Window内で弾き、Enemy / Bossへ反撃可能な隙を作る。
 
 ## 3. 確定仕様・スコープ
 
@@ -83,17 +83,17 @@ Window Close / End
 
 - [ ] Parry InputからActionを開始できる。
 - [ ] Window内のParryable Attackだけ成功する。
-- [ ] 成功EventをEnemy / Bossへ1回通知できる。
+- [ ] Success EventをEnemy / Bossへ1回通知できる。
 - [ ] Failure / Cancel後にWindowとTagが残らない。
 
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#58`, `#60`
+- [#58](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/58), [#60](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/60)
 - Enemy / Boss Attack Definition
 
 ### Issue反映
-- `#115`へInput、Window、Attack Tag、Success Event、Failure Recoveryを反映する。
+- [#115](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/115)へInput、Window、Attack Tag、Success Event、Failure Recoveryを反映する。
 
 ## 12. 未決事項
 

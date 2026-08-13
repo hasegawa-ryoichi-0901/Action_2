@@ -4,16 +4,16 @@
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-022` |
+| 要件ID | [`FR-PLAYER-022`](../../01_Requirements.md#fr-player-022) |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `初期プレイアブル版` |
 | 設計状態 | `Draft` |
-| 関連Issue | `#148` |
-| 関連要件・設計 | `FR-ENEMY-007`, `FR-ENEMY-008`, `Docs/05_GASDesign.md` |
+| 関連Issue | [#148](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/148) |
+| 関連要件・設計 | [`FR-ENEMY-007`](../../01_Requirements.md#fr-enemy-007), [`FR-ENEMY-008`](../../01_Requirements.md#fr-enemy-008), [GAS Design](../../05_GASDesign.md) |
 
 ## 2. 目的
 
-EnemyのPosture Breakを高DamageのPlayer Actionへ接続し、Down状態への明確なCombat Rewardを提供する。
+Enemy Posture Breakを高DamageのPlayer Actionへ接続し、Down状態への明確なCombat Rewardを提供する。
 
 ## 3. 確定仕様・スコープ
 
@@ -99,12 +99,12 @@ Fatal Damage
 ## 11. 依存・Issue反映
 
 ### 依存
-- `#123` Enemy Down / 受付
-- `#62` Damage
-- `#64` Montage Event
+- [#123 Enemy Down / 受付](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/123)
+- [#62 Damage](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/62)
+- [#64 Montage Event](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/64)
 
 ### Issue反映
-- `#148`へ位置合わせ、Ability、Montage、Damage、Cleanupを反映する。
+- [#148](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/148)へ位置合わせ、Ability、Montage、Damage、Cleanupを反映する。
 
 ## 12. 未決事項
 

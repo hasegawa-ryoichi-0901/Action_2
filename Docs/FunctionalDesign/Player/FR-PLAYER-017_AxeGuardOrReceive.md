@@ -1,25 +1,25 @@
-# FR-PLAYER-017 AxeでGuardまたは受け止めを実行できる
+# FR-PLAYER-017 AxeでGuardまたはReceiveを実行できる
 
 ## 1. 基本情報
 
 | 項目 | 内容 |
 |---|---|
-| 要件ID | `FR-PLAYER-017` |
+| 要件ID | [`FR-PLAYER-017`](../../01_Requirements.md#fr-player-017) |
 | 優先度 | `Should` |
 | 対応範囲 | `Post-VS` |
 | 設計状態 | `Draft` |
 | 関連Issue | `未割当` |
-| 関連要件・設計 | `FEATURE-AXE-*`, `Docs/04_WeaponSystem.md` |
+| 関連要件・設計 | `FEATURE-AXE-*`, [Weapon System](../../04_WeaponSystem.md) |
 
 ## 2. 目的
 
-Axeの武器固有防御として、Sword Parryとは異なるGuard / Receive系Actionを提供する。
+Axe固有防御として、Sword Parryとは異なるGuard / Receive系Actionを提供する。
 
 ## 3. 確定仕様・スコープ
 
-- Initial VS対象外。
+- 初期プレイアブル版対象外。
 - Axe装備時のみ利用可能とする。
-- Guard / Receiveの詳細なDamage軽減・Stamina・Guard Break規則はPost-VS実装前に確定する。
+- Guard / Receiveの詳細なDamage軽減・Stamina・Guard Break RuleはPost-VS実装前に確定する。
 
 ## 4. 基本フロー
 
@@ -30,7 +30,7 @@ Axe装備確認
 ↓
 Guard / Receive状態
 ↓
-Attack受け付け
+Attack受付
 ↓
 Post-VSで確定するGuard Result
 ```
@@ -50,7 +50,7 @@ Post-VSで確定するGuard Result
 
 | データ | 用途 | 備考 |
 |---|---|---|
-| Guard Policy | 防御結果 | Gameplay Data |
+| Guard Policy | 防御Result | Gameplay Data |
 | Stamina Cost / Damage Reduction | 防御Cost / 軽減 | 未決調整値 |
 | Guard Montage | Animation | Asset |
 
@@ -76,7 +76,7 @@ Post-VSで確定するGuard Result
 
 ### 依存
 - Axe Future Feature
-- `FR-PLAYER-008`
+- [`FR-PLAYER-008`](../../01_Requirements.md#fr-player-008)
 
 ### Issue反映
 - Post-VS RoadmapでGuard仕様確定後にIssue化する。
@@ -85,4 +85,4 @@ Post-VSで確定するGuard Result
 
 | 未決事項 | Issue作成前に確定必須 | 理由 |
 |---|---|---|
-| Guard / ReceiveのDamage軽減、Stamina、Guard Break規則 | Yes | Gameplay結果とIssue境界が変わるため |
+| Guard / ReceiveのDamage軽減、Stamina、Guard Break Rule | Yes | Gameplay ResultとIssue境界が変わるため |
