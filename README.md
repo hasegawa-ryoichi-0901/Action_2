@@ -2,16 +2,12 @@
 
 Unreal Engine / C++ を用いた3Dアクションゲームのポートフォリオプロジェクトです。
 
-初期プレイアブル版ではSwordを中心に、Player操作、Combat、Normal Enemy / Boss AI、Checkpoint、DeathDrop、Save / Load、UIまで一連のGameplay Loopを構築します。
-
 ## 主要ドキュメント
 
 - [プロジェクト概要](./Docs/00_ProjectOverview.md)
 - [要件定義](./Docs/01_Requirements.md)
 - [基本設計一覧](./Docs/FunctionalDesign/FunctionalDesign_Root.md)
 - [実装ロードマップ](./Docs/ImplementationRoadmap.md)
-
-`基本設計一覧`から、各要件の基本設計・要件定義・関連GitHub Issueへ移動できます。
 
 ## ゲーム・システム設計
 

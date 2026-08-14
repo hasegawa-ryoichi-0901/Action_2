@@ -122,4 +122,4 @@ Axe / Bow追加Feature
 - Save / Stage Clear
 - 技術資料
 
-### [戻る](../README.md#ドキュメント一覧)
+### [戻る](../README.md#主要ドキュメント)
