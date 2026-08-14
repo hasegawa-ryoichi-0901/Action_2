@@ -4,7 +4,7 @@
 
 初期プレイアブル版は**剣のみ**を使用して、起動・タイトル・チュートリアル・移動・戦闘・通常敵・ボス・チェックポイント・死亡・セーブ・ステージクリアまでの一連のゲームループを完成させます。斧と弓は4～6カ月目の追加目標とします。
 
-> 基本設計から要件へ直接リンクできるよう、各要件IDの直前に固定HTML Anchorを定義します。Anchor名は要件IDを小文字化したものを使用します。
+> 各要件IDへ直接リンクできるよう、すべての要件IDの直前に固定HTML Anchorを定義します。Anchor名は要件IDを小文字化したものを使用します。
 
 ## 1. 機能要件
 
@@ -225,21 +225,32 @@
 
 既存の`FR-PLAYER-008`、`FR-PLAYER-009`、`FR-PLAYER-017`をPost-VSで有効化します。加えて次をFuture Feature候補とします。
 
+<a id="feature-axe-001"></a>
 - `FEATURE-AXE-001` 斧で3段の通常攻撃コンボを実行できる
+<a id="feature-axe-002"></a>
 - `FEATURE-AXE-002` 斧でチャージ攻撃を実行できる
+<a id="feature-axe-003"></a>
 - `FEATURE-AXE-003` 斧で回避攻撃を実行できる
+<a id="feature-axe-004"></a>
 - `FEATURE-AXE-004` 斧の指定攻撃にスーパーアーマー特性を設定できる
+<a id="feature-axe-005"></a>
 - `FEATURE-AXE-005` 斧のジャスト回避後に高威力の武器固有反撃を実行できる
 
 ### 3.2 弓
 
 既存の`FR-PLAYER-008`、`FR-PLAYER-009`、`FR-BOSS-004`、`FR-BOSS-014`をPost-VSで有効化します。加えて次をFuture Feature候補とします。
 
+<a id="feature-bow-001"></a>
 - `FEATURE-BOW-001` 弓で遠距離射撃を実行できる
+<a id="feature-bow-002"></a>
 - `FEATURE-BOW-002` 弓を構えて肩越し照準を使用できる
+<a id="feature-bow-003"></a>
 - `FEATURE-BOW-003` 通常射撃は弾数を消費せず、射撃ごとにスタミナを消費する
+<a id="feature-bow-004"></a>
 - `FEATURE-BOW-004` 射撃距離に応じてダメージを減衰できる
+<a id="feature-bow-005"></a>
 - `FEATURE-BOW-005` 敵の弱点部位へ命中した場合に追加ダメージを与えられる
+<a id="feature-bow-006"></a>
 - `FEATURE-BOW-006` 弓のジャスト回避後に武器固有反撃を実行できる
 
 ## 4. 初期プレイアブル版対象外
