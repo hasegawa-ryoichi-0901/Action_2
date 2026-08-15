@@ -9,7 +9,7 @@
 - 依存先Issueが未完了の場合、依存元Issueを先に実装しない。
 - 共有基盤は後続Actionで重複実装せず、既存Issueを依存先として参照する。
 - 横断的なMaintainability / Quality Issueは、単独機能の完成ではなく各PhaseのReview Gateとして扱う。
-- `Post-VS`のAxe / Bow / 複数武器関連は初期プレイアブル版完了後に着手する。
+- `Post-VS`のAxe / Bow / 複数武器関連はα版完了後に着手する。
 
 ## 2. GitHub Project Field方針
 
@@ -296,7 +296,7 @@ Tracking Parent: [#125](https://github.com/hasegawa-ryoichi-0901/Action_2/issues
 
 # 11. Post-VS
 
-初期プレイアブル版完了後に、Requirementsの`Post-VS` / `Future Feature`を別Roadmapとして作成する。
+α版完了後に、Requirementsの`Post-VS` / `Future Feature`を別Roadmapとして作成する。
 
 対象例：Axe、Bow、Checkpoint Weapon Change、Axe Guard / Receive、Axe Super Armor、Bow Shooting / Shoulder Aim / Distance Falloff / Weak Point、Boss Weapon Adaptation / Bow Gap Closer、Steam Cloud。
 

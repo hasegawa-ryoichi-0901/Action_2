@@ -6,7 +6,7 @@
 >
 > 実装方式が未確定の場合、存在しないClass / Interface / Component / Adapterをテンプレート都合で確定実装として記載しない。
 >
-> 本プロジェクトでは、従来の`Initial Vertical Slice`を日本語で**「初期プレイアブル版」**と表記する。
+> 本プロジェクトでは、従来の`α版`を日本語で**「α版」**と表記する。
 
 ## リンク必須ルール
 
@@ -30,7 +30,7 @@
 |---|---|
 | 要件ID | [`FR-...`](../../01_Requirements.md#fr-...) |
 | 優先度 | `Must / Should / Could` |
-| 対応範囲 | `初期プレイアブル版 / Post-VS` |
+| 対応範囲 | `α版 / Post-VS` |
 | 設計状態 | `Draft / Review / Approved / Implemented` |
 | 関連Issue | `未割当` または [#xxx](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/xxx) |
 | 関連要件・設計 | `[Requirement ID / 相対リンク]` |

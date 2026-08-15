@@ -1,4 +1,4 @@
-# FR-PLAYER-001 三人称視点で移動できる
+# 三人称視点で移動
 
 ## 1. 基本情報
 
@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-001`](../../01_Requirements.md#fr-player-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#110](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/110) |
 | 関連要件・設計 | [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002), [`FR-PLAYER-021`](../../01_Requirements.md#fr-player-021), [`NFR-MAINT-003`](../../01_Requirements.md#nfr-maint-003), [Class Design](../../07_ClassDesign.md) |

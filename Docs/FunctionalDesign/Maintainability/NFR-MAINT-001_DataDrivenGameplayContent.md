@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`NFR-MAINT-001`](../../01_Requirements.md#nfr-maint-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#137](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/137), [#155](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/155) |
 | 関連要件・設計 | [Data Design](../../08_DataDesign.md), [Master Data / CSV Architecture](../../17_MasterDataCsvArchitecture.md) |

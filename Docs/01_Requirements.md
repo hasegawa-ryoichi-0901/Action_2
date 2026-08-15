@@ -1,8 +1,8 @@
 # 01. 要件定義
 
-本ドキュメントは、Action_2で実装する機能要件・非機能要件と、初期プレイアブル版以降に追加するFuture Featureを定義します。
+本ドキュメントは、Action_2で実装する機能要件・非機能要件と、α版以降に追加するFuture Featureを定義します。
 
-初期プレイアブル版は**剣のみ**を使用して、起動・タイトル・チュートリアル・移動・戦闘・通常敵・ボス・チェックポイント・死亡・セーブ・ステージクリアまでの一連のゲームループを完成させます。斧と弓は4～6カ月目の追加目標とします。
+α版は**剣のみ**を使用して、起動・タイトル・チュートリアル・移動・戦闘・通常敵・ボス・チェックポイント・死亡・セーブ・ステージクリアまでの一連のゲームループを完成させます。斧と弓は4～6カ月目の追加目標とします。
 
 > 各FR / NFRの要件IDから、対応する基本設計ファイルへ直接移動できます。
 
@@ -11,7 +11,7 @@
 ### 1.1 プレイヤー
 
 <a id="fr-player-001"></a>
-- [`FR-PLAYER-001`](./FunctionalDesign/Player/FR-PLAYER-001_ThirdPersonMovement.md) 三人称視点で移動できる
+- [`FR-PLAYER-001`](./FunctionalDesign/Player/FR-PLAYER-001_ThirdPersonMovement.md) 三人称視点で移動
 <a id="fr-player-002"></a>
 - [`FR-PLAYER-002`](./FunctionalDesign/Player/FR-PLAYER-002_EquivalentInputDevices.md) ゲームパッドとキーボード・マウスで同等に操作できる
 <a id="fr-player-003"></a>
@@ -168,7 +168,7 @@
 <a id="fr-ui-001"></a>
 - [`FR-UI-001`](./FunctionalDesign/UI/FR-UI-001_TitleAndStartFlow.md) ゲーム起動後にIntroを経てTitleを表示し、TitleからContinue / Load Game / New Game / Config / Exitを選択できる。New GameはTutorial TextとTutorialへ進み、ContinueはPlay Start、Load GameはSave Data選択へ進む。Ending終了後はTitleへ戻る
 <a id="fr-ui-002"></a>
-- [`FR-UI-002`](./FunctionalDesign/UI/FR-UI-002_GameplayHUD.md) 初期プレイアブル版で必要なGameplay HUDとしてPlayer HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態表示、Tutorial表示を提供する
+- [`FR-UI-002`](./FunctionalDesign/UI/FR-UI-002_GameplayHUD.md) α版で必要なGameplay HUDとしてPlayer HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態表示、Tutorial表示を提供する
 
 ## 2. 非機能要件
 
@@ -219,7 +219,7 @@
 
 ## 3. Future Feature要件
 
-初期プレイアブル版では実装せず、剣による初期プレイアブル版完成後の4～6カ月目を目安に追加します。
+α版では実装せず、剣によるα版完成後の4～6カ月目を目安に追加します。
 
 ### 3.1 斧
 
@@ -242,7 +242,7 @@
 - `FEATURE-BOW-005` 敵の弱点部位へ命中した場合に追加ダメージを与えられる
 - `FEATURE-BOW-006` 弓のジャスト回避後に武器固有反撃を実行できる
 
-## 4. 初期プレイアブル版対象外
+## 4. α版対象外
 
 - 斧の実装
 - 弓の実装

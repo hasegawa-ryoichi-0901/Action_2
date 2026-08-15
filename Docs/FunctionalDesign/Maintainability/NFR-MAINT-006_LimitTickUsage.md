@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`NFR-MAINT-006`](../../01_Requirements.md#nfr-maint-006) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#141](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/141) |
 | 関連要件・設計 | [`NFR-PERF-005`](../../01_Requirements.md#nfr-perf-005), [`NFR-PERF-006`](../../01_Requirements.md#nfr-perf-006) |

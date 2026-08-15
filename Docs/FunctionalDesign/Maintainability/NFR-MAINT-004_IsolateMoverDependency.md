@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`NFR-MAINT-004`](../../01_Requirements.md#nfr-maint-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版 / 将来Mover検証` |
+| 対応範囲 | `α版 / 将来Mover検証` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#139](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/139) |
 | 関連要件・設計 | [`FR-PLAYER-001`](../../01_Requirements.md#fr-player-001), [Class Design](../../07_ClassDesign.md) |
@@ -14,7 +14,7 @@
 現在のCharacterMovement利用を維持しつつ、将来Moverを検証する場合にもCombat SystemをMover固有APIへ結合させない。
 
 ## 3. 確定仕様・スコープ
-- 初期プレイアブル版ではCharacterMovementを現行Movement実装として利用する。
+- α版ではCharacterMovementを現行Movement実装として利用する。
 - 未使用の`IMovementDriver`、`UMovementAdapterComponent`等を先行導入しない。
 - Combat / Abilityは「移動要求」というGameplay上の責務を持ち、Mover固有型・固有APIを直接参照しない。
 - Mover採用の必要性が確認された時点でのみ境界を追加設計する。
@@ -54,12 +54,12 @@ Movement実装側だけ差し替え可能にする
 なし。
 
 ## 9. 異常系・終了条件
-- 初期プレイアブル版のためだけに未使用抽象層を追加しない。
+- α版のためだけに未使用抽象層を追加しない。
 - Combat ClassのPublic APIにMover固有型を露出しない。
 - 将来Mover検証で既存Combat Ruleを書き換える前提にしない。
 
 ## 10. 受入条件
-- [ ] 初期プレイアブル版をCharacterMovementで成立させられる。
+- [ ] α版をCharacterMovementで成立させられる。
 - [ ] Combat / AbilityがMover固有APIへ直接依存しない。
 - [ ] 不要なMovement Adapterを先行実装しない。
 - [ ] 将来差し替える境界を説明できる。

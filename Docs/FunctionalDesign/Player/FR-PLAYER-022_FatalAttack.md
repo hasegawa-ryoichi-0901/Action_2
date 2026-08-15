@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-022`](../../01_Requirements.md#fr-player-022) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#148](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/148) |
 | 関連要件・設計 | [`FR-ENEMY-007`](../../01_Requirements.md#fr-enemy-007), [`FR-ENEMY-008`](../../01_Requirements.md#fr-enemy-008), [GAS Design](../../05_GASDesign.md) |

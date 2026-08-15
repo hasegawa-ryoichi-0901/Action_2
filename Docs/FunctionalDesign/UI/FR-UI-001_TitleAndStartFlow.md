@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`FR-UI-001`](../../01_Requirements.md#fr-ui-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#150](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/150) |
 | 関連要件・設計 | `FR-STAGE-001`, `FR-STAGE-013`, `FR-SAVE-001`, `FR-SAVE-006` |

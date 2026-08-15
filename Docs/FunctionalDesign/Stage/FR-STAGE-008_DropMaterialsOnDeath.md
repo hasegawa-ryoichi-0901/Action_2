@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | `FR-STAGE-008` |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | `#82`, `#84` |
 | 関連要件・設計 | `FR-PLAYER-020`, `FR-STAGE-009`, `FR-STAGE-010`, `FR-SAVE-005` |

@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-015`](../../01_Requirements.md#fr-player-015) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#114](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/114) |
 | 関連要件・設計 | [`FR-PLAYER-014`](../../01_Requirements.md#fr-player-014), [Weapon System](../../04_WeaponSystem.md) |
@@ -21,7 +21,7 @@ Perfect Dodge成功をAttack機会へ変換し、Sword固有Counter Actionを成
 - Normal Dodgeでは受付を開始しない。
 - Perfect Resultで記録したAttack SourceをCounter Targetとして利用可能とする。
 - 受付時間は調整可能とする。
-- 初期プレイアブル版ではSword Counterを実装し、Axe / Bow固有CounterはPost-VSで追加する。
+- α版ではSword Counterを実装し、Axe / Bow固有CounterはPost-VSで追加する。
 
 ## 4. 基本フロー
 

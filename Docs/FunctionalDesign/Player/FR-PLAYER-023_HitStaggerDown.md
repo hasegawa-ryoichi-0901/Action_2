@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-023`](../../01_Requirements.md#fr-player-023) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#149](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/149) |
 | 関連要件・設計 | [`FR-PLAYER-020`](../../01_Requirements.md#fr-player-020), Enemy / Boss Attack Data, [Combat System](../../03_CombatSystem.md) |

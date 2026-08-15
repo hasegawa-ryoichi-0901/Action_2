@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-019`](../../01_Requirements.md#fr-player-019) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#52](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/52), [#53](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/53), [#54](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/54), [#55](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/55), [#56](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/56), [#57](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/57) |
 | 関連要件・設計 | [`FR-PLAYER-011`](../../01_Requirements.md#fr-player-011), [`FR-PLAYER-014`](../../01_Requirements.md#fr-player-014), [Combat System](../../03_CombatSystem.md) |

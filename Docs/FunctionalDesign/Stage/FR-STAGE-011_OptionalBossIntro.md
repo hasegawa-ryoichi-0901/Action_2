@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | `FR-STAGE-011` |
 | 優先度 | `Could` |
-| 対応範囲 | `Initial Vertical Slice Optional` |
+| 対応範囲 | `α版 Optional` |
 | 設計状態 | `Draft` |
 | 関連Issue | `#147` |
 | 関連要件・設計 | `FR-BOSS-001`, `FR-BOSS-015` |

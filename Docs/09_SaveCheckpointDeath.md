@@ -139,7 +139,7 @@ Normal Enemy1体のDefeatごとにReward Masterから0..N件のReward Entryを�
 [Clear Areaへ進行可能]
 ```
 
-初期プレイアブル版ではBoss Replayを実装しない。
+α版ではBoss Replayを実装しない。
 
 ## 11. Stage Clear
 
@@ -161,10 +161,10 @@ Stage Clear自体では追加Auto Saveを行わない。
 
 - Continue: 現在のProgress Saveを読みPlay Startする。
 - Load Game: Save Data選択画面を経由してLoadする。
-- 初期プレイアブル版は1 Slotのため、選択可能なProgress Saveは現在存在する1件を基本とする。
+- α版は1 Slotのため、選択可能なProgress Saveは現在存在する1件を基本とする。
 - Corrupt / Invalid SaveはRuntimeへ部分適用しない。
 - Corrupt Saveを削除し、New Gameを開始できる状態へ戻す。
-- 初期プレイアブル版ではBackupからの自動復旧を行わない。
+- α版ではBackupからの自動復旧を行わない。
 
 ## 13. Settings / Steam Cloud
 

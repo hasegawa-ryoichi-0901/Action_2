@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`NFR-QUALITY-003`](../../01_Requirements.md#nfr-quality-003) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#111](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/111) |
 | 関連要件・設計 | [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002), [`FR-UI-001`](../../01_Requirements.md#fr-ui-001), [`FR-STAGE-013`](../../01_Requirements.md#fr-stage-013) |
@@ -57,15 +57,15 @@ Title / Checkpoint / Config等のUIを両Deviceで操作可能にする。操作
 - 一方のDeviceでしか実行できない必須Actionを残さない。
 
 ## 10. 受入条件
-- [ ] Gamepadのみで初期プレイアブル版をClearできる。
-- [ ] Keyboard-Mouseのみで初期プレイアブル版をClearできる。
+- [ ] Gamepadのみでα版をClearできる。
+- [ ] Keyboard-Mouseのみでα版をClearできる。
 - [ ] 両方で必須UIを操作できる。
 - [ ] Device差によるGameplay Rule分岐がない。
 
 ## 11. 依存・Issue反映
 ### 依存
 - [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002)
-- 初期プレイアブル版全操作
+- α版全操作
 
 ### Issue反映
 - 重複Issueを作らず[#111](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/111)で機能要件と品質確認を統合する。

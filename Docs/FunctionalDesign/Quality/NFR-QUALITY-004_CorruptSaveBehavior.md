@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`NFR-QUALITY-004`](../../01_Requirements.md#nfr-quality-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#144](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/144), [#154](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154) |
 | 関連要件・設計 | [`FR-SAVE-001`](../../01_Requirements.md#fr-save-001)～[`006`](../../01_Requirements.md#fr-save-006), [Save JSON Architecture](../../18_SaveJsonArchitecture.md) |
@@ -17,7 +17,7 @@
 - Save読込時に形式・Version・必須Data等を検証可能にする。
 - 破損または読込失敗したDataをRuntimeへ部分適用しない。
 - Save破損を検出した場合は破損Saveを削除し、New Gameを開始できる状態へ戻す。
-- 破損SaveからのBackup復旧は初期プレイアブル版では行わない。
+- 破損SaveからのBackup復旧はα版では行わない。
 - Load失敗をUI / 呼出元へ通知可能にする。
 
 ## 4. 基本フロー

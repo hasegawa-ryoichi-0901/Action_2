@@ -52,7 +52,7 @@ Gold / Upgrade Material / Boss Unique ItemはGAS AttributeではなくPlayer Inv
 
 ## 4. Ability構成
 
-初期プレイアブル版の主なAbility：
+α版の主なAbility：
 
 - Light Attack
 - Heavy Attack

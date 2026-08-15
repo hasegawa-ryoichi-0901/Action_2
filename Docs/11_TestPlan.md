@@ -203,7 +203,7 @@ Auto Save
 - 保存失敗時にGameplay状態を破壊しない
 - Corrupt SaveをRuntimeへ部分適用しない
 - Corrupt Saveだけを削除し、New Game開始可能状態へ戻る
-- 初期プレイアブル版ではBackupから自動復旧しない
+- α版ではBackupから自動復旧しない
 
 JSON永続化固有の詳細テストはSave Architecture確定後に追加します。
 
@@ -213,6 +213,6 @@ JSON永続化固有の詳細テストはSave Architecture確定後に追加し�
 - Boss Phase2でFrame Timeを確認する。
 - 長時間PlayでMemory増加を確認する。
 - Shipping Buildで最終確認する。
-- Gamepad / Keyboard-Mouse双方で初期プレイアブル版を完走する。
+- Gamepad / Keyboard-Mouse双方でα版を完走する。
 
 ### [戻る](../README.md#ドキュメント一覧)

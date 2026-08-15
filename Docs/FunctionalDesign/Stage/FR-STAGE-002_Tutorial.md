@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | `FR-STAGE-002` |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | `#133` |
 | 関連要件・設計 | `FR-STAGE-001`, Player主要Action, `FR-UI-002` |

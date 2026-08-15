@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-018`](../../01_Requirements.md#fr-player-018) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#116](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/116) |
 | 関連要件・設計 | [`FR-STAGE-005`](../../01_Requirements.md#fr-stage-005), [`FR-PLAYER-020`](../../01_Requirements.md#fr-player-020), [`FR-BOSS-005`](../../01_Requirements.md#fr-boss-005) |

@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`NFR-PERF-004`](../../01_Requirements.md#nfr-perf-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#134](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/134) |
 | 関連要件・設計 | [`NFR-PERF-001`](../../01_Requirements.md#nfr-perf-001)～[`003`](../../01_Requirements.md#nfr-perf-003), [`NFR-PERF-005`](../../01_Requirements.md#nfr-perf-005), [`NFR-PERF-006`](../../01_Requirements.md#nfr-perf-006) |

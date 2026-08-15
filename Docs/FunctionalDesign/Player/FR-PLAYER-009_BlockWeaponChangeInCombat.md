@@ -19,7 +19,7 @@ WeaponごとのCombat特性を維持し、Combat途中の即時切替によるAb
 
 - Weapon変更はCheckpoint Menuからのみ行う。
 - Combat状態中の変更要求は拒否する。
-- 初期プレイアブル版はSword固定のため実質的な変更処理はPost-VS。
+- α版はSword固定のため実質的な変更処理はPost-VS。
 
 ## 4. 基本フロー
 

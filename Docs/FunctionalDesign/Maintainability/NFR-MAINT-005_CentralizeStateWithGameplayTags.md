@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`NFR-MAINT-005`](../../01_Requirements.md#nfr-maint-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#140](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/140) |
 | 関連要件・設計 | [Combat System](../../03_CombatSystem.md), [GAS Design](../../05_GASDesign.md) |

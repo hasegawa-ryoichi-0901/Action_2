@@ -2,7 +2,7 @@
 
 本ドキュメントは、確定済み仕様と混同しないよう、今後の数値調整・Asset依存・Post-VS検証事項のみを管理します。
 
-## 1. 初期プレイアブル版で残る調整事項
+## 1. α版で残る調整事項
 
 以下は基本仕様を変更せず、実装・Play Test中に調整可能な項目です。
 
@@ -30,7 +30,7 @@ Dodge方向、無入力時Back Step、Air使用不可、Enemy Collision非通過
 
 - Mouse / Gamepad Sensitivity
 - Pitch Clamp
-- Y軸反転設定を初期プレイアブル版へ追加するか
+- Y軸反転設定をα版へ追加するか
 - LockOn最大距離
 - 遮蔽による解除時間
 - Camera Collision / SpringArmの最終調整値
@@ -75,7 +75,7 @@ Map制作時に決定する事項：
 
 ## 3. Mover — 将来検証
 
-現行実装はCharacterMovementを使用します。Moverは初期プレイアブル版の必須依存ではありません。
+現行実装はCharacterMovementを使用します。Moverはα版の必須依存ではありません。
 
 Mover採用の具体的メリットが確認されるまで、`IMovementDriver`や`UMovementAdapterComponent`等の抽象化を先行追加しません。採用する場合もCombat層へMover固有型・APIを直接依存させません。
 
@@ -119,6 +119,6 @@ Gameplay上の挙動とは分離して次を管理します。
 
 ## 9. Online / Steam
 
-初期プレイアブル版ではOnline、Network同期、EOS、Steam Cloudを対象外とします。Steam公開版でSteam Cloud、Achievement、Localization等を再評価します。
+α版ではOnline、Network同期、EOS、Steam Cloudを対象外とします。Steam公開版でSteam Cloud、Achievement、Localization等を再評価します。
 
 ### [戻る](../README.md#ドキュメント一覧)

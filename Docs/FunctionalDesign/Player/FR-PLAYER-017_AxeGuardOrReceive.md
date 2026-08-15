@@ -17,7 +17,7 @@ Axe固有防御として、Sword Parryとは異なるGuard / Receive系Actionを
 
 ## 3. 確定仕様・スコープ
 
-- 初期プレイアブル版対象外。
+- α版対象外。
 - Axe装備時のみ利用可能とする。
 - Guard / Receiveの詳細なDamage軽減・Stamina・Guard Break RuleはPost-VS実装前に確定する。
 

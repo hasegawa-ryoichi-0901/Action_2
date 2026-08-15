@@ -2,18 +2,18 @@
 
 ## 1. 開発スコープ
 
-### 初期プレイアブル版
+### α版
 
-初期プレイアブル版では**Swordのみ**を実装します。複数Weapon切替、Axe、Bowは完成条件に含めません。
+α版では**Swordのみ**を実装します。複数Weapon切替、Axe、Bowは完成条件に含めません。
 
 ### Post-VS
 
-初期プレイアブル版完成後の4～6カ月目を目安にAxeとBowを追加し、CheckpointでWeapon Change可能にします。
+α版完成後の4～6カ月目を目安にAxeとBowを追加し、CheckpointでWeapon Change可能にします。
 
 ## 2. 共通仕様
 
 - 最終的なWeapon構成はSword、Axe、Bowの3種類。
-- 初期プレイアブル版はSwordのみ。
+- α版はSwordのみ。
 - 複数Weapon実装後はCheckpointで変更可能。
 - Combat中は変更不可。
 - 各Weaponは共通のWeapon Definition・Attack Definition・Ability連携を利用する。
@@ -27,7 +27,7 @@
 
 ## 3. 共通Action構成
 
-初期プレイアブル版ではSwordでCombat基盤を成立させ、Axe / Bowは同じ基盤を利用して追加します。
+α版ではSwordでCombat基盤を成立させ、Axe / Bowは同じ基盤を利用して追加します。
 
 - Light Attack
 - Heavy Attack
@@ -39,7 +39,7 @@
 
 Light Attack、Heavy Attack、Combo AttackはIssue管理上それぞれ別Action / Featureとして扱います。ActionとActorComponentの数を一致させることは前提としません。
 
-## 4. Sword — 初期プレイアブル版対象
+## 4. Sword — α版対象
 
 ### 役割
 

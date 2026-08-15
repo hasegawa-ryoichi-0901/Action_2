@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | `FR-BOSS-008` |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | `#128` |
 | 関連要件・設計 | `FR-BOSS-003`, `005`～`007`, `009`～`013`, `BOSS-AI-COMMON` |

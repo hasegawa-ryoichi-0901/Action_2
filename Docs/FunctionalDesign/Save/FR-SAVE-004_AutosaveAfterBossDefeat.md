@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`FR-SAVE-004`](../../01_Requirements.md#fr-save-004) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#103](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/103) |
 | 関連要件・設計 | [`FR-BOSS-015`](../../01_Requirements.md#fr-boss-015), [`FR-BOSS-016`](../../01_Requirements.md#fr-boss-016), [`FR-STAGE-013`](../../01_Requirements.md#fr-stage-013) |

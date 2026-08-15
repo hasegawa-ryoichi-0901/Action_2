@@ -4,7 +4,7 @@
 
 本作の中心はPlayer操作とEnemyとのCombat。MovementとCameraは高い応答性を持たせ、Attackは入力遅延ではなくStartup / Commitment / Active / RecoveryとCancel制約によって重量感を表現する。
 
-初期プレイアブル版ではSwordのみを使用し、Boot / Title、Tutorial、Movement、Dodge、Attack、Parry、Fatal Attack、Normal Enemy、Boss、Death / Respawn、Endingまでの一連の体験を完成させる。Axe / BowはPost-VSとする。
+α版ではSwordのみを使用し、Boot / Title、Tutorial、Movement、Dodge、Attack、Parry、Fatal Attack、Normal Enemy、Boss、Death / Respawn、Endingまでの一連の体験を完成させる。Axe / BowはPost-VSとする。
 
 ## 2. Boot / Title / Start
 
@@ -176,10 +176,10 @@ Boss撃破直後にEndingへ自動遷移せず、Stage Clear自体では追加Au
 
 ## 13. HUD
 
-初期プレイアブル版で必要な表示：Player HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態、Tutorial表示。Player Reaction内部蓄積値は表示しない。
+α版で必要な表示：Player HP、Stamina、Healing Item、Gold、Upgrade Material、LockOn Marker、Boss HP、Perfect Dodge Feedback、Save状態、Tutorial表示。Player Reaction内部蓄積値は表示しない。
 
 ## 14. Future Weapons
 
-Axe / Bowは初期プレイアブル版完成後に追加する。Weapon追加が初期プレイアブル版の完成条件を妨げないよう共通基盤を再利用する。
+Axe / Bowはα版完成後に追加する。Weapon追加がα版の完成条件を妨げないよう共通基盤を再利用する。
 
 ### [戻る](../README.md#ドキュメント一覧)

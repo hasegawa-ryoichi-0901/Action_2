@@ -8,8 +8,8 @@
 - 最初の企業提出は開発開始から3カ月後
 - 途中状態でも提出可能にする
 - 3カ月時点ではゲーム全体より、剣とボス1体による戦闘品質を優先する
-- **初期プレイアブル版は剣のみで完成させる**
-- 斧・弓は初期プレイアブル版完成に必須とせず、4～6カ月目のPost-VS Featureとする
+- **α版は剣のみで完成させる**
+- 斧・弓はα版完成に必須とせず、4～6カ月目のPost-VS Featureとする
 - Issue番号順ではなく、`Docs/ImplementationRoadmap.md`の依存関係順で実装する
 - Gameplay Action / Systemの親IssueはTracking用途とし、実装Issueは原則`1 Issue = 1 PR`とする
 
@@ -73,7 +73,7 @@ Player操作、GAS共有基盤、Inventory / Save / Data境界、Sword Combatの
 - Melee Attack Slot最大2体が機能する
 - Healing ItemはHeal Animation開始直後に消費され、その後の被弾中断では返却されない
 
-## 4. 3カ月目 — Boss / Stage Clear / 初期プレイアブル版完成
+## 4. 3カ月目 — Boss / Stage Clear / α版完成
 
 ### 依存順
 

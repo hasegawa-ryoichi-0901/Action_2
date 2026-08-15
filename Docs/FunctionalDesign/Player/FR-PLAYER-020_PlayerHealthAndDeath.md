@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-020`](../../01_Requirements.md#fr-player-020) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#82](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/82), [#83](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/83) |
 | 関連要件・設計 | [`FR-STAGE-008`](../../01_Requirements.md#fr-stage-008)～[`FR-STAGE-012`](../../01_Requirements.md#fr-stage-012), [`FR-SAVE-005`](../../01_Requirements.md#fr-save-005), [Save / Checkpoint / Death](../../09_SaveCheckpointDeath.md) |

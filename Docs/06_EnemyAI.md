@@ -16,7 +16,7 @@
 - Attack / Score調整値はGameplay Dataから取得する。
 - **Boss AIの各基本設計には、その判断根拠を確認できるDebug出力を含める。Debugは別Gameplay FeatureではなくBoss AIの検証責務とする。**
 
-初期プレイアブル版ではPlayer WeaponはSword固定とし、Axe / BowによるWeapon ModifierはPost-VSで追加する。
+α版ではPlayer WeaponはSword固定とし、Axe / BowによるWeapon ModifierはPost-VSで追加する。
 
 ## 2. 通常敵
 
@@ -79,7 +79,7 @@ Root
 
 ## 6. Boss Combat Context
 
-初期プレイアブル版で評価する情報：
+α版で評価する情報：
 
 - PlayerとのDistance
 - Healing State

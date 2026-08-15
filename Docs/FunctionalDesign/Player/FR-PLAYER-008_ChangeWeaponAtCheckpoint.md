@@ -17,7 +17,7 @@ Axe / Bow追加後、CheckpointをWeapon Loadout変更地点として利用で�
 
 ## 3. 確定仕様・スコープ
 
-- 初期プレイアブル版はSword固定のため対象外。
+- α版はSword固定のため対象外。
 - Post-VSでSword / Axe / BowをCheckpoint Menuから変更する。
 - Combat中の変更は禁止し`FR-PLAYER-009`へ従う。
 

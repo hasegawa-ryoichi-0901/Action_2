@@ -17,7 +17,7 @@ Gameplay基本設計で確定したSave / Load上の挙動と、JSONの具体Sch
 
 Playerは最後のActiveCheckpoint、未設定時はPlayerStartから再開する。
 
-Save破損を検出した場合は、破損SaveをGameplayへ適用せず削除し、New Gameを開始できる状態へ戻す。初期プレイアブル版ではBackupからの自動復旧は行わない。
+Save破損を検出した場合は、破損SaveをGameplayへ適用せず削除し、New Gameを開始できる状態へ戻す。α版ではBackupからの自動復旧は行わない。
 
 ## 3. 境界
 
@@ -64,7 +64,7 @@ New Game開始可能状態
 - 正常Saveを誤って削除しない。
 - 破損Saveの一部だけをRuntimeへ適用しない。
 - 削除後は旧Save由来のRuntime状態を残さない。
-- 初期プレイアブル版ではBackup復旧を行わない。
+- α版ではBackup復旧を行わない。
 
 ## 6. #154で確定するArchitecture事項
 

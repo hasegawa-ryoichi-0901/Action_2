@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-003`](../../01_Requirements.md#fr-player-003) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#108](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/108), [#109](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/109) |
 | 関連要件・設計 | [`FR-PLAYER-004`](../../01_Requirements.md#fr-player-004), [`NFR-MAINT-003`](../../01_Requirements.md#nfr-maint-003) |
@@ -18,7 +18,7 @@ GroundedからAirborneへ移行する基本Actionを提供し、Air Attackへ接
 ## 3. 確定仕様・スコープ
 
 - Grounded時のみJumpを開始する。
-- Airborne中の再Jumpは初期プレイアブル版では行わない。
+- Airborne中の再Jumpはα版では行わない。
 - Inputは`IPlayerInputComponent`契約からGameplayへ配送する。
 
 ## 4. 基本フロー

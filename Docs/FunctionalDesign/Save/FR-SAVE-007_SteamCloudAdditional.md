@@ -14,7 +14,7 @@
 Local Save仕様が安定した後、Steam公開版でProgress / Settings SaveをCloud同期可能にする。
 
 ## 3. 確定仕様・スコープ
-- 初期プレイアブル版対象外。
+- α版対象外。
 - Local Save / Load契約を正とし、その上にSteam Cloud同期を追加する。
 - Cloud固有APIをGameplay Systemへ直接依存させない。
 

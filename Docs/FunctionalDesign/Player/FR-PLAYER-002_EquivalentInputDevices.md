@@ -6,14 +6,14 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-002`](../../01_Requirements.md#fr-player-002) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#111](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/111) |
 | 関連要件・設計 | [`NFR-QUALITY-003`](../../01_Requirements.md#nfr-quality-003), [`NFR-MAINT-003`](../../01_Requirements.md#nfr-maint-003), [GAS Design](../../05_GASDesign.md) |
 
 ## 2. 目的
 
-初期プレイアブル版の主要操作をGamepadとKeyboard-Mouseのどちらでも同じGameplay Ruleで実行できるようにする。
+α版の主要操作をGamepadとKeyboard-Mouseのどちらでも同じGameplay Ruleで実行できるようにする。
 
 ## 3. 確定仕様・スコープ
 
@@ -69,7 +69,7 @@ Input TagはAction識別に利用する。Component粒度はTag粒度と固定�
 
 ## 10. 受入条件
 
-- [ ] 初期プレイアブル版の主要Actionを両Deviceで実行できる。
+- [ ] α版の主要Actionを両Deviceで実行できる。
 - [ ] Device差でGameplay結果が変わらない。
 - [ ] Mapping / Bindingが重複しない。
 - [ ] 両DeviceでTitleからStage Clearまで通し操作できる。

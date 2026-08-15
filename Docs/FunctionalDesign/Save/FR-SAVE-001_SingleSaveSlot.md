@@ -5,13 +5,13 @@
 |---|---|
 | 要件ID | [`FR-SAVE-001`](../../01_Requirements.md#fr-save-001) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#88](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/88) |
 | 関連要件・設計 | [`FR-SAVE-002`～`006`](../../01_Requirements.md#fr-save-002), [Save / Checkpoint / Death](../../09_SaveCheckpointDeath.md), [Save JSON Architecture](../../18_SaveJsonArchitecture.md) |
 
 ## 2. 目的
-初期プレイアブル版のProgress Saveを単一の論理Slotへ集約し、Save / Load契約を単純化する。
+α版のProgress Saveを単一の論理Slotへ集約し、Save / Load契約を単純化する。
 
 ## 3. 確定仕様・スコープ
 - Progress Saveは1 Slotとする。

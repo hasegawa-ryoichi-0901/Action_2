@@ -1,11 +1,11 @@
-# FR-UI-002 初期プレイアブル版のGameplay HUDを提供する
+# FR-UI-002 α版のGameplay HUDを提供する
 
 ## 1. 基本情報
 | 項目 | 内容 |
 |---|---|
 | 要件ID | [`FR-UI-002`](../../01_Requirements.md#fr-ui-002) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#151](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/151) |
 | 関連要件・設計 | Player / Boss / Save / Tutorial各要件 |

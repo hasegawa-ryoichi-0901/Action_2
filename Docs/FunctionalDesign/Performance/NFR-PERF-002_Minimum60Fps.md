@@ -5,13 +5,13 @@
 |---|---|
 | 要件ID | [`NFR-PERF-002`](../../01_Requirements.md#nfr-perf-002) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#135](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/135) |
 | 関連要件・設計 | [`NFR-PERF-001`](../../01_Requirements.md#nfr-perf-001), [`NFR-PERF-004`](../../01_Requirements.md#nfr-perf-004)～[`006`](../../01_Requirements.md#nfr-perf-006) |
 
 ## 2. 目的
-初期プレイアブル版の操作応答とCombat品質を維持するため、基準環境で60fpsを最低保証目標とする。
+α版の操作応答とCombat品質を維持するため、基準環境で60fpsを最低保証目標とする。
 
 ## 3. 確定仕様・スコープ
 - 1080p基準条件・RTX3060開発環境で60fpsを最低保証目標とする。

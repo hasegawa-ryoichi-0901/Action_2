@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | [`FR-SAVE-005`](../../01_Requirements.md#fr-save-005) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#87](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/87), [#90](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/90) |
 | 関連要件・設計 | [`FR-STAGE-008`](../../01_Requirements.md#fr-stage-008)～[`010`](../../01_Requirements.md#fr-stage-010), [`FR-STAGE-012`](../../01_Requirements.md#fr-stage-012), [Save JSON Architecture](../../18_SaveJsonArchitecture.md) |

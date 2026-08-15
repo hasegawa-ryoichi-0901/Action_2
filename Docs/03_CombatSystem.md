@@ -14,7 +14,7 @@
     +--> [Dead]
 ```
 
-初期プレイアブル版はSwordのみを対象とします。状態はGameplay Tagで管理します。
+α版はSwordのみを対象とします。状態はGameplay Tagで管理します。
 
 ```text
 State.Action.Attacking
@@ -143,7 +143,7 @@ Exhaustedの実装単位は[#152](https://github.com/hasegawa-ryoichi-0901/Actio
 
 ### Parry
 
-- 初期プレイアブル版ではSword固有。
+- α版ではSword固有。
 - Attack PropertyごとにParry可否を設定する。
 - 失敗時に専用Recoveryを発生させる。
 - 成功時にEnemy Postureを大きく削る。
@@ -202,7 +202,7 @@ Health <= 0?
 - GoldをPlayer Inventoryへ付与する。
 - 初回討伐時のみ固有収集ItemをPlayer Inventoryへ直接付与する。
 - Reward確定後にAuto Saveする。
-- 初期プレイアブル版ではBoss Replayを実装しない。
+- α版ではBoss Replayを実装しない。
 
 ## 9. Posture
 

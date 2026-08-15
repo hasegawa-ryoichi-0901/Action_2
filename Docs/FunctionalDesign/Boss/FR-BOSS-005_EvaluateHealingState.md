@@ -5,7 +5,7 @@
 |---|---|
 | 要件ID | `FR-BOSS-005` |
 | 優先度 | `Must` |
-| 対応範囲 | `Initial Vertical Slice` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | `#127` |
 | 関連要件・設計 | `FR-PLAYER-018`, `FR-BOSS-008`, `BOSS-AI-COMMON` |

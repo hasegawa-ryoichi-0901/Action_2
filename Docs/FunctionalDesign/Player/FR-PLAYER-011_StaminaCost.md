@@ -6,7 +6,7 @@
 |---|---|
 | 要件ID | [`FR-PLAYER-011`](../../01_Requirements.md#fr-player-011) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#61](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/61) |
 | 関連要件・設計 | [`FR-PLAYER-010`](../../01_Requirements.md#fr-player-010), [`FR-PLAYER-012`](../../01_Requirements.md#fr-player-012), [`FR-PLAYER-013`](../../01_Requirements.md#fr-player-013), [`FR-PLAYER-019`](../../01_Requirements.md#fr-player-019), [GAS Design](../../05_GASDesign.md) |

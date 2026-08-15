@@ -5,13 +5,13 @@
 |---|---|
 | 要件ID | [`NFR-QUALITY-006`](../../01_Requirements.md#nfr-quality-006) |
 | 優先度 | `Must` |
-| 対応範囲 | `初期プレイアブル版` |
+| 対応範囲 | `α版` |
 | 設計状態 | `Draft` |
 | 関連Issue | [#146](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/146) |
 | 関連要件・設計 | [`NFR-QUALITY-001`](../../01_Requirements.md#nfr-quality-001)～[`005`](../../01_Requirements.md#nfr-quality-005), Performance要件 |
 
 ## 2. 目的
-Editor / Development環境だけでなく、実際に提出するShipping Buildで初期プレイアブル版全体が成立することを最終確認する。
+Editor / Development環境だけでなく、実際に提出するShipping Buildでα版全体が成立することを最終確認する。
 
 ## 3. 確定仕様・スコープ
 - Shipping Buildを生成して実機環境で通しPlayする。
@@ -71,7 +71,7 @@ Shipping BuildでDebug専用表示に依存せず、必要UI / HUD / Endingが�
 - [#111](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/111), [#135](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/135), [#136](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/136), [#142](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/142), [#143](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/143), [#144](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/144), [#145](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/145)
 
 ### Issue反映
-- [#146](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/146)を初期プレイアブル版最終Release Gateとする。
+- [#146](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/146)をα版最終Release Gateとする。
 
 ## 12. 未決事項
 なし
