@@ -1,4 +1,4 @@
-# FR-PLAYER-005 Soft Lockを使用できる
+# [FR-PLAYER-005] ソフトロック
 
 ## 1. 基本情報
 

@@ -1,4 +1,4 @@
-# FR-PLAYER-012 Stamina不足時は対象Actionを実行できない
+# [FR-PLAYER-012] スタミナ不足時のアクション拒否
 
 ## 1. 基本情報
 

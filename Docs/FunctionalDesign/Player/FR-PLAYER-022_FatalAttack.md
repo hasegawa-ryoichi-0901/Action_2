@@ -1,4 +1,4 @@
-# FR-PLAYER-022 Down中EnemyへFatal Attackを実行できる
+# [FR-PLAYER-022] ダウン中の敵への致命攻撃
 
 ## 1. 基本情報
 

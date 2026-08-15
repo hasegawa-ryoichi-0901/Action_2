@@ -1,4 +1,4 @@
-# FR-PLAYER-011 AttackとDodgeでStaminaを消費する
+# [FR-PLAYER-011] 攻撃・回避時のスタミナ消費
 
 ## 1. 基本情報
 

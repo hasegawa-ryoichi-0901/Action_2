@@ -1,4 +1,4 @@
-# FR-ENEMY-006 EnemyはHPとPostureを持つ
+# [FR-ENEMY-006] 敵の体力・体勢
 
 ## 1. 基本情報
 | 項目 | 内容 |

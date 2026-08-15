@@ -1,4 +1,4 @@
-# NFR-MAINT-005 Gameplay TagでGameplay状態を一元管理する
+# [NFR-MAINT-005] Gameplay Tagによるゲームプレイ状態の一元管理
 
 ## 1. 基本情報
 | 項目 | 内容 |

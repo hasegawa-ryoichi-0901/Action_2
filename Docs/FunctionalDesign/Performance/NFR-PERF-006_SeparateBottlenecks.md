@@ -1,4 +1,4 @@
-# NFR-PERF-006 Game Thread / Render Thread / GPUのBottleneckを分離する
+# [NFR-PERF-006] ゲーム処理・描画処理・GPU間のボトルネック切り分け
 
 ## 1. 基本情報
 | 項目 | 内容 |

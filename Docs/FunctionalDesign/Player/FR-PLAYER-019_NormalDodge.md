@@ -1,4 +1,4 @@
-# FR-PLAYER-019 Normal Dodgeを実行できる
+# [FR-PLAYER-019] 通常回避
 
 ## 1. 基本情報
 

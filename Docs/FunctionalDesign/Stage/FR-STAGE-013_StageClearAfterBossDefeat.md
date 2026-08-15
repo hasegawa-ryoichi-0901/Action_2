@@ -1,4 +1,4 @@
-# FR-STAGE-013 Boss撃破後にClear TriggerからEndingへ進む
+# [FR-STAGE-013] ボス撃破後のクリア判定・エンディング遷移
 
 ## 1. 基本情報
 | 項目 | 内容 |

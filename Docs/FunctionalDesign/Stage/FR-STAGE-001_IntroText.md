@@ -1,4 +1,4 @@
-# FR-STAGE-001 New Game時にTutorial Textを表示する
+# [FR-STAGE-001] 新規ゲーム開始時のチュートリアル文章表示
 
 ## 1. 基本情報
 | 項目 | 内容 |

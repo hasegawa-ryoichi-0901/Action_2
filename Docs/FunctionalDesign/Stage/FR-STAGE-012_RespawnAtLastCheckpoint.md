@@ -1,4 +1,4 @@
-# FR-STAGE-012 最後のActive CheckpointからRespawnする
+# [FR-STAGE-012] 最後に有効化したチェックポイントからの再出現
 
 ## 1. 基本情報
 | 項目 | 内容 |

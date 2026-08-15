@@ -1,4 +1,4 @@
-# NFR-QUALITY-005 長時間PlayでMemory増加を確認する
+# [NFR-QUALITY-005] 長時間プレイ時のメモリ増加
 
 ## 1. 基本情報
 | 項目 | 内容 |

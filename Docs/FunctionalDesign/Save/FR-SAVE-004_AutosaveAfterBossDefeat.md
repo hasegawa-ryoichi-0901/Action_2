@@ -1,4 +1,4 @@
-# FR-SAVE-004 Boss Reward確定後にAuto Saveする
+# [FR-SAVE-004] ボス報酬確定後の自動保存
 
 ## 1. 基本情報
 | 項目 | 内容 |

@@ -1,4 +1,4 @@
-# FR-STAGE-004 Checkpoint Rest時に通常EnemyをRespawnする
+# [FR-STAGE-004] チェックポイント休息時の通常敵再出現
 
 ## 1. 基本情報
 | 項目 | 内容 |

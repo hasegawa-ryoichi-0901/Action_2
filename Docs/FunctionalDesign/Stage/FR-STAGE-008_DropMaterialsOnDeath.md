@@ -1,4 +1,4 @@
-# FR-STAGE-008 死亡時にInventory ResourceをDeathDropへ移す
+# [FR-STAGE-008] 死亡時の所持資源落下
 
 ## 1. 基本情報
 | 項目 | 内容 |

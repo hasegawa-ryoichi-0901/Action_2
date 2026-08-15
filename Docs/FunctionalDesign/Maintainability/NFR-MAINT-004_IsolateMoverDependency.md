@@ -1,4 +1,4 @@
-# NFR-MAINT-004 Mover固有依存をCombatへ持ち込まない
+# [NFR-MAINT-004] Mover固有依存の戦闘機能からの分離
 
 ## 1. 基本情報
 | 項目 | 内容 |

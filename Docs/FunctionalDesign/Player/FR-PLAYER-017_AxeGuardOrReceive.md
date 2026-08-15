@@ -1,4 +1,4 @@
-# FR-PLAYER-017 AxeでGuardまたはReceiveを実行できる
+# [FR-PLAYER-017] 斧による防御・受け止め
 
 ## 1. 基本情報
 

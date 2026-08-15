@@ -1,4 +1,4 @@
-# FR-ENEMY-005 Melee / Ranged Attack Slotを分離する
+# [FR-ENEMY-005] 近接・遠距離攻撃枠の分離
 
 ## 1. 基本情報
 | 項目 | 内容 |

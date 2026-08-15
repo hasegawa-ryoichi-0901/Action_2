@@ -1,4 +1,4 @@
-# FR-PLAYER-008 CheckpointでWeaponを変更できる
+# [FR-PLAYER-008] チェックポイントでの武器変更
 
 ## 1. 基本情報
 

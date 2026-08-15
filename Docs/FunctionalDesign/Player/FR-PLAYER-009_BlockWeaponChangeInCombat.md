@@ -1,4 +1,4 @@
-# FR-PLAYER-009 Combat中はWeaponを変更できない
+# [FR-PLAYER-009] 戦闘中の武器変更禁止
 
 ## 1. 基本情報
 

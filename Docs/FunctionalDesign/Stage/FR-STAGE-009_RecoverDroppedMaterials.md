@@ -1,4 +1,4 @@
-# FR-STAGE-009 DeathDropからResourceを回収する
+# [FR-STAGE-009] 死亡落とし物からの資源回収
 
 ## 1. 基本情報
 | 項目 | 内容 |

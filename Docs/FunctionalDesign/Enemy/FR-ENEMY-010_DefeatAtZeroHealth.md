@@ -1,4 +1,4 @@
-# FR-ENEMY-010 HP0以下でEnemyをDefeatする
+# [FR-ENEMY-010] 体力ゼロ時の敵撃破
 
 ## 1. 基本情報
 | 項目 | 内容 |

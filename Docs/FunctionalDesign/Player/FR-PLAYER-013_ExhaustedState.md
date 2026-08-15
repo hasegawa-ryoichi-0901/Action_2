@@ -1,4 +1,4 @@
-# FR-PLAYER-013 Stamina枯渇時にExhaustedになる
+# [FR-PLAYER-013] スタミナ枯渇状態
 
 ## 1. 基本情報
 

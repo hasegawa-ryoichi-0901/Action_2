@@ -1,4 +1,4 @@
-# FR-ENEMY-008 Down中だけFatal Attackを受け付ける
+# [FR-ENEMY-008] ダウン中の致命攻撃受付
 
 ## 1. 基本情報
 | 項目 | 内容 |

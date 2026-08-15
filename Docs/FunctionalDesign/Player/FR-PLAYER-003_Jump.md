@@ -1,4 +1,4 @@
-# FR-PLAYER-003 Jumpできる
+# [FR-PLAYER-003] ジャンプ
 
 ## 1. 基本情報
 

@@ -1,4 +1,4 @@
-# FR-PLAYER-015 Perfect Dodge後にWeapon固有Counterを実行できる
+# [FR-PLAYER-015] ジャスト回避後の武器固有反撃
 
 ## 1. 基本情報
 

@@ -1,4 +1,4 @@
-# FR-SAVE-002 Checkpoint Rest確定後にAuto Saveする
+# [FR-SAVE-002] チェックポイント休息確定後の自動保存
 
 ## 1. 基本情報
 | 項目 | 内容 |

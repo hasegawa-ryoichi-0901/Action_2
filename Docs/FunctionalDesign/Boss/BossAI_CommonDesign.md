@@ -1,4 +1,4 @@
-# BOSS-AI-COMMON Boss AI共通設計
+# [BOSS-AI-COMMON] ボスAI共通設計
 
 ## 1. 基本情報
 | 項目 | 内容 |

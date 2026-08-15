@@ -1,4 +1,4 @@
-# NFR-MAINT-003 Player InputをIPlayerInputComponentで抽象化する
+# [NFR-MAINT-003] IPlayerInputComponentによるプレイヤー入力の抽象化
 
 ## 1. 基本情報
 | 項目 | 内容 |

@@ -1,4 +1,4 @@
-# NFR-MAINT-001 Gameplay ContentをData Drivenで追加できる
+# [NFR-MAINT-001] データ駆動によるゲーム内容追加
 
 ## 1. 基本情報
 | 項目 | 内容 |

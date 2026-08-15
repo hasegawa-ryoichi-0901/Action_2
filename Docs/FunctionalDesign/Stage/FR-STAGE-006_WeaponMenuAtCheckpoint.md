@@ -1,4 +1,4 @@
-# FR-STAGE-006 CheckpointでWeapon Menuを利用する
+# [FR-STAGE-006] チェックポイントの武器メニュー
 
 ## 1. 基本情報
 | 項目 | 内容 |

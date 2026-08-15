@@ -1,4 +1,4 @@
-# FR-SAVE-007 Steam CloudへSave Dataを同期する
+# [FR-SAVE-007] Steamクラウドへのセーブデータ同期
 
 ## 1. 基本情報
 | 項目 | 内容 |

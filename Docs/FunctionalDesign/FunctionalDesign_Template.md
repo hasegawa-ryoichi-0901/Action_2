@@ -22,7 +22,7 @@
 | 関連Issue | [#110](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/110) |
 ```
 
-# [要件ID] [要件名]
+# [要件ID] 要件名
 
 ## 1. 基本情報
 

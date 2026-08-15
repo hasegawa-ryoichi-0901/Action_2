@@ -1,4 +1,4 @@
-# FR-PLAYER-016 SwordでParryできる
+# [FR-PLAYER-016] 剣による受け流し
 
 ## 1. 基本情報
 

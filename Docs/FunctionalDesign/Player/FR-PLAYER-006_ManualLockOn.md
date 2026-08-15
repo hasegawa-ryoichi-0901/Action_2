@@ -1,4 +1,4 @@
-# FR-PLAYER-006 Manual LockOnを使用できる
+# [FR-PLAYER-006] 手動ロックオン
 
 ## 1. 基本情報
 

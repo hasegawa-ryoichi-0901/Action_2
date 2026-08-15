@@ -1,4 +1,4 @@
-# FR-STAGE-007 CheckpointでWeaponをUpgradeする
+# [FR-STAGE-007] チェックポイントでの武器強化
 
 ## 1. 基本情報
 | 項目 | 内容 |

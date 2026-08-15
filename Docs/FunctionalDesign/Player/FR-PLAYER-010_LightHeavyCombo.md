@@ -1,4 +1,4 @@
-# FR-PLAYER-010 Light / Heavy AttackとComboを実行できる
+# [FR-PLAYER-010] 弱攻撃・強攻撃・連続攻撃
 
 ## 1. 基本情報
 

@@ -1,4 +1,4 @@
-# FR-SAVE-003 Checkpoint MenuからManual Saveできる
+# [FR-SAVE-003] チェックポイントメニューからの手動保存
 
 ## 1. 基本情報
 | 項目 | 内容 |

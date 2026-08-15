@@ -1,4 +1,4 @@
-# NFR-QUALITY-006 Shipping Buildで最終確認する
+# [NFR-QUALITY-006] 出荷用ビルドの最終確認
 
 ## 1. 基本情報
 | 項目 | 内容 |

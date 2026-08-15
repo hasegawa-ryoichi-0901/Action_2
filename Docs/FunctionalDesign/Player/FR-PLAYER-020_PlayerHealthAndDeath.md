@@ -1,4 +1,4 @@
-# FR-PLAYER-020 PlayerはHPを持ちHP0以下で死亡する
+# [FR-PLAYER-020] プレイヤーの体力・死亡
 
 ## 1. 基本情報
 

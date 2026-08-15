@@ -1,4 +1,4 @@
-# FR-PLAYER-002 GamepadとKeyboard-Mouseで同等に操作できる
+# [FR-PLAYER-002] ゲームパッド・キーボード／マウスでの同等操作
 
 ## 1. 基本情報
 

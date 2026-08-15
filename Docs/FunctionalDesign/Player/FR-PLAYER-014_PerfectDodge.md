@@ -1,4 +1,4 @@
-# FR-PLAYER-014 Dodge結果としてPerfect Dodgeが成立する
+# [FR-PLAYER-014] ジャスト回避
 
 ## 1. 基本情報
 

@@ -1,4 +1,4 @@
-# FR-BOSS-011 Boss Attack Comboを分岐できる
+# [FR-BOSS-011] ボス攻撃コンボの分岐
 
 ## 1. 基本情報
 | 項目 | 内容 |

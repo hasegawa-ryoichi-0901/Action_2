@@ -1,4 +1,4 @@
-# FR-PLAYER-004 Air Attackを実行できる
+# [FR-PLAYER-004] 空中攻撃
 
 ## 1. 基本情報
 

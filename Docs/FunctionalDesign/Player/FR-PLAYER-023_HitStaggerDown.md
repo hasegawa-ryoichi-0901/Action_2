@@ -1,4 +1,4 @@
-# FR-PLAYER-023 PlayerはHit / Stagger / Down Reactionを持つ
+# [FR-PLAYER-023] 被弾・よろめき・ダウン反応
 
 ## 1. 基本情報
 

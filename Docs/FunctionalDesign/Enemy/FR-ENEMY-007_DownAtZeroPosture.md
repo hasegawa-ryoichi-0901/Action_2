@@ -1,4 +1,4 @@
-# FR-ENEMY-007 Posture0でDownする
+# [FR-ENEMY-007] 体勢値ゼロ時のダウン
 
 ## 1. 基本情報
 | 項目 | 内容 |

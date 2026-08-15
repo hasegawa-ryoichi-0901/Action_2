@@ -1,4 +1,4 @@
-# FR-STAGE-005 Checkpoint Rest時にPlayerを回復・補充する
+# [FR-STAGE-005] チェックポイント休息時の回復・補充
 
 ## 1. 基本情報
 | 項目 | 内容 |

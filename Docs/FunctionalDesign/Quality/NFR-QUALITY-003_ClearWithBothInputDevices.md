@@ -1,4 +1,4 @@
-# NFR-QUALITY-003 GamepadとKeyboard-Mouseの両方でClear確認する
+# [NFR-QUALITY-003] ゲームパッド・キーボード／マウス双方でのクリア確認
 
 ## 1. 基本情報
 | 項目 | 内容 |
