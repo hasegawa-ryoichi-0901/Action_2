@@ -1,115 +1,124 @@
 # 15. 未確定事項・プロトタイプ検証項目
 
-これらは初期実装を止める要因ではありません。Vertical Sliceまでに検証して確定します。
+本ドキュメントは、確定済み仕様と混同しないよう、今後の数値調整・Asset依存・Post-VS検証事項のみを管理します。
 
-## 1. アセット依存
+## 1. α版で残る調整事項
 
-- 世界観
-  - 現代都市
-  - 近未来
-  - ファンタジー
-- 最初のボス
-  - 人型
-  - 獣型
-  - 大型怪物
-- 回避モーション
-  - 武器別ステップ
-  - ローリング
-  - アセット依存の変更
-- ボス登場演出
+以下は基本仕様を変更せず、実装・Play Test中に調整可能な項目です。
 
-## 2. 数値
+### Dodge
 
-- 回復アイテム所持数
-- 回復量
-- 回復時間
-- スタミナ最大値
-- スタミナ回復開始遅延
-- 息切れ解除閾値
-- ジャスト回避受付時間
-- 反撃受付時間
-- パリィ受付時間
-- パリィ失敗硬直
-- ロックオン最大距離
+- Invincible Windowの具体時間
+- Perfect Dodge Windowの具体時間
+- Roll移動距離・時間
+- Back Step移動距離・時間
+- Roll / Back Step Animation Asset
+
+Dodge方向、無入力時Back Step、Air使用不可、Enemy Collision非通過、Invincible WindowとPerfect Dodge Windowの分離は確定済みです。
+
+### Combat
+
+- Max Stamina
+- Stamina Recovery Delay
+- Exhausted Recovery Threshold
+- Counter受付時間
+- Parry受付時間
+- Parry Failure Recovery
+- 各AttackのDamage / Posture Damage / Stamina Cost
+
+### Camera / Targeting
+
+- Mouse / Gamepad Sensitivity
+- Pitch Clamp
+- Y軸反転設定をα版へ追加するか
+- LockOn最大距離
 - 遮蔽による解除時間
-- 遠距離攻撃枠の最大数
-- 通常敵最大同時出現数
-- 弓の距離減衰曲線
-- 体勢値回復速度
-- ボス各攻撃の評価値
+- Camera Collision / SpringArmの最終調整値
 
-## 3. 弓
+LockOn中のCamera Look無効、Target追従、専用左右InputによるTarget Switch、対象死亡時の自動Lock解除は確定済みです。
 
-- 通常攻撃を3段コンボにするか連続射撃にするか
-- ProjectileとLine Traceの最終分担
-- 弱点倍率
-- 弱点判定の表現
-- 肩越し照準時の移動速度
+### Enemy / Boss
 
-## 4. 斧
+- Normal Enemy最大同時出現数
+- Ranged Attack Slot最大数
+- Posture Recovery Rate
+- Boss各AttackのScore調整値
+- Enemy / BossのReward量
 
-- ガードか受け止めか
-- ガード中のスタミナ消費
-- ガードブレイク
-- スーパーアーマーの対象攻撃
+Rewardの種類と付与タイミングは確定済みです。
 
-## 5. Mover
+## 2. Stage ClearのMap・演出依存事項
 
-段階導入で比較します。
+進行ロジックは確定しています。
 
 ```text
-評価項目
-  |
-  +--> 入力応答性
-  +--> Root Motion連携
-  +--> Motion Warping連携
-  +--> ジャンプ
-  +--> 回避
-  +--> 斜面
-  +--> 段差
-  +--> パフォーマンス
-  +--> デバッグ容易性
-  +--> Shippingビルド安定性
+Boss Defeat
+↓
+Reward Grant
+↓
+Auto Save
+↓
+Clear AreaのCollisionへ進入
+↓
+Skippable Ending Sequence
+↓
+Title
 ```
 
-2～3週間の検証後に次を決定します。
+Map制作時に決定する事項：
 
-- Moverを継続
-- CharacterMovementComponentへ移行
-- 一部のみMoverを使用
+- Clear Areaを城 / 洞窟 / 祠等のどの表現にするか
+- Clear Triggerの具体座標・形状
+- Ending Sequenceの映像・Camera・Text・Animation
 
-## 6. アニメーション機能
+これらはStage Clearの進行ロジックIssue作成・実装開始の前提条件にはしません。
 
-使用予定ですが、目的のない全機能導入は避けます。
+## 3. Mover — 将来検証
 
-- Animation Blueprint
-- Animation Montage
-- Motion Warping
-- Root Motion
-- Control Rig
-- IK Retargeter
-- Full Body IK
-- Pose Warping
+現行実装はCharacterMovementを使用します。Moverはα版の必須依存ではありません。
 
-各機能について「何の問題を解決したか」を記録します。
+Mover採用の具体的メリットが確認されるまで、`IMovementDriver`や`UMovementAdapterComponent`等の抽象化を先行追加しません。採用する場合もCombat層へMover固有型・APIを直接依存させません。
 
-## 7. オンライン
+## 4. Axe — Post-VS
 
-Vertical Sliceでは対象外です。
+- Guard / Receiveの最終方式
+- Guard中Stamina消費
+- Guard Break
+- Super Armor対象Attack
+- Heavy Branchの具体Combo
+- 各Attackの速度・Damage・Posture Damage
 
-- Epic Online Services
-- ネットワーク同期
-- マルチプレイ
+## 5. Bow — Post-VS
 
-Steam公開版で必要性を再評価します。
+- 通常Attackを3段Comboにするか連続射撃にするか
+- ProjectileとLine Traceの最終分担
+- Weak Point倍率・判定表現
+- Shoulder Aim時のMovement Speed
+- Distance Falloff Curve
+- Bow Counterの具体挙動
 
-## 8. Steam
+## 6. Asset依存
 
-- ストア価格
-- 体験版の範囲
-- Steam Cloud方式
-- 実績
-- 対応言語
-- ストア素材
+- 世界観：現代都市 / 近未来 / ファンタジー
+- 最初のBoss：人型 / 獣型 / 大型怪物
+- Boss Intro演出
+
+## 7. Animation機能
+
+使用候補：Animation Blueprint、Animation Montage、Motion Warping、Root Motion、Control Rig、IK Retargeter、Full Body IK、Pose Warping。
+
+各機能は「何の問題を解決するために採用したか」を記録します。
+
+## 8. 永続化・Master Data Architecture
+
+Gameplay上の挙動とは分離して次を管理します。
+
+- JSON Save Architecture: [#154](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/154)
+- CSV / Master Data Architecture: [#155](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/155)
+- Steam Cloud同期方式: Post-VS
+
+## 9. Online / Steam
+
+α版ではOnline、Network同期、EOS、Steam Cloudを対象外とします。Steam公開版でSteam Cloud、Achievement、Localization等を再評価します。
 
 ### [戻る](../README.md#ドキュメント一覧)

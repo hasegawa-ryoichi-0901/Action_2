@@ -4,32 +4,23 @@
 
 ```text
 [Neutral]
-    |
     +--> [Attack]
-    |
     +--> [Dodge]
-    |
     +--> [Jump]
-    |
-    +--> [Parry / Guard]
-    |
+    +--> [Parry]
     +--> [Heal]
-    |
     +--> [Exhausted]
-    |
-    +--> [Hit / Stagger]
-    |
+    +--> [Hit / Stagger / Down]
     +--> [Dead]
 ```
 
-状態はGameplay Tagで管理します。
+α版はSwordのみを対象とします。状態はGameplay Tagで管理します。
 
 ```text
 State.Action.Attacking
 State.Action.Dodging
 State.Action.Jumping
 State.Action.Parrying
-State.Action.Guarding
 State.Action.Healing
 State.Action.Exhausted
 State.Reaction.Hit
@@ -42,26 +33,17 @@ State.Dead
 
 ```text
 [Startup]
-    |
-    | 攻撃準備
-    | 一部の軽攻撃のみ回避キャンセル候補
-    v
+    ↓
 [Commitment]
-    |
-    | 原則キャンセル不可
-    v
+    ↓
 [Active]
-    |
-    | 攻撃判定有効
-    v
+    ↓
 [Recovery]
-    |
-    | 後半で次入力を受付
-    v
+    ↓
 [Neutral / Next Combo]
 ```
 
-キャンセル可能期間はAnim Notify StateまたはGameplay Tagで管理します。
+Cancel・Combo・Hitbox等の受付期間はAnim Notify StateまたはGameplay Tagで表現します。
 
 ```text
 Window.Cancel.Dodge
@@ -71,187 +53,183 @@ Window.Counter.Available
 Window.FatalAttack.Available
 ```
 
-## 3. 入力バッファ
+## 3. Input / Gameplay Action / Issueの境界
 
-### 対象入力
+Enhanced InputのBindingとLifecycle管理は`IPlayerInputComponent`を入口とします。Gameplay Actionの単位とActorComponentの単位は同一と断定しません。
 
-- 通常攻撃
-- 強攻撃
-- 回避
-- ジャンプ
-- パリィ
-- ガード
-- 武器スキル
-- ジャスト回避反撃
+- Dodgeは1 Actionで、Normal Dodge / Perfect Dodgeは結果分岐。
+- Light Attackは1 Action。
+- Heavy AttackはLight Attackとは別Action。
+- Combo AttackはLight / Heavy単体実装とは別の統合Action / Featureとして扱う。
+- Gameplay Tag、GAS、責務、Lifecycleを考慮してComponent構成を決定する。
 
-### 優先順位候補
+## 4. Dodge
+
+Dodge Input Tagは1つです。Normal DodgeとPerfect Dodgeで別Input Actionを作りません。
 
 ```text
-死亡・強制リアクション
-        |
-        v
-ジャスト回避反撃
-        |
-        v
-回避
-        |
-        v
-パリィ / ガード
-        |
-        v
-武器スキル
-        |
-        v
-強攻撃
-        |
-        v
-通常攻撃
+[Dodge Input]
+      ↓
+[実行条件 / Stamina確認]
+      +-- NG --> [Reject / Buffer]
+      ↓
+[State.Action.Dodging]
+      ↓
+[移動入力あり？]
+   ├─ Yes → 入力方向へRoll
+   └─ No  → 後方へBack Step
+      ↓
+[Invincible Window]
+[Perfect Dodge Window]
+      ↓
+[Enemy Attackとの関係を評価]
+   ├─ Perfect Window成立 → Perfect Dodge Result
+   ├─ Invincibleのみ成立 → Normal Dodge / No Damage
+   └─ 無敵外でHit          → Damage
+      ↓
+[Recovery / Neutral]
 ```
 
-## 4. スタミナ
+確定事項：
 
-### 消費対象
+- Invincible WindowとPerfect Dodge Windowは別々の調整値。
+- 具体的な時間は開発中に調整可能とする。
+- Air Dodge不可。
+- Dodge中にEnemy Collisionを通過しない。
+- Normal / Perfectの結果通知は用途に応じて別のGameplay Tag / Gameplay Eventを使用できる。
+- Perfect Dodgeは別ActionではなくDodge Actionの結果。
 
-- 通常攻撃
-- 強攻撃
-- チャージ攻撃
-- 回避
-- ジャスト回避反撃
-- パリィ
-- ガード
-- 武器スキル
-- 弓射撃
+## 5. Stamina / Exhausted
 
-### 回復
-
-- 最後のスタミナ消費から一定時間後に回復を開始する
-- 回復開始遅延、回復量、息切れ解除閾値はデータで設定する
-
-### 枯渇
+消費対象：Light Attack、Heavy Attack、Dodge、Perfect Dodge後Counter、Parry等。最後の消費から一定時間後に回復を開始します。
 
 ```text
 Stamina <= 0
-     |
-     v
+     ↓
 [State.Action.Exhausted]
-     |
      +--> 通常移動       : 可能
-     +--> カメラ操作     : 可能
-     +--> ロックオン解除 : 可能
-     +--> ジャンプ       : 不可
-     +--> 攻撃           : 不可
-     +--> 回避           : 不可
-     +--> ガード         : 不可
-     +--> パリィ         : 不可
-     |
-     v
+     +--> Camera操作     : 可能
+     +--> LockOn解除     : 可能
+     +--> Jump           : 不可
+     +--> Attack         : 不可
+     +--> Dodge          : 不可
+     +--> Parry          : 不可
+     ↓
 Stamina >= ExhaustedRecoveryThreshold
-     |
-     v
+     ↓
 [Neutral]
 ```
 
-## 5. ジャスト回避
+Exhaustedの実装単位は[#152](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/152)で管理します。
 
-### 成功条件
+## 6. Perfect Dodge Result
 
-- 回避Abilityが有効
-- 敵攻撃の判定とジャスト回避受付時間が重なる
-- プレイヤーが死亡・ダウン・息切れ中ではない
-
-### 成功処理
+成功条件はDodge Actionが有効で、Enemy Attack判定とPerfect Dodge Windowが重なることです。
 
 ```text
-[Enemy Attack]
-      |
-      v
-[Dodge Window Check]
-      |
-      +-- Failed --> [Normal Dodge / Hit]
-      |
-      v
-[Perfect Dodge Success]
-      |
-      +--> 短いヒットストップ
-      +--> HUDカウンター表示
-      +--> Counter Gameplay Tag付与
-      +--> 対象敵を記録
-      |
-      v
-[攻撃入力待ち]
-      |
-      +-- 入力なし・時間切れ --> [通常状態]
-      |
-      v
-[Weapon Specific Counter]
+[Perfect Dodge Result]
+      +--> 短いHit Stop
+      +--> HUD通知
+      +--> 結果通知Tag / Event
+      +--> 対象Enemyを記録
+      +--> Counter受付状態
 ```
 
-### 仕様
+- Slow Motionは使用しない。
+- Counterは強制しない。
+- Counter受付中のAttack InputでSword固有Counterへ派生できる。
 
-- スローモーションは発生させない
-- 反撃は強制しない
-- 有効時間中に攻撃入力した場合だけ専用反撃へ派生する
-- 反撃はスタミナを消費する
-- 有効時間は武器データで設定する
-- 反撃時に対象敵へ向きを自動補正する
+## 7. Parry / Fatal Attack
 
-## 6. パリィ
+### Parry
 
-- 剣固有
-- 攻撃属性ごとにパリィ可否を設定する
-- 失敗時に専用硬直を発生させる
-- 成功時に敵の体勢値を大きく削る
-- 体勢値が0になった場合のみダウンと致命攻撃へ接続する
+- α版ではSword固有。
+- Attack PropertyごとにParry可否を設定する。
+- 失敗時に専用Recoveryを発生させる。
+- 成功時にEnemy Postureを大きく削る。
+- Posture 0時のみDown / Fatal Attackへ接続する。
+
+### Fatal Attack
 
 ```text
-[Parry Input]
-      |
-      v
-[Parry Window]
-      |
-      +-- Parry不可攻撃 --> [失敗硬直 / 被弾]
-      |
-      +-- タイミング失敗 --> [失敗硬直 / 被弾]
-      |
-      v
-[Parry Success]
-      |
-      v
-[Posture Damage]
-      |
-      +-- Posture > 0 --> [敵リアクション]
-      |
-      v
-[Enemy Down]
-      |
-      v
-[Fatal Attack Available]
+Enemy Down
+↓
+Down Animation + Fatal受付Collision
+↓
+Collision内でPlayer Attack Input
+↓
+Fatal Attack基準TransformへPlayer位置合わせ
+↓
+UGA_FatalAttack
+↓
+Fatal Attack Montage
+↓
+Fatal Damage
 ```
 
-## 7. 体勢値
+Enemy Down終了 / Defeat / Fatal Attack成立時は受付を無効化します。
 
-### 敵
+## 8. HP・Reaction・Death・Defeat
 
-- HPとは独立して保持する
-- 攻撃ごとに体勢ダメージを設定する
-- 敵データごとに自然回復の有無と回復速度を設定する
-- 0になるとダウンする
-- ダウン時に正面・背後の両方から致命攻撃可能
+### Player
 
-### プレイヤー
+```text
+[Enemy / Boss Attack Hit]
+   ↓
+Health Damage + Reaction蓄積
+   ↓
+Health <= 0?
+   ├─ Yes → [State.Dead]
+   └─ No  → Hit / Stagger / Down判定
+```
 
-独立した体勢ゲージは持たず、装備武器に応じた怯み耐性を持たせます。
+- Hit / Stagger / Downの蓄積値はEnemy / Boss Attack Dataが持つ。
+- 蓄積値は内部計算のみでHUDへ表示しない。
+- DeathはReactionより優先する。
+- DeathDrop・Auto Save・Respawnは`Docs/09_SaveCheckpointDeath.md`を正とする。
 
-- 剣：標準
-- 斧：高い
-- 弓：低い
+### Normal Enemy
 
-## 8. 回復
+- HP0以下でDefeatedへ1回だけ遷移する。
+- Attack Ability、AI移動、Attack Slotを終了・解放する。
+- Enemy1体撃破ごとにUpgrade MaterialとGoldをPlayer Inventoryへ直接付与する。
+- Rewardは`RewardId -> 0..N Reward Entry`として取得する。
 
-- 回数制限付き回復アイテム
-- チェックポイントで補充
-- 使用中に攻撃を受けると中断
-- ボスAIは回復Abilityの確定済み発動状態を評価可能
-- 回復量、使用回数、使用時間は未確定データとする
+### Boss
+
+- HP0以下でDefeatedへ1回だけ遷移する。
+- AI評価とAttack Abilityを停止する。
+- GoldをPlayer Inventoryへ付与する。
+- 初回討伐時のみ固有収集ItemをPlayer Inventoryへ直接付与する。
+- Reward確定後にAuto Saveする。
+- α版ではBoss Replayを実装しない。
+
+## 9. Posture
+
+EnemyはHPとは独立してPostureを持ち、0でDownします。HP0によるDefeatはPosture Downより優先します。
+
+## 10. Healing Item
+
+確定フロー：
+
+```text
+Heal Input
+↓
+Item Count確認
+↓
+Heal Animation開始
+↓
+Healing Itemを1個消費
+↓
+Animation継続
+├ 被弾 → Heal中断 / Itemは返却しない
+└ 完了 → HP回復
+```
+
+- 回数制限付きHealing Item。
+- Checkpoint Rest / Respawnで最大数まで補充する。
+- Animation開始前にHealが成立しなければItemは消費しない。
+- Animation開始直後にItemを消費し、その後の被弾 / Cancelでは返却しない。
+- Boss AIは`State.Action.Healing`を評価可能。
 
 ### [戻る](../README.md#ドキュメント一覧)

@@ -12,101 +12,114 @@ Steamでの公開と販売も想定しますが、売上を優先して仕様を
 - 設計理由とトレードオフを説明できる
 - 実行可能ビルドと技術ドキュメントを提出できる
 
-## 2. 成功条件
+## 2. α版の成功条件
+
+α版は**Swordのみ**で完成させます。Axe / Bowは完成条件に含めません。
 
 ### 必須
 
-- 応募企業へ実行可能ビルドを提出できる
-- 3～5分のプレイ動画を用意できる
+- 応募企業へ実行可能Buildを提出できる
+- 3～5分のPlay動画を用意できる
 - 技術資料が完成している
-- C++コードの主要部分を限定公開できる
-- ボス1体との高品質な戦闘が完成している
-- 60fpsを安定して維持できる
+- C++ Codeの主要部分を限定公開できる
+- SwordでBoss1体との高品質なCombatが完成している
+- Player Death → DeathDrop → Auto Save → Checkpoint Respawnが成立する
+- Normal Enemy Defeat → Upgrade Material + Gold → Player Inventory → Weapon Upgradeが成立する
+- Boss Defeat → Gold + 初回Unique Item → Auto Save → Clear Area → Ending → Titleが成立する
+- Gamepad / Keyboard-Mouseの両方で操作できる
+- 60fps最低保証目標を確認できる
 
-### 追加目標
+### Post-VS追加目標
 
-- Steam体験版を公開する
-- 斧と弓を実装する
-- 最大3ステージを実装する
-- 最大3体のボスを実装する
+- Axeを実装する
+- Bowを実装する
+- CheckpointでWeapon Changeできる
+- Steam Demoを公開する
+- 最大3Stageを実装する
+- 最大3体のBossを実装する
 - Steam Cloudへ対応する
 - 120fpsを達成する
 
-## 3. 開発スコープ
-
-### Vertical Slice
+## 3. α版フロー
 
 ```text
-[タイトル]
-    |
-    v
-[導入テキスト]
-    |
-    v
-[チュートリアル]
-    |
-    v
-[近接敵 1体]
-    |
-    v
-[チェックポイント]
-    |
-    v
-[近接 + 遠距離の集団戦]
-    |
-    v
-[武器強化]
-    |
-    v
-[ボス前チェックポイント]
-    |
-    v
-[ボス戦 Phase 1 / Phase 2]
-    |
-    v
-[クリア]
+[Game Boot]
+    ↓
+[Intro]
+    ↓
+[Title]
+    ↓ New Game
+[Tutorial Text]
+    ↓
+[Tutorial]
+    ↓
+[Melee Enemy]
+    ↓
+[Upgrade Material + Gold]
+    ↓
+[Checkpoint]
+    ↓
+[Melee + Ranged Group Battle]
+    ↓
+[Gold + MaterialによるWeapon Upgrade]
+    ↓
+[Boss前Checkpoint]
+    ↓
+[Boss Phase1 / Phase2]
+    ↓
+[Boss Defeat]
+    ↓
+[Gold + 初回Unique Item]
+    ↓
+[Auto Save]
+    ↓
+[Clear Area]
+    ↓
+[Clear Trigger]
+    ↓
+[Skippable Ending]
+    ↓
+[Title]
 ```
 
-### 製品版候補
+Player Death時はDeath Animation後にUpgrade Material 100% + Gold 100%をDeathDropへ移し、DeathDrop確定後Auto Saveを行います。その後Camera確認・Fade Outを経て最後のActiveCheckpoint、未設定時はPlayerStartから再開し、Normal Enemyを復活させます。
 
-- ステージ：最大3
-- 武器：剣、斧、弓
-- 通常敵：ステージの役割に応じて追加
-- ボス：各ステージ1体を上限候補とする
-- 想定プレイ時間：30分～1時間
+## 4. Post-VS候補
 
-## 4. スコープ削減方針
+- Weapon：Axe、Bow
+- Stage：最大3
+- Normal Enemy：Stageの役割に応じて追加
+- Boss：各Stage1体を上限候補
+- 想定Play時間：30分～1時間
 
-開発が遅延した場合、システムの中核を削除せず、コンテンツ量を減らします。
+## 5. スコープ削減方針
 
-削減順序は次のとおりです。
+開発が遅延した場合、Systemの中核を削除せずContent量を減らします。
 
 ```text
-ステージ3
-  |
-  v
-ステージ2
-  |
-  v
-通常敵の派生種類
-  |
-  v
-追加ボス
-  |
-  v
-斧・弓の一部追加スキル
+Stage 3
+  ↓
+Stage 2
+  ↓
+Normal Enemy派生種類
+  ↓
+追加Boss
+  ↓
+Axe / Bow追加Feature
 ```
 
-次のシステムはポートフォリオの中心であるため、原則として削除しません。
+次はPortfolioの中心であるため原則として削除しません。
 
-- C++中心の戦闘基盤
+- C++中心のCombat基盤
+- `IPlayerInputComponent`を中心としたInput基盤
 - GAS
-- ジャスト回避
-- 体勢値
-- ボスAI
-- 集団戦管理
-- デバッグ表示
-- セーブ
+- Normal Dodge / Perfect Dodge
+- Posture
+- Boss AI / Debug
+- Group Battle管理
+- Player Death / DeathDrop / Respawn
+- Player Inventory / Reward / Weapon Upgrade
+- Save / Stage Clear
 - 技術資料
 
-### [戻る](../README.md#ドキュメント一覧)
+### [戻る](../README.md#主要ドキュメント)

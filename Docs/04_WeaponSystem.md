@@ -1,174 +1,127 @@
 # 04. 武器システム
 
-## 1. 共通仕様
+## 1. 開発スコープ
 
-- 武器は剣、斧、弓の3種類
-- チェックポイントで変更可能
-- 戦闘中は変更不可
-- すべてのボスをすべての武器で撃破可能にする
-- 各武器は同じ基底インターフェースを使用する
-- 攻撃力、体勢削り、スタミナコスト、怯み耐性をデータ化する
-- 強化は3段階
-- 強化素材は初期仕様では共通
-- 素材種別はマスターデータで変更可能
-- 強化素材の振り直しが可能
+### α版
 
-## 2. アクション構成
+α版では**Swordのみ**を実装します。複数Weapon切替、Axe、Bowは完成条件に含めません。
 
-各武器の最終目標は次のとおりです。
+### Post-VS
 
-- 通常攻撃コンボ：1系統
-- 強攻撃：1種類
-- チャージ攻撃：1種類
-- 回避攻撃：1種類
-- ジャスト回避反撃：1種類
-- 固有スキル：2種類
-- 空中攻撃：1種類
-- 致命攻撃：1種類
+α版完成後の4～6カ月目を目安にAxeとBowを追加し、CheckpointでWeapon Change可能にします。
 
-## 3. 剣
+## 2. 共通仕様
+
+- 最終的なWeapon構成はSword、Axe、Bowの3種類。
+- α版はSwordのみ。
+- 複数Weapon実装後はCheckpointで変更可能。
+- Combat中は変更不可。
+- 各Weaponは共通のWeapon Definition・Attack Definition・Ability連携を利用する。
+- Attack Power、Posture Damage、Stamina Cost、Stagger Resistance等をData化する。
+- Upgradeは3段階候補。
+- Weapon Upgradeには**Upgrade MaterialとGoldの両方**を使用する。
+- Goldの用途はWeapon Upgradeのみ。
+- Weapon UpgradeはCheckpoint Menuからのみ実行できる。
+- Upgrade Material / Goldの必要量はGameplay Dataで管理する。
+- Gold / Upgrade Materialの正本はPlayer Inventoryとする。
+
+## 3. 共通Action構成
+
+α版ではSwordでCombat基盤を成立させ、Axe / Bowは同じ基盤を利用して追加します。
+
+- Light Attack
+- Heavy Attack
+- Combo Attack
+- Dodge Attack候補
+- Perfect Dodge Counter
+- Air Attack
+- Fatal Attack
+
+Light Attack、Heavy Attack、Combo AttackはIssue管理上それぞれ別Action / Featureとして扱います。ActionとActorComponentの数を一致させることは前提としません。
+
+## 4. Sword — α版対象
 
 ### 役割
 
 - 標準的な速度
 - 高い対応力
-- パリィ可能
-- 比較的短い硬直
-- ジャスト回避後の高速接近反撃
+- Parry可能
+- 比較的短いRecovery
+- Perfect Dodge後の高速接近Counter
 
-### コンボ
+### Combo
 
 ```text
 Light 1
-  |
   +--> Light 2
-  |       |
-  |       +--> Light 3
-  |               |
-  |               +--> Light 4
-  |
+  |      +--> Light 3
+  |              +--> Light 4
   +--> Heavy Branch
 
 Light 2
-  |
   +--> Heavy Branch
 
-Charge Heavy
-Dodge Attack
+Charge Heavy候補
+Dodge Attack候補
 Air Attack
 Perfect Dodge Counter
 Fatal Attack
 ```
 
-### 通常攻撃段数
+## 5. Axe — Post-VS Feature
 
-- 4段
+関連要件：`FR-PLAYER-017`、`FEATURE-AXE-001`～`FEATURE-AXE-005`。
 
-## 4. 斧
+- 低速・高威力・高Posture Damage・高Stagger Resistance。
+- Guard / Receive。
+- 一部AttackにSuper Armor候補。
+- 3段Light Combo、Charge Attack、Dodge Attack、Perfect Dodge Counterを追加候補とする。
 
-### 役割
+## 6. Bow — Post-VS Feature
 
-- 低速
-- 高威力
-- 高い体勢削り
-- 高い怯み耐性
-- ガードまたは受け止め
-- 一部攻撃にスーパーアーマー候補
-- ジャスト回避後に高威力の叩きつけ
+関連要件：`FEATURE-BOW-001`～`FEATURE-BOW-006`、`FR-BOSS-014`。
 
-### コンボ
+- Ranged Attack。
+- 通常時はSoft Lock。
+- Aim時はShoulder Camera。
+- 通常射撃は弾数無制限候補で、射撃ごとにStaminaを消費。
+- Weak Point、Distance Falloffを持つ。
+- 遠距離維持に対してBossは専用Gap Closerを使用する。
 
-```text
-Light 1
-  |
-  +--> Light 2
-  |       |
-  |       +--> Light 3
-  |
-  +--> Heavy Branch
+Projectile / Line Trace等の最終方式はPost-VS Prototypeで決定します。
 
-Charge Heavy
-Guard / Receive
-Dodge Attack
-Air Attack
-Perfect Dodge Counter
-Fatal Attack
-```
-
-### 通常攻撃段数
-
-- 3段
-
-## 5. 弓
-
-### 役割
-
-- 遠距離攻撃
-- 通常時はソフトロック
-- 構え時は肩越し照準
-- 弾数は無制限
-- 射撃ごとにスタミナを消費
-- 敵の弱点部位を攻撃可能
-- 弱点はUIへ明示しない
-- 距離が長くなるほどダメージが減少
-- 遠距離維持に対し、ボスは専用接近行動を使用する
-
-### 通常攻撃段数
-
-- 3段または連続射撃
-- プロトタイプで操作感を比較して決定
-
-### 射撃方式の暫定案
-
-ポートフォリオとして複数方式を説明できるよう、次を暫定採用します。
-
-```text
-通常矢
-  |
-  +--> Projectile
-  +--> 飛翔時間あり
-  +--> 距離減衰あり
-
-特殊高速射撃
-  |
-  +--> Line Trace
-  +--> 即着弾
-  +--> Abilityまたはスキルとして使用
-```
-
-最終採用は操作感、アニメーション、負荷、ボスAIとの相性をプロトタイプで比較して決定します。
-
-## 6. 武器強化
+## 7. Weapon Upgrade
 
 ```text
 Level 1
-  |
   +--> 初期性能
 
 Level 2
-  |
-  +--> 攻撃力上昇
-  +--> 体勢削り性能上昇
+  +--> Attack Power上昇
+  +--> Posture Damage上昇
 
 Level 3
-  |
-  +--> 固有スキル解放
+  +--> 固有Skill解放候補
 ```
-
-### 強化処理
 
 ```text
-[Checkpoint]
-      |
-      v
-[Weapon Upgrade Menu]
-      |
-      +--> 素材確認
-      +--> 強化実行
-      +--> Gameplay Ability付与
-      +--> パラメータ更新
-      +--> オートセーブ
+[Checkpoint Menu]
+      ↓
+[Upgrade対象選択]
+      ↓
+[Gold Cost確認]
+      +-- 不足 --> [Reject]
+      ↓
+[Upgrade Material Cost確認]
+      +-- 不足 --> [Reject]
+      ↓
+[両ResourceをPlayer Inventoryから消費]
+      ↓
+[Weapon Level / Parameter更新]
 ```
 
+Weapon UpgradeそのものをAuto Save契機にはしません。進行Saveは`Docs/09_SaveCheckpointDeath.md`で定義した契機に従います。
+
+関連Inventory基盤: [#153](https://github.com/hasegawa-ryoichi-0901/Action_2/issues/153)
 
 ### [戻る](../README.md#ドキュメント一覧)
