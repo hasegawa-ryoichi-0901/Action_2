@@ -1,0 +1,17 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "Reusable Debug Menu",
+	"Description": "A data-driven, local-player-scoped runtime debug menu.",
+	"Category": "Debugging",
+	"EnabledByDefault": true,
+	"CanContainContent": false,
+	"Modules": [
+		{
+			"Name": "ReusableDebugMenu",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

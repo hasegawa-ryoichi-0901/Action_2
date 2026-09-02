@@ -16,6 +16,7 @@ public class Action_2 : ModuleRules
 				"InputCore",
 				"EnhancedInput",
 				"GameplayTags",
+				"ReusableDebugMenu",
 				"UMG" });
 
 		// Uncomment if you are using Slate UI
