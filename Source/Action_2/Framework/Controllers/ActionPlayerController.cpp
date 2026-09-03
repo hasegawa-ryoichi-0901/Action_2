@@ -5,10 +5,17 @@
 #include "DebugMenuTypes.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
+#include "InputMappingContext.h"
 #include "ReusableDebugMenu.h"
 
 #define LOCTEXT_NAMESPACE "ActionPlayerControllerDebugMenu"
+
+namespace
+{
+	constexpr int32 DebugInputMappingContextPriority = 100;
+}
 
 void AActionPlayerController::SetupInputComponent()
 {
@@ -16,6 +23,10 @@ void AActionPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 #if !UE_BUILD_SHIPPING
+	// SetupInputComponent can run before BeginPlay on some controller paths. Retry
+	// here so a valid Local Player is enough to make the mapping available.
+	RegisterDebugInputMappingContext();
+
 	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
 	if (!IsValid(EnhancedInput) || !IsValid(toggleDebugMenuAction))
 	{
@@ -36,18 +47,85 @@ void AActionPlayerController::SetupInputComponent()
 void AActionPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	RegisterDebugInputMappingContext();
 	ConfigureDebugMenu();
 }
 
 void AActionPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	RemoveDebugMenuInputBinding();
+	RemoveDebugInputMappingContext();
 	if (UReusableDebugMenuSubsystem* Subsystem = GetDebugMenuSubsystem())
 	{
 		Subsystem->NotifyPlayerControllerEndPlay(this);
 	}
 
 	Super::EndPlay(EndPlayReason);
+}
+
+void AActionPlayerController::RegisterDebugInputMappingContext()
+{
+#if !UE_BUILD_SHIPPING
+	if (!IsValid(debugInputMappingContext))
+	{
+		UE_LOG(
+			LogReusableDebugMenu,
+			Warning,
+			TEXT("Debug input mapping context is not assigned on '%s'. The debug menu toggle will be unavailable."),
+			*GetName());
+		return;
+	}
+
+	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = GetEnhancedInputSubsystem();
+	if (!IsValid(InputSubsystem))
+	{
+		UE_LOG(
+			LogReusableDebugMenu,
+			Warning,
+			TEXT("Could not access Enhanced Input subsystem for '%s'; debug mapping context registration will be retried."),
+			*GetName());
+		return;
+	}
+
+	// Do not claim or remove a context registered by another owner.
+	if (InputSubsystem->HasMappingContext(debugInputMappingContext))
+	{
+		return;
+	}
+
+	// PlayerInput can be recreated during a map transition while this controller
+	// survives. Treat a missing context as a lost registration and add it again.
+	bDebugInputMappingContextRegistered = false;
+	InputSubsystem->AddMappingContext(debugInputMappingContext, DebugInputMappingContextPriority);
+	bDebugInputMappingContextRegistered = InputSubsystem->HasMappingContext(debugInputMappingContext);
+	if (!bDebugInputMappingContextRegistered)
+	{
+		UE_LOG(
+			LogReusableDebugMenu,
+			Warning,
+			TEXT("Failed to register debug input mapping context '%s' for '%s'."),
+			*GetNameSafe(debugInputMappingContext),
+			*GetName());
+	}
+#endif
+}
+
+void AActionPlayerController::RemoveDebugInputMappingContext()
+{
+#if !UE_BUILD_SHIPPING
+	if (!bDebugInputMappingContextRegistered)
+	{
+		return;
+	}
+
+	if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = GetEnhancedInputSubsystem();
+		IsValid(InputSubsystem) && IsValid(debugInputMappingContext))
+	{
+		InputSubsystem->RemoveMappingContext(debugInputMappingContext);
+	}
+
+	bDebugInputMappingContextRegistered = false;
+#endif
 }
 
 void AActionPlayerController::ToggleDebugMenu()
@@ -141,6 +219,14 @@ void AActionPlayerController::RemoveDebugMenuInputBinding()
 
 	BoundDebugInputComponent.Reset();
 	DebugMenuBindingHandle = 0;
+}
+
+UEnhancedInputLocalPlayerSubsystem* AActionPlayerController::GetEnhancedInputSubsystem() const
+{
+	const ULocalPlayer* LocalPlayer = GetLocalPlayer();
+	return IsValid(LocalPlayer)
+		? LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()
+		: nullptr;
 }
 
 UReusableDebugMenuSubsystem* AActionPlayerController::GetDebugMenuSubsystem() const

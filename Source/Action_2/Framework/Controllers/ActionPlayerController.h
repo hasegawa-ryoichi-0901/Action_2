@@ -5,7 +5,9 @@
 #include "ActionPlayerController.generated.h"
 
 class UEnhancedInputComponent;
+class UEnhancedInputLocalPlayerSubsystem;
 class UInputAction;
+class UInputMappingContext;
 class UReusableDebugMenuCatalog;
 class UReusableDebugMenuSubsystem;
 class UReusableDebugMenuRootWidget;
@@ -27,6 +29,14 @@ protected:
 		Category = "Debug",
 		meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> toggleDebugMenuAction;
+
+	/** Debug mapping context registered by this controller so the menu works without a Pawn. */
+	UPROPERTY(
+		EditDefaultsOnly,
+		BlueprintReadOnly,
+		Category = "Debug",
+		meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputMappingContext> debugInputMappingContext;
 
 	UPROPERTY(
 		EditDefaultsOnly,
@@ -54,9 +64,13 @@ private:
 	void ToggleDebugMenu();
 	void ConfigureDebugMenu();
 	void RegisterFallbackDebugCategories(UReusableDebugMenuSubsystem& Subsystem);
+	void RegisterDebugInputMappingContext();
+	void RemoveDebugInputMappingContext();
 	void RemoveDebugMenuInputBinding();
+	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputSubsystem() const;
 	UReusableDebugMenuSubsystem* GetDebugMenuSubsystem() const;
 
 	TWeakObjectPtr<UEnhancedInputComponent> BoundDebugInputComponent;
 	uint32 DebugMenuBindingHandle = 0;
+	bool bDebugInputMappingContextRegistered = false;
 };
