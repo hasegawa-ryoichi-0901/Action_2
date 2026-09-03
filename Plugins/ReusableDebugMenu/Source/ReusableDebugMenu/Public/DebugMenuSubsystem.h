@@ -43,8 +43,10 @@ public:
 
 	bool ToggleMenu();
 	bool ShowMenu();
+	/** Hides only the root menu; active debug windows remain visible and the game continues. */
 	void HideMenu();
 	void NotifyPlayerControllerEndPlay(const APlayerController* PlayerController);
+	/** Returns whether the root menu is visible; independent windows may still be open. */
 	bool IsMenuOpen() const;
 
 	UReusableDebugMenuRegistry* GetRegistry() const { return Registry; }
@@ -52,6 +54,10 @@ public:
 
 private:
 	APlayerController* ResolvePlayerController() const;
+	bool HasActiveDebugWindows() const;
+	void RestoreGameplayInputState();
+	void ReleaseMenuGameplayState();
+	void RestoreGameplayStateIfIdle();
 	void ToggleWindow(FName NodeId);
 	void CloseWindow(FName NodeId);
 	void CloseAllWindows();

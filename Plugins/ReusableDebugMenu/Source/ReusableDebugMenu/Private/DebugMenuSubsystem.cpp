@@ -16,6 +16,7 @@ void UReusableDebugMenuSubsystem::Initialize(FSubsystemCollectionBase& Collectio
 
 void UReusableDebugMenuSubsystem::Deinitialize()
 {
+	CloseAllWindows();
 	HideMenu();
 	ActiveWindows.Reset();
 	WindowClasses.Reset();
@@ -39,11 +40,12 @@ void UReusableDebugMenuSubsystem::Configure(
 	const bool bInPauseGameWhenOpen,
 	const bool bInManageInputMode)
 {
-	if (IsMenuOpen() &&
+	if ((bMenuOpen || HasActiveDebugWindows()) &&
 		(MenuWidgetClass != InMenuWidgetClass ||
 		 bPauseGameWhenOpen != bInPauseGameWhenOpen ||
 		 bManageInputMode != bInManageInputMode))
 	{
+		CloseAllWindows();
 		HideMenu();
 		if (MenuWidgetClass != InMenuWidgetClass)
 		{
@@ -223,6 +225,12 @@ bool UReusableDebugMenuSubsystem::ShowMenu()
 		return false;
 	}
 
+	if (HasActiveDebugWindows() && MenuOwnerController.Get() != PlayerController)
+	{
+		CloseAllWindows();
+		HideMenu();
+	}
+
 	if (!MenuWidgetClass || MenuWidgetClass->HasAnyClassFlags(CLASS_Abstract))
 	{
 		UE_LOG(
@@ -260,9 +268,13 @@ bool UReusableDebugMenuSubsystem::ShowMenu()
 		return false;
 	}
 
+	const bool bDebugSessionAlreadyActive = bMenuOpen || HasActiveDebugWindows();
 	MenuOwnerController = PlayerController;
-	bPreviousMouseCursorVisible = PlayerController->bShowMouseCursor;
-	bPausedBySubsystem = false;
+	if (!bDebugSessionAlreadyActive)
+	{
+		bPreviousMouseCursorVisible = PlayerController->bShowMouseCursor;
+		bPausedBySubsystem = false;
+	}
 
 	if (bPauseGameWhenOpen && PlayerController->GetWorld() && !PlayerController->GetWorld()->IsPaused())
 	{
@@ -296,32 +308,14 @@ bool UReusableDebugMenuSubsystem::ShowMenu()
 void UReusableDebugMenuSubsystem::HideMenu()
 {
 	const bool bWasOpen = bMenuOpen || (IsValid(MenuWidget) && MenuWidget->IsInViewport());
-	CloseAllWindows();
 
 	if (IsValid(MenuWidget))
 	{
 		MenuWidget->RemoveFromParent();
 	}
 
-	APlayerController* PlayerController = MenuOwnerController.Get();
-	if (IsValid(PlayerController))
-	{
-		if (bManageInputMode)
-		{
-			FInputModeGameOnly InputMode;
-			PlayerController->SetInputMode(InputMode);
-			PlayerController->bShowMouseCursor = bPreviousMouseCursorVisible;
-		}
-
-		if (bPausedBySubsystem)
-		{
-			PlayerController->SetPause(false);
-		}
-	}
-
-	bPausedBySubsystem = false;
 	bMenuOpen = false;
-	MenuOwnerController.Reset();
+	ReleaseMenuGameplayState();
 
 	if (bWasOpen)
 	{
@@ -335,6 +329,7 @@ void UReusableDebugMenuSubsystem::NotifyPlayerControllerEndPlay(
 	if (MenuOwnerController.Get() == PlayerController ||
 		(IsValid(MenuWidget) && MenuWidget->GetOwningPlayer() == PlayerController))
 	{
+		CloseAllWindows();
 		HideMenu();
 		MenuWidget = nullptr;
 	}
@@ -349,6 +344,64 @@ APlayerController* UReusableDebugMenuSubsystem::ResolvePlayerController() const
 {
 	const ULocalPlayer* LocalPlayer = GetLocalPlayer();
 	return IsValid(LocalPlayer) ? LocalPlayer->GetPlayerController(GetWorld()) : nullptr;
+}
+
+bool UReusableDebugMenuSubsystem::HasActiveDebugWindows() const
+{
+	for (const TPair<FName, TObjectPtr<UReusableDebugMenuWindow>>& Pair : ActiveWindows)
+	{
+		if (IsValid(Pair.Value) && Pair.Value->IsInViewport())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void UReusableDebugMenuSubsystem::RestoreGameplayInputState()
+{
+	APlayerController* PlayerController = MenuOwnerController.Get();
+	if (IsValid(PlayerController) && bManageInputMode)
+	{
+		FInputModeGameOnly InputMode;
+		PlayerController->SetInputMode(InputMode);
+		PlayerController->bShowMouseCursor = bPreviousMouseCursorVisible;
+	}
+}
+
+void UReusableDebugMenuSubsystem::ReleaseMenuGameplayState()
+{
+	APlayerController* PlayerController = MenuOwnerController.Get();
+	if (IsValid(PlayerController) && bPausedBySubsystem)
+	{
+		PlayerController->SetPause(false);
+	}
+
+	bPausedBySubsystem = false;
+
+	if (HasActiveDebugWindows())
+	{
+		// DebugWindow is an independent visual overlay. Return mouse and keyboard
+		// input to the game while leaving the window rendered on screen.
+		RestoreGameplayInputState();
+		return;
+	}
+
+	RestoreGameplayStateIfIdle();
+}
+
+void UReusableDebugMenuSubsystem::RestoreGameplayStateIfIdle()
+{
+	if (bMenuOpen || HasActiveDebugWindows())
+	{
+		return;
+	}
+
+	RestoreGameplayInputState();
+
+	bPausedBySubsystem = false;
+	MenuOwnerController.Reset();
 }
 
 void UReusableDebugMenuSubsystem::ToggleWindow(const FName NodeId)
@@ -423,6 +476,8 @@ void UReusableDebugMenuSubsystem::CloseWindow(const FName NodeId)
 		Window->NotifyClosed();
 		Window->RemoveFromParent();
 	}
+
+	RestoreGameplayStateIfIdle();
 }
 
 void UReusableDebugMenuSubsystem::CloseAllWindows()

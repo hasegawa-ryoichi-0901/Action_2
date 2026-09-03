@@ -124,11 +124,18 @@ Derived Data Cache のロック競合が起こるため、必ず Editor を終�
 | `Action2.Player` | （空） | `Category` | （空） |
 | `Action2.Player.Health` | `Action2.Player` | `Command` | `WBP_DebugMenuWindow` |
 
-`BP_ActionPlayerController` では、次の3つを同じ設定にします。
+`BP_ActionPlayerController` では、次の4つを設定します。
 
 - `Toggle Debug Menu Action`: `IA_DebugMenu`
+- `Debug Input Mapping Context`: `IMC_Debug`
 - `Debug Widget Class`: `WBP_DebugRootWidget`
 - `Debug Menu Catalog`: `DA_DebugMenuCatalog`
+
+`IMC_Debug` は Pawn ではなく PlayerController が Local Player に登録します。
+そのため Pawn が未生成、死亡、UnPossessed の状態でも Toggle 入力を受け取れます。
+`IA_DebugMenu` と `IA_DebugModifier` のデバッグ用マッピングは `IMC_Debug` にだけ置き、
+`IMC_Default` から削除してください。両方に同じ Action を残すと、Pawn の所有中に
+入力が重複して通知される可能性があります。
 
 `WBP_DebugRootWidget` には `debugListView` という名前の `ListView` を配置し、
 その Entry Widget Class に List Entry Blueprint を指定します。List Entry Blueprint
@@ -143,7 +150,10 @@ Subsystem は `AddToPlayerScreen` を使用するため、Local Player ごとに
 表示されます。Player Index 0 を前提にしません。Shipping build では Runtime 生成を無効化しています。
 
 デフォルトでは、Subsystem は一時的に `FInputModeGameAndUI` を適用し、マウスカーソルを
-表示して、閉じる際に `FInputModeGameOnly` へ戻します。既存の Input Mode stack を持つ
+表示します。DebugMenuを閉じてもDebugWindowは表示されたままですが、ゲームをPauseせずに
+`FInputModeGameOnly` と元のカーソル状態へ戻します。Windowの操作が必要な場合はDebugMenuを
+再表示してください。
+既存の Input Mode stack を持つ
 プロジェクトでは `bInManageInputMode = false` を渡し、独自のアダプターで Input を復元してください。
 Pause については所有権を追跡し、Subsystem 自身が正常に Pause した場合にのみ解除します。
 
@@ -165,10 +175,18 @@ Pause については所有権を追跡し、Subsystem 自身が正常に Pause 
 1. プロジェクトの `Plugins/ReusableDebugMenu` を有効にし、Editorターゲットを一度ビルドします。
 2. Root Widget、List Entry Widget、必要なCommand WindowのBlueprintを作成します。
 3. Catalog Data Assetを作成し、CategoryとCommandを登録します（詳細は「Data Assetでメニューを定義する」を参照）。
-4. PlayerControllerの `Toggle Debug Menu Action`、`Debug Widget Class`、
-   `Debug Menu Catalog` にアセットを割り当てます。
-5. Input Mapping ContextをLocal Playerへ登録し、Toggle用Input Actionにキーを割り当てます。
-6. Editorを再起動してからPIEで入力を確認します。
+4. `IMC_Debug` の `IA_DebugMenu` に Toggle キーを割り当て、`IA_DebugModifier` などの
+   デバッグ用 Action もこの Context にまとめます。
+5. `IMC_Default` に残っているデバッグ用 Action のマッピングを削除します。
+6. PlayerControllerの `Toggle Debug Menu Action` に `IA_DebugMenu`、
+   `Debug Input Mapping Context` に `IMC_Debug`、`Debug Widget Class` に
+   `WBP_DebugRootWidget`、`Debug Menu Catalog` に `DA_DebugMenuCatalog` を割り当てます。
+7. Editorを再起動してからPIEで、Pawn生成前・Pawn消滅後を含めて Toggle 入力を確認します。
+
+`Debug Input Mapping Context` は Controller の `BeginPlay` で登録し、`EndPlay` で解除します。
+`SetupInputComponent` でも登録を再試行するため、Local Player の初期化順序が異なる画面でも
+Pawn の `EnableMappingContext`／`UnPossessed` に依存しません。未設定の場合はログに警告が出て、
+デバッグメニューの Toggle 入力だけが無効になります。
 
 ### 日常の変更手順
 
@@ -178,7 +196,10 @@ Pause については所有権を追跡し、Subsystem 自身が正常に Pause 
 2. Command用の具象Window Blueprintを `WindowClass` に割り当てます。
 3. `NodeId`、`ParentId`、`NodeType`、`DisplayName`、`SortOrder`を確認してData Assetを保存します。
 4. PIEを再起動し、Toggleキー、Enter（決定）、Escape／BackSpace（戻る・閉じる）を確認します。
-5. 問題がなければ `.uasset` と必要なC++変更を同じ変更単位でバージョン管理へ登録します。
+5. Command Windowを開いた状態でルートのDebugMenuを閉じ、Windowが表示されたままゲームを
+   継続できること、マウスフォーカスがゲーム画面へ戻ることを確認します。Windowを閉じる場合は
+   DebugMenuを再表示してからWindow内の `RequestClose` ボタンを使用し、入力モードとカーソル状態を確認します。
+6. 問題がなければ `.uasset` と必要なC++変更を同じ変更単位でバージョン管理へ登録します。
 
 `NodeId` は保存済みデータや外部コードから参照される識別子です。表示名を変更しても構いませんが、
 既存の `NodeId` を名前変更や再利用に使わないでください。Categoryへ `WindowClass` を設定したり、
@@ -190,6 +211,19 @@ Window Blueprintでは、表示開始時の初期化を `On Debug Window Opened`
 `On Debug Window Closed` イベントにまとめます。画面内の閉じるボタンからは
 `RequestClose` を呼び出してください。SubsystemがWindowの生成、表示順、終了、GCを管理するため、
 Blueprint側で別のWindowを生成して保持しないでください。
+Windowのフォーカス可否はプラグイン基底クラスがC++で設定します。ルートメニューを閉じた状態では
+ゲーム側にマウスフォーカスを戻すため、Windowを操作・終了する場合はメニューを再表示してください。
+
+### DebugMenuとDebugWindowの独立した運用
+
+Commandを決定すると、`DebugWindow` はルートの `DebugMenu` とは別のWidgetとして表示されます。
+その状態でルートメニューを Escape／BackSpace または Toggleキーで閉じても、表示中のWindowは
+閉じずに残り、ゲームは再開してマウスフォーカスもゲーム画面へ戻ります。Windowを操作・終了する
+場合はDebugMenuを再表示し、Window内の閉じるボタンから `RequestClose` を呼び出してください。
+
+メニューを閉じた後は、`FInputModeGameOnly`を適用してゲーム側にマウスとキーボードのフォーカスを
+戻します。`Pause Game When Open` が有効でSubsystem自身がPauseした場合も、ルートメニューを
+閉じた時点でPauseを解除します。Windowは表示のみ継続し、メニューを再表示すると再び操作できます。
 
 ### C++から動的に登録する場合
 
@@ -227,6 +261,14 @@ Action_2のアダプターはCatalogが無効または空の場合、6つの既�
 `Player` エントリの `Node Type` を `Category` にし、`Window Class` を空にします。
 `Window Class` を指定できるのは `Command` エントリだけです。1つでも不正なエントリが
 あると、誤ったメニューを表示しないため Catalog 全体が拒否されます。
+
+Pawn が存在しない画面で Toggle キーが反応しない場合は、PlayerController の
+`Debug Input Mapping Context` に `IMC_Debug`（例:
+`/Game/Project/Debug/Input/InputMappingContext/IMC_Debug`）が割り当てられているか確認します。
+デバッグ用 Action を Pawn の `IMC_Default` にだけ登録している構成では、
+`UnPossessed`／`EndPlay` で Context が解除されるため、Title や死亡画面では入力できません。
+`IMC_Debug` を Controller が登録する構成にし、`IMC_Default` から重複するデバッグ用マッピングを
+削除してください。
 
 ホスト側のアダプターは Catalog が拒否された場合にデフォルトの Category を登録して
 メニューを開けるようにできます。ただし Command の Window は復旧しないため、ログに
