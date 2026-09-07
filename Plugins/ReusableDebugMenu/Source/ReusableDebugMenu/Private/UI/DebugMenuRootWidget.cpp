@@ -65,6 +65,16 @@ FReply UReusableDebugMenuRootWidget::NativeOnPreviewKeyDown(
 	const FGeometry& InGeometry,
 	const FKeyEvent& InKeyEvent)
 {
+	// The host owns Enhanced Input configuration. Let it recognize its toggle
+	// action before this widget consumes the same key as UI confirm/cancel.
+	if (!InKeyEvent.IsRepeat() &&
+		ToggleInputRequested.IsBound() &&
+		ToggleInputRequested.Execute(InKeyEvent))
+	{
+		CloseRequested.ExecuteIfBound();
+		return FReply::Handled();
+	}
+
 	const FKey Key = InKeyEvent.GetKey();
 	if (Key == EKeys::Enter || Key == EKeys::Gamepad_FaceButton_Bottom)
 	{
@@ -74,7 +84,7 @@ FReply UReusableDebugMenuRootWidget::NativeOnPreviewKeyDown(
 
 	if (Key == EKeys::Escape || Key == EKeys::BackSpace || Key == EKeys::Gamepad_FaceButton_Right)
 	{
-		NavigateBackOrClose();
+		NavigateBack();
 		return FReply::Handled();
 	}
 
@@ -142,11 +152,10 @@ void UReusableDebugMenuRootWidget::ConfirmSelectedItem()
 	WindowRequested.ExecuteIfBound(Definition.NodeId);
 }
 
-void UReusableDebugMenuRootWidget::NavigateBackOrClose()
+void UReusableDebugMenuRootWidget::NavigateBack()
 {
 	if (NavigationStack.IsEmpty())
 	{
-		CloseRequested.ExecuteIfBound();
 		return;
 	}
 

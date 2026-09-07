@@ -6,6 +6,7 @@
 
 class UEnhancedInputComponent;
 class UEnhancedInputLocalPlayerSubsystem;
+struct FKeyEvent;
 class UInputAction;
 class UInputMappingContext;
 class UReusableDebugMenuCatalog;
@@ -62,6 +63,7 @@ protected:
 
 private:
 	void ToggleDebugMenu();
+	bool MatchesDebugMenuToggleInput(const FKeyEvent& KeyEvent) const;
 	void ConfigureDebugMenu();
 	void RegisterFallbackDebugCategories(UReusableDebugMenuSubsystem& Subsystem);
 	void RegisterDebugInputMappingContext();

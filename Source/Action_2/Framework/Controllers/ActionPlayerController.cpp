@@ -5,9 +5,12 @@
 #include "DebugMenuTypes.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedPlayerInput.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Input/Events.h"
+#include "InputTriggers.h"
 #include "ReusableDebugMenu.h"
 
 #define LOCTEXT_NAMESPACE "ActionPlayerControllerDebugMenu"
@@ -15,6 +18,41 @@
 namespace
 {
 	constexpr int32 DebugInputMappingContextPriority = 100;
+
+	bool AreChordTriggersSatisfied(
+		const TArray<TObjectPtr<UInputTrigger>>& Triggers,
+		const UEnhancedPlayerInput& PlayerInput)
+	{
+		for (const UInputTrigger* Trigger : Triggers)
+		{
+			const UInputTriggerChordAction* ChordTrigger = Cast<UInputTriggerChordAction>(Trigger);
+			if (!IsValid(ChordTrigger))
+			{
+				continue;
+			}
+
+			const FInputActionInstance* ChordInstance = IsValid(ChordTrigger->ChordAction)
+				? PlayerInput.FindActionInstanceData(ChordTrigger->ChordAction)
+				: nullptr;
+			const bool bChordTriggered =
+				ChordInstance != nullptr &&
+				ChordInstance->GetTriggerEvent() == ETriggerEvent::Triggered;
+
+			if (Trigger->IsA<UInputTriggerChordBlocker>())
+			{
+				if (bChordTriggered)
+				{
+					return false;
+				}
+			}
+			else if (!bChordTriggered)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
 
 void AActionPlayerController::SetupInputComponent()
@@ -136,6 +174,30 @@ void AActionPlayerController::ToggleDebugMenu()
 	}
 }
 
+bool AActionPlayerController::MatchesDebugMenuToggleInput(const FKeyEvent& KeyEvent) const
+{
+#if UE_BUILD_SHIPPING
+	return false;
+#else
+	if (!IsValid(toggleDebugMenuAction))
+	{
+		return false;
+	}
+
+	const UEnhancedInputLocalPlayerSubsystem* InputSubsystem = GetEnhancedInputSubsystem();
+	const UEnhancedPlayerInput* EnhancedPlayerInput = IsValid(InputSubsystem)
+		? InputSubsystem->GetPlayerInput()
+		: nullptr;
+	if (!IsValid(EnhancedPlayerInput) ||
+		!AreChordTriggersSatisfied(toggleDebugMenuAction->Triggers, *EnhancedPlayerInput))
+	{
+		return false;
+	}
+
+	return InputSubsystem->QueryKeysMappedToAction(toggleDebugMenuAction).Contains(KeyEvent.GetKey());
+#endif
+}
+
 void AActionPlayerController::ConfigureDebugMenu()
 {
 #if !UE_BUILD_SHIPPING
@@ -144,6 +206,10 @@ void AActionPlayerController::ConfigureDebugMenu()
 	{
 		return;
 	}
+
+	Subsystem->OnToggleInputRequested().BindUObject(
+		this,
+		&ThisClass::MatchesDebugMenuToggleInput);
 
 	// カタログの検証失敗時にもデバッグメニュー自体は開けるよう、
 	// カタログ登録を Configure から分離してフォールバックを適用する。

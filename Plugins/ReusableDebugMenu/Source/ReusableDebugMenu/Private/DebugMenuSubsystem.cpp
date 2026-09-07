@@ -260,6 +260,7 @@ bool UReusableDebugMenuSubsystem::ShowMenu()
 		MenuWidget->InitializeMenu(Registry);
 		MenuWidget->OnWindowRequested().BindUObject(this, &ThisClass::ToggleWindow);
 		MenuWidget->OnCloseRequested().BindUObject(this, &ThisClass::HideMenu);
+		MenuWidget->OnToggleInputRequested().BindUObject(this, &ThisClass::MatchesToggleInput);
 	}
 
 	if (!MenuWidget->AddToPlayerScreen(1000))
@@ -344,6 +345,11 @@ APlayerController* UReusableDebugMenuSubsystem::ResolvePlayerController() const
 {
 	const ULocalPlayer* LocalPlayer = GetLocalPlayer();
 	return IsValid(LocalPlayer) ? LocalPlayer->GetPlayerController(GetWorld()) : nullptr;
+}
+
+bool UReusableDebugMenuSubsystem::MatchesToggleInput(const FKeyEvent& KeyEvent) const
+{
+	return ToggleInputRequested.IsBound() && ToggleInputRequested.Execute(KeyEvent);
 }
 
 bool UReusableDebugMenuSubsystem::HasActiveDebugWindows() const

@@ -137,6 +137,13 @@ Derived Data Cache のロック競合が起こるため、必ず Editor を終�
 `IMC_Default` から削除してください。両方に同じ Action を残すと、Pawn の所有中に
 入力が重複して通知される可能性があります。
 
+`IA_DebugMenu` が Chord Action を使用する場合、ホスト側のPlayerControllerアダプターが
+現在有効なキーとChord状態を判定します。ルートWidgetはこの判定をUIの決定・戻る処理より
+先に実行するため、同じゲームパッド操作でメニューを開閉できます。Chordが成立していない
+通常の決定ボタンは、従来どおりCategory／Commandの決定に使用されます。
+Pause中にも開閉する場合は、`IA_DebugMenu` とChordに使用するActionの
+`Trigger When Paused` を有効にしてください。
+
 `WBP_DebugRootWidget` には `debugListView` という名前の `ListView` を配置し、
 その Entry Widget Class に List Entry Blueprint を指定します。List Entry Blueprint
 には `entryTitleText` という名前の `TextBlock` が必須です。名前が異なると Blueprint
@@ -182,6 +189,8 @@ Pause については所有権を追跡し、Subsystem 自身が正常に Pause 
    `Debug Input Mapping Context` に `IMC_Debug`、`Debug Widget Class` に
    `WBP_DebugRootWidget`、`Debug Menu Catalog` に `DA_DebugMenuCatalog` を割り当てます。
 7. Editorを再起動してからPIEで、Pawn生成前・Pawn消滅後を含めて Toggle 入力を確認します。
+   キーボードとゲームパッドの両方で、プレイ画面から開く操作と、メニューの任意の階層から
+   同じ操作で閉じてプレイ画面へ戻ることを確認してください。
 
 `Debug Input Mapping Context` は Controller の `BeginPlay` で登録し、`EndPlay` で解除します。
 `SetupInputComponent` でも登録を再試行するため、Local Player の初期化順序が異なる画面でも
@@ -195,7 +204,10 @@ Pawn の `EnableMappingContext`／`UnPossessed` に依存しません。未設�
 1. 既存のCategoryを親にしてCatalogへ新しいCommandを追加します。
 2. Command用の具象Window Blueprintを `WindowClass` に割り当てます。
 3. `NodeId`、`ParentId`、`NodeType`、`DisplayName`、`SortOrder`を確認してData Assetを保存します。
-4. PIEを再起動し、Toggleキー、Enter（決定）、Escape／BackSpace（戻る・閉じる）を確認します。
+4. PIEを再起動し、キーボード／ゲームパッドのToggle操作、Enter／ゲームパッド決定、
+   Escape／BackSpace／ゲームパッド戻るを確認します。Toggle操作にChordを使う場合は、
+   Chordなしの決定操作がCategory選択として残ることも確認します。戻る操作はCategory階層を
+   一段戻るためだけに使用し、最上位CategoryではDebugMenuを閉じないことを確認します。
 5. Command Windowを開いた状態でルートのDebugMenuを閉じ、Windowが表示されたままゲームを
    継続できること、マウスフォーカスがゲーム画面へ戻ることを確認します。Windowを閉じる場合は
    DebugMenuを再表示してからWindow内の `RequestClose` ボタンを使用し、入力モードとカーソル状態を確認します。
@@ -217,9 +229,10 @@ Windowのフォーカス可否はプラグイン基底クラスがC++で設定�
 ### DebugMenuとDebugWindowの独立した運用
 
 Commandを決定すると、`DebugWindow` はルートの `DebugMenu` とは別のWidgetとして表示されます。
-その状態でルートメニューを Escape／BackSpace または Toggleキーで閉じても、表示中のWindowは
-閉じずに残り、ゲームは再開してマウスフォーカスもゲーム画面へ戻ります。Windowを操作・終了する
-場合はDebugMenuを再表示し、Window内の閉じるボタンから `RequestClose` を呼び出してください。
+その状態でルートメニューをToggle操作で閉じても、表示中のWindowは閉じずに残り、ゲームは
+再開してマウスフォーカスもゲーム画面へ戻ります。戻る操作はCategory階層の移動専用であり、
+最上位CategoryからDebugMenuを閉じる用途には使用しません。Windowを操作・終了する場合は
+DebugMenuを再表示し、Window内の閉じるボタンから `RequestClose` を呼び出してください。
 
 メニューを閉じた後は、`FInputModeGameOnly`を適用してゲーム側にマウスとキーボードのフォーカスを
 戻します。`Pause Game When Open` が有効でSubsystem自身がPauseした場合も、ルートメニューを

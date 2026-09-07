@@ -51,9 +51,11 @@ public:
 
 	UReusableDebugMenuRegistry* GetRegistry() const { return Registry; }
 	FOnDebugMenuVisibilityChanged& OnVisibilityChanged() { return VisibilityChanged; }
+	FDebugMenuToggleInputMatcher& OnToggleInputRequested() { return ToggleInputRequested; }
 
 private:
 	APlayerController* ResolvePlayerController() const;
+	bool MatchesToggleInput(const FKeyEvent& KeyEvent) const;
 	bool HasActiveDebugWindows() const;
 	void RestoreGameplayInputState();
 	void ReleaseMenuGameplayState();
@@ -86,4 +88,5 @@ private:
 	bool bPausedBySubsystem = false;
 	bool bPreviousMouseCursorVisible = false;
 	FOnDebugMenuVisibilityChanged VisibilityChanged;
+	FDebugMenuToggleInputMatcher ToggleInputRequested;
 };

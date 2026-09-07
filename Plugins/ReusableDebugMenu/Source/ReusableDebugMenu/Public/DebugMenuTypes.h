@@ -3,6 +3,11 @@
 #include "CoreMinimal.h"
 #include "DebugMenuTypes.generated.h"
 
+struct FKeyEvent;
+
+/** Host-owned matcher used to recognize its debug-menu toggle input in focused UI. */
+DECLARE_DELEGATE_RetVal_OneParam(bool, FDebugMenuToggleInputMatcher, const FKeyEvent&);
+
 UENUM(BlueprintType)
 enum class EDebugMenuNodeType : uint8
 {

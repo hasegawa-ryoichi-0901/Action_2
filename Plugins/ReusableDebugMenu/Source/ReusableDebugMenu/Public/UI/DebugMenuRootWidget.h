@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "DebugMenuTypes.h"
 #include "DebugMenuRootWidget.generated.h"
 
 class UDebugMenuListItemObject;
@@ -26,6 +27,7 @@ public:
 
 	FOnDebugMenuWindowRequested& OnWindowRequested() { return WindowRequested; }
 	FOnDebugMenuCloseRequested& OnCloseRequested() { return CloseRequested; }
+	FDebugMenuToggleInputMatcher& OnToggleInputRequested() { return ToggleInputRequested; }
 
 protected:
 	virtual void NativeOnInitialized() override;
@@ -36,7 +38,7 @@ protected:
 private:
 	void RebuildVisibleItems();
 	void ConfirmSelectedItem();
-	void NavigateBackOrClose();
+	void NavigateBack();
 	void HandleItemDoubleClicked(UObject* Item);
 
 	UPROPERTY(meta = (BindWidget))
@@ -53,4 +55,5 @@ private:
 	FDelegateHandle RegistryChangedHandle;
 	FOnDebugMenuWindowRequested WindowRequested;
 	FOnDebugMenuCloseRequested CloseRequested;
+	FDebugMenuToggleInputMatcher ToggleInputRequested;
 };
