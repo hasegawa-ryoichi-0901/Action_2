@@ -11,6 +11,7 @@ public class ReusableDebugMenu : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
+			"EnhancedInput",
 			"SlateCore",
 			"UMG"
 		});
