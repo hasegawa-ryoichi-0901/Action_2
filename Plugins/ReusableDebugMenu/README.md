@@ -1,337 +1,741 @@
-# 再利用可能なデバッグメニュー
+# ReusableDebugMenu
 
-`ReusableDebugMenu` は、ホストプロジェクトのゲームプレイクラスやアセットに
-依存せず、汎用的なデバッグメニューの動作を提供する Unreal Engine の Runtime
-Plugin です。
+Unreal Engine用の、再利用可能なデータ駆動型デバッグメニュープラグインです。
 
-## 依存方向
+このREADMEは、プラグインを別のUnreal Engineプロジェクトへ追加し、Blueprint中心でデバッグメニューを表示するところまでを完結できるようにまとめています。
 
-1. `FDebugMenuNodeDefinition` と `UReusableDebugMenuRegistry` が検証済みのメニュー
-   データを保持します。
-2. `UReusableDebugMenuSubsystem` が Local Player 単位のライフサイクルと Window の
-   ユースケースを管理します。
-3. UMG クラスが Registry の内容を描画し、ユーザー操作を Subsystem へ伝えます。
-4. プロジェクト固有の PlayerController、Catalog、Window Blueprint はアダプターです。
+## 目次
 
-ゲームプレイシステムは、特定の Root Widget や List Widget に直接依存しないでください。
-安定した Node ID を登録し、プロジェクト固有の Window は外側の境界で実装します。
+- [最短セットアップ](#0-最短セットアップ)
+- [提供する機能](#1-提供する機能)
+- [動作要件](#2-動作要件)
+- [プラグインをプロジェクトへ追加する](#3-プラグインをプロジェクトへ追加する)
+- [Enhanced Inputの前提設定](#4-enhanced-inputの前提設定)
+- [推奨する統合方法](#5-推奨する統合方法)
+- [プロジェクト独自のアセットを作成する](#6-プロジェクト独自のアセットを作成する)
+- [Componentへアセットを設定する](#7-componentへアセットを設定する)
+- [PIEで確認する](#8-pieで確認する)
+- [Runtimeの挙動](#9-runtimeの挙動)
+- [C++から利用する場合](#10-cから利用する場合)
+- [既存プロジェクトへ導入するときの責務分担](#11-既存プロジェクトへ導入するときの責務分担)
+- [トラブルシューティング](#12-トラブルシューティング)
+- [Automation Test](#13-automation-test)
+- [サンプルアセットの場所](#14-サンプルアセットの場所)
 
-## 自動テストの使い方
+## 0. 最短セットアップ
 
-`Source/ReusableDebugMenu/Private/Tests/DebugMenuRegistryTests.cpp` は、Registry の
-ツリー検証を行う Unreal Automation Test です。Data Asset や UMG を読み込まず、次の
-不正な登録が原子的に拒否され、既存データが壊れないことを確認します。
+既存のサンプルアセットを使う場合は、次の手順だけで動作確認できます。
 
-- 親が存在しないノード
-- 自分自身を親にするノード
-- 複数ノードによる循環参照
-- 同一バッチ内の重複 `NodeId`
-- 空の `DisplayName`
-- `Command` を親にするノード
+1. この ReusableDebugMenu フォルダを対象プロジェクトの Plugins フォルダへコピーする。
+2. Unreal Editorを終了した状態で、プロジェクトを一度ビルドする。
+3. Editorを起動し、ReusableDebugMenuプラグインを有効にする。
+4. 既存の PlayerController Blueprintを開く。
+5. Add Component から ReusableDebugMenuControllerComponent を追加する。
+6. 次のサンプルアセットをComponentのプロパティへ設定する。
 
-テストは `#if WITH_DEV_AUTOMATION_TESTS` で囲まれているため、Shipping ビルドには
-含まれません。登録名は次のとおりです。
+| Componentのプロパティ | サンプルアセット |
+| --- | --- |
+| ToggleMenuAction | Plugins/ReusableDebugMenu/Content/Input/Actions/IA_DebugMenu.uasset |
+| DebugInputMappingContext | Plugins/ReusableDebugMenu/Content/Input/InputMappingContext/IMC_Debug.uasset |
+| MenuWidgetClass | Plugins/ReusableDebugMenu/Content/Widgets/WBP_DebugRootWidget.uasset |
+| Catalog | Plugins/ReusableDebugMenu/Content/DataAssets/DA_DebugMenuCatalog.uasset |
 
-```text
+7. GameModeの PlayerController Class に、そのPlayerController Blueprintを設定する。
+8. PIEを開始し、IMC_Debugに設定されているToggleキーを入力する。
+
+この手順で表示されない場合は、[トラブルシューティング](#トラブルシューティング)を確認してください。
+
+サンプルアセットを使わず、プロジェクト独自のUIやメニューを作る場合は、[プロジェクト独自のアセットを作成する](#プロジェクト独自のアセットを作成する)へ進んでください。
+
+## 1. 提供する機能
+
+- UReusableDebugMenuControllerComponentによるPlayerControllerとの統合
+- Enhanced InputによるToggle入力
+- Local Player単位のメニュー管理
+- Category / Commandによる階層メニュー
+- UReusableDebugMenuCatalog Data Assetによるメニュー定義
+- UReusableDebugMenuWindow派生WidgetによるCommand画面
+- Menu本体とDebug Windowの独立表示
+- Pause状態、Cursor状態、Input Modeの復元
+- 複数Local Playerへの対応
+- ShippingビルドでのRuntime生成無効化
+- Registryの不正なツリー構造を検証するAutomation Test
+
+## 2. 動作要件
+
+- Unreal Engine 5.7で確認済み
+- Enhanced Inputプラグイン
+- UMG
+- C++プロジェクト、またはC++プラグインをビルドできる環境
+
+このプラグインは ReusableDebugMenu.uplugin でEnhanced Inputを依存プラグインとして宣言しています。
+
+プラグインの主要なRuntime依存モジュールは次のとおりです。
+
+- Core
+- CoreUObject
+- Engine
+- EnhancedInput
+- SlateCore
+- UMG
+
+ホストプロジェクトのC++からプラグインの公開クラスをincludeする場合は、対象モジュールの Build.cs に ReusableDebugMenu を追加してください。
+
+~~~csharp
+PublicDependencyModuleNames.AddRange(new[]
+{
+    "Core",
+    "CoreUObject",
+    "Engine",
+    "EnhancedInput",
+    "ReusableDebugMenu",
+    "UMG"
+});
+~~~
+
+## 3. プラグインをプロジェクトへ追加する
+
+### 3.1 フォルダをコピーする
+
+プロジェクトのフォルダ構成が次のようになるようにコピーします。
+
+~~~text
+YourProject/
+├─ YourProject.uproject
+└─ Plugins/
+   └─ ReusableDebugMenu/
+      ├─ Content/
+      ├─ Docs/
+      │  └─ Images/
+      ├─ Source/
+      ├─ README.md
+      └─ ReusableDebugMenu.uplugin
+~~~
+
+Sourceだけでなく、サンプルアセットを含む Content も必要です。
+
+![プラグインをPluginsフォルダへ配置した状態](Docs/Images/01-plugin-location.png)
+
+*図1. Plugins/ReusableDebugMenu の配置場所*
+
+### 3.2 プラグインを有効化する
+
+Editorを起動し、Edit > Plugins から ReusableDebugMenu を有効化します。
+
+または、プロジェクトの .uproject に次を追加できます。
+
+~~~json
+{
+    "Name": "ReusableDebugMenu",
+    "Enabled": true
+}
+~~~
+
+すでに Plugins 配列がある場合は、その配列内へ追加してください。
+
+### 3.3 C++モジュールをビルドする
+
+次の手順を推奨します。
+
+1. Unreal Editorを終了する。
+2. .uproject を右クリックし、IDE用のProject Filesを再生成する。
+3. Editorターゲットをビルドする。
+4. Editorを再起動する。
+
+Live CodingやHot ReloadでReflection型を変更した場合、既存のData Assetを保存する前に型不一致警告がないことを確認してください。
+
+## 4. Enhanced Inputの前提設定
+
+このプラグインは UEnhancedInputComponent と UEnhancedPlayerInput を使用します。
+
+プロジェクトの Config/DefaultInput.ini に次の設定がない場合は追加してください。
+
+~~~ini
+[/Script/Engine.InputSettings]
+DefaultPlayerInputClass=/Script/EnhancedInput.EnhancedPlayerInput
+DefaultInputComponentClass=/Script/EnhancedInput.EnhancedInputComponent
+~~~
+
+設定後はEditorを再起動してください。
+
+DefaultInputComponentClass が通常の UInputComponent のままだと、ComponentがToggle Actionを登録できず、Output Logに次の警告が出ます。
+
+~~~text
+Debug menu input binding is unavailable on [component].
+~~~
+
+## 5. 推奨する統合方法
+
+通常は、PlayerController Blueprintへ ReusableDebugMenuControllerComponent を追加して使用します。
+
+この方法では、ホストプロジェクト側でSubsystemの生成やWidgetの生成コードを書く必要がありません。
+
+~~~mermaid
+flowchart TD
+    PC[PlayerController Blueprint]
+    Component[ReusableDebugMenuControllerComponent]
+    Input[Enhanced Input]
+    Subsystem[ReusableDebugMenuSubsystem]
+    Registry[ReusableDebugMenuRegistry]
+    Root[Root Widget]
+    Window[Debug Window]
+    Catalog[Catalog Data Asset]
+
+    PC --> Component
+    Component --> Input
+    Component --> Subsystem
+    Catalog --> Registry
+    Subsystem --> Registry
+    Subsystem --> Root
+    Subsystem --> Window
+    Root --> Registry
+~~~
+
+### 5.1 PlayerControllerへComponentを追加する
+
+1. 使用するPlayerController Blueprintを開く。
+2. Add Componentを選択する。
+3. ReusableDebugMenuControllerComponentを追加する。
+4. Componentを選択し、次のプロパティを設定する。
+
+![PlayerController BlueprintへComponentを追加する画面](Docs/Images/02-player-controller-component.png)
+
+*図2. PlayerController BlueprintへのComponent追加*
+
+| プロパティ | 必須 | 説明 |
+| --- | --- | --- |
+| ToggleMenuAction | 必須 | メニューを開閉するInput Action |
+| DebugInputMappingContext | 必須 | Local Playerへ登録するMapping Context |
+| MenuWidgetClass | 必須 | UReusableDebugMenuRootWidget派生の具象Widget |
+| Catalog | 推奨 | MenuのCategory / Command定義 |
+| MappingContextPriority | 推奨 | Debug用Mapping Contextの優先度。初期値は100 |
+| bAutoInitialize | 推奨 | BeginPlayで自動初期化する。初期値はtrue |
+| bPauseGameWhenOpen | 任意 | Menu表示中にPauseする。初期値はtrue |
+| bManageInputMode | 任意 | Menu表示時にInput ModeとCursorを変更する。初期値はtrue |
+
+![ReusableDebugMenuControllerComponentのプロパティ設定](Docs/Images/03-component-properties.png)
+
+*図3. Componentへ4つのアセットを設定した状態*
+
+ComponentのOwnerは APlayerController でなければなりません。
+
+PawnやCharacterへ追加した場合、次の警告が出て動作しません。
+
+~~~text
+ReusableDebugMenuControllerComponent must be owned by a PlayerController.
+~~~
+
+### 5.2 GameModeへPlayerControllerを設定する
+
+Componentを追加したPlayerController Blueprintが、実際のGameModeで使用されている必要があります。
+
+確認方法：
+
+1. 使用中のGameMode Blueprintを開く。
+2. Player Controller Class にPlayerController Blueprintを設定する。
+3. World Settingsで別のGameModeが指定されていないか確認する。
+4. PIEを開始する。
+
+## 6. プロジェクト独自のアセットを作成する
+
+サンプルアセットをそのまま使うのではなく、プロジェクトの見た目や用途に合わせる場合は、次の4種類を作成します。
+
+1. Input Action
+2. Input Mapping Context
+3. Root WidgetとList Entry Widget
+4. CatalogとCommand Window
+
+### 6.1 Toggle用Input Actionを作成する
+
+Content Browserで Input Actionを作成します。
+
+例：
+
+~~~text
+Content/Debug/Input/IA_DebugMenu
+~~~
+
+このActionを、PlayerController Componentの ToggleMenuAction に設定します。
+
+Toggle入力は Started イベントで処理されます。長押し中に毎フレーム開閉しないよう、Toggle用途では Triggered ではなく Started を使用してください。
+
+ゲームをPauseしている間もToggleしたい場合は、ActionとChordに使用するActionの Trigger When Paused を有効にしてください。
+
+### 6.2 Input Mapping Contextを作成する
+
+Input Mapping Contextを作成し、Toggle用Input Actionを割り当てます。
+
+例：
+
+~~~text
+Content/Debug/Input/IMC_Debug
+~~~
+
+このContextをComponentの DebugInputMappingContext に設定します。
+
+このMapping ContextはPawnではなくLocal Playerへ登録されます。そのため、Pawnが未生成、死亡、UnPossessedの状態でもToggle入力を受け取れます。
+
+デバッグ用Actionを通常のPawn用Mapping Contextにも登録すると、Pawnの所有中に入力が重複する場合があります。Toggle用ActionはDebug用Contextにだけ登録してください。
+
+![Input Mapping ContextへToggle用Input Actionを設定する画面](Docs/Images/06-input-mapping.png)
+
+*図4. Debug用Input Mapping Contextの設定*
+
+### 6.3 Root Widgetを作成する
+
+User Widget Blueprintを作成し、親クラスに UReusableDebugMenuRootWidget を指定します。
+
+Root Widgetには、次の名前のListViewが必須です。
+
+~~~text
+debugListView
+~~~
+
+Widget階層の例：
+
+~~~text
+WBP_MyDebugRoot
+└─ CanvasPanel
+   └─ Border
+      └─ ListView
+         Name: debugListView
+~~~
+
+debugListView の Entry Widget Class には、次のList Entry Widgetを指定します。
+
+![Root Widgetの階層とdebugListViewの設定](Docs/Images/04-root-widget-hierarchy.png)
+
+*図5. Root Widgetの階層、debugListView、Entry Widget Classの設定*
+
+Root Widgetは、RegistryのMenu項目を表示し、Categoryの移動とCommand選択を処理します。
+
+Root Widget Blueprint側で InitializeMenu を呼び出す必要はありません。ComponentモードではSubsystemが自動的に初期化します。
+
+### 6.4 List Entry Widgetを作成する
+
+User Widget Blueprintを作成し、親クラスに UReusableDebugMenuListEntryWidget を指定します。
+
+次のWidget名が必要です。
+
+| Widget名 | 種類 | 必須 |
+| --- | --- | --- |
+| entryTitleText | TextBlock | 必須 |
+| selectorText | TextBlock | 任意 |
+| entryButton | Button | 任意 |
+
+entryTitleText はMenuのDisplayNameを表示します。
+
+selectorText は選択状態の表示に使用できます。存在しない場合でも動作します。
+
+### 6.5 Catalog Data Assetを作成する
+
+Content Browserで Miscellaneous > Data Asset を選択し、クラスに ReusableDebugMenuCatalog を指定します。
+
+例：
+
+~~~text
+Content/Debug/DataAssets/DA_MyDebugMenuCatalog
+~~~
+
+Catalogの Entries にMenu項目を追加します。
+
+#### Categoryの例
+
+| 項目 | 値 |
+| --- | --- |
+| NodeId | Project.Player |
+| ParentId | 空 |
+| DisplayName | Player |
+| NodeType | Category |
+| SortOrder | 0 |
+| WindowClass | 空 |
+
+#### Commandの例
+
+| 項目 | 値 |
+| --- | --- |
+| NodeId | Project.Player.Health |
+| ParentId | Project.Player |
+| DisplayName | Health |
+| NodeType | Command |
+| SortOrder | 0 |
+| WindowClass | 具象Window Blueprint |
+
+Catalogには次のルールがあります。
+
+- NodeId はCatalog内で一意にする
+- NodeId は保存済みデータやコードから参照する安定した識別子にする
+- DisplayName は空にしない
+- ParentId は空、または既存Categoryの NodeId にする
+- Categoryには子Nodeを追加できる
+- Commandを親にはできない
+- Categoryに WindowClass を設定しない
+- Commandには具象の UReusableDebugMenuWindow 派生クラスを設定する
+- 循環した親子関係を作らない
+
+![Catalog Data AssetのCategoryとCommand設定](Docs/Images/05-catalog-entries.png)
+
+*図6. CatalogのCategory / Command定義*
+
+不正なEntryが1つでもある場合、Catalog全体がRegistryへ登録されません。
+
+### 6.6 Command Windowを作成する
+
+User Widget Blueprintを作成し、親クラスに UReusableDebugMenuWindow を指定します。
+
+Windowの見た目や、対象システムの情報取得はプロジェクト側で実装します。
+
+画面を閉じるButtonでは、Windowを直接Removeするのではなく、Blueprintから RequestClose を呼び出してください。
+
+~~~text
+Button OnClicked
+└─ RequestClose
+~~~
+
+WindowのライフサイクルはSubsystemが管理します。
+
+- 表示開始時: On Debug Window Opened
+- 表示終了時: On Debug Window Closed
+- 閉じる要求: RequestClose
+
+Window Blueprint側で別のDebug Windowを生成・管理する必要はありません。
+
+## 7. Componentへアセットを設定する
+
+作成したアセットをPlayerController Blueprintの ReusableDebugMenuControllerComponent へ設定します。
+
+| プロパティ | 設定例 |
+| --- | --- |
+| ToggleMenuAction | IA_MyDebugMenu |
+| DebugInputMappingContext | IMC_MyDebug |
+| MenuWidgetClass | WBP_MyDebugRoot |
+| Catalog | DA_MyDebugMenuCatalog |
+| MappingContextPriority | 100 |
+| bAutoInitialize | true |
+| bPauseGameWhenOpen | true |
+| bManageInputMode | true |
+
+## 8. PIEで確認する
+
+次の順番で確認してください。
+
+1. PIEを開始する。
+2. Toggleキーを押してRoot Menuが表示されることを確認する。
+3. Categoryを選択して子項目へ移動する。
+4. EnterまたはGamepadの決定ボタンでCommandを選択する。
+5. Command Windowが表示されることを確認する。
+6. MenuをToggleで閉じてもWindowが残ることを確認する。
+7. Menuを閉じたとき、PauseとInput Modeが復元されることを確認する。
+8. Menuを再表示し、WindowのClose Buttonから RequestClose を呼ぶ。
+9. Pawn生成前、UnPossessed後、Pawn消滅後にもToggleできることを確認する。
+10. キーボードとゲームパッドの両方を確認する。
+
+![PIE中にRoot MenuとCommand Windowを表示した状態](Docs/Images/07-pie-result.png)
+
+*図7. PIEでRoot MenuとCommand Windowを確認している状態*
+
+Root Menuの操作は次のとおりです。
+
+| 操作 | 動作 |
+| --- | --- |
+| Toggle Action | Menuの表示 / 非表示 |
+| Enter | 選択項目の決定 |
+| Gamepad Face Button Bottom | 選択項目の決定 |
+| Escape | Categoryを1階層戻る |
+| BackSpace | Categoryを1階層戻る |
+| Gamepad Face Button Right | Categoryを1階層戻る |
+
+最上位Categoryで戻る操作をしても、Root Menuは閉じません。Root Menuを閉じる場合はToggle Actionを使用してください。
+
+## 9. Runtimeの挙動
+
+### Local Player単位
+
+Subsystemは ULocalPlayerSubsystem です。
+
+Player Index 0を前提にせず、Local Playerごとに次の状態が独立します。
+
+- Root Menu
+- Debug Window
+- Registry
+- Input Context
+- Pause / Input Mode復元状態
+
+### MenuとWindowの独立性
+
+Commandを決定すると、Debug WindowはRoot Menuとは別のWidgetとして表示されます。
+
+Root Menuを閉じても、表示中のWindowは残ります。Root Menuを閉じた時点で、通常はInput ModeがGame Onlyへ戻り、Subsystem自身がPauseしていた場合はPauseも解除されます。
+
+Windowを操作または終了する場合は、Root Menuを再表示してください。
+
+### PauseとInput Mode
+
+bPauseGameWhenOpen が有効な場合、SubsystemはMenu表示時にPauseを試みます。
+
+Subsystem自身がPauseに成功した場合だけ、Menuを閉じるとPauseを解除します。
+
+bManageInputMode が有効な場合は、Menu表示時に次を適用します。
+
+- FInputModeGameAndUI
+- Mouse Cursor表示
+- Root WidgetへのFocus
+
+Menuを閉じると、通常は次を適用します。
+
+- FInputModeGameOnly
+- Menu表示前のCursor状態
+
+既存のInput Mode Stackをプロジェクト側で管理している場合は、bManageInputModeをfalseにし、ホスト側でInput Modeを管理してください。
+
+### Shippingビルド
+
+ShippingビルドではSubsystemを生成しません。
+
+そのため、Shippingビルドでデバッグメニューが表示されないのは意図した挙動です。
+
+## 10. C++から利用する場合
+
+通常はController Componentの利用を推奨します。
+
+Data Assetを使わず、C++からMenu Nodeを動的に登録することもできます。
+
+~~~cpp
+#include "DebugMenuSubsystem.h"
+#include "DebugMenuTypes.h"
+#include "Engine/LocalPlayer.h"
+
+void AMyPlayerController::BeginPlay()
+{
+    Super::BeginPlay();
+
+    ULocalPlayer* LocalPlayer = GetLocalPlayer();
+    if (!IsValid(LocalPlayer))
+    {
+        return;
+    }
+
+    UReusableDebugMenuSubsystem* Subsystem =
+        LocalPlayer->GetSubsystem<UReusableDebugMenuSubsystem>();
+    if (!IsValid(Subsystem))
+    {
+        return;
+    }
+
+    Subsystem->Configure(RootWidgetClass, nullptr, true, true);
+
+    FText Error;
+    if (!Subsystem->RegisterNodes(CategoryNodes, Error))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to register categories: %s"), *Error.ToString());
+        return;
+    }
+
+    if (!Subsystem->RegisterWindowNode(CommandNode, WindowClass, Error))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to register command: %s"), *Error.ToString());
+    }
+}
+~~~
+
+この方式では、次の処理をホスト側で実装する必要があります。
+
+- Enhanced Input Mapping Contextの登録
+- Toggle ActionのInput Binding
+- 必要に応じたChord判定
+- Root Widget Classの提供
+- Window Classの提供
+
+入力処理まで含めて利用する場合は、ReusableDebugMenuControllerComponentを使う方が安全です。
+
+## 11. 既存プロジェクトへ導入するときの責務分担
+
+プラグイン本体とホストプロジェクトの責務は次のように分かれています。
+
+| 内容 | 所有者 |
+| --- | --- |
+| Menuの表示・非表示 | ReusableDebugMenu |
+| Windowの生成・終了 | ReusableDebugMenu |
+| Nodeのツリー検証 | ReusableDebugMenu |
+| Local Player単位の状態管理 | ReusableDebugMenu |
+| Menu階層とDisplayName | ホスト側Catalog |
+| Windowの見た目と情報取得 | ホスト側Window Blueprint |
+| Root Widgetのレイアウト | ホスト側Root Widget Blueprint |
+| Toggleキー | ホスト側Input Action / Mapping Context |
+| PlayerControllerとの接続 | Componentまたはホスト側Adapter |
+
+通常のMenu項目追加では、プラグイン本体のC++を変更する必要はありません。
+
+## 12. トラブルシューティング
+
+### Plugin moduleが見つからない
+
+次を確認してください。
+
+- Plugins/ReusableDebugMenu/ReusableDebugMenu.uplugin が存在する
+- Sourceフォルダをコピーしている
+- Unreal Editorを終了してからビルドした
+- Project Filesを再生成した
+- C++プロジェクトの Build.cs に ReusableDebugMenu がある
+
+### Toggleキーが反応しない
+
+次を順番に確認してください。
+
+1. GameModeの PlayerController Class が正しいか
+2. ComponentのOwnerがPlayerControllerか
+3. ToggleMenuAction が設定されているか
+4. DebugInputMappingContext が設定されているか
+5. Mapping ContextにToggle Actionのキーが登録されているか
+6. DefaultInputComponentClass が EnhancedInputComponent か
+7. bAutoInitialize がtrueか
+8. Output Logに Debug menu input binding is unavailable が出ていないか
+9. 同じToggle Actionを別のMapping Contextへ重複登録していないか
+
+現在のController Componentは、BeginPlay時または InitializeDebugMenu() 呼び出し時に入力を初期化します。初回にEnhanced Inputの準備ができていない場合は、後から InitializeDebugMenu() を呼び出して再試行してください。
+
+### Menuは表示されるが項目がない
+
+次を確認してください。
+
+- Catalogが設定されている
+- Catalogの Entries が空ではない
+- NodeIdが空ではない
+- DisplayNameが空ではない
+- ParentIdが存在するCategoryを指している
+- Commandの WindowClass が具象クラスである
+- Categoryに WindowClass を設定していない
+- Output LogにCatalog登録エラーが出ていない
+
+### ゲームだけPauseされてMenuが見えない
+
+Catalogが不正で全Entryの登録に失敗している可能性があります。
+
+Output Logで次のようなエラーを確認してください。
+
+~~~text
+Rejected debug menu catalog [catalog]
+Cannot open debug menu: MenuWidgetClass is missing or abstract.
+~~~
+
+また、Root Widget Blueprintに debugListView が存在し、ListViewのEntry Widget Classが設定されていることを確認してください。
+
+### Windowが閉じない
+
+WindowのClose Buttonから Remove From Parent を直接呼ばず、RequestCloseを呼んでください。
+
+Windowを閉じた後の後処理は On Debug Window Closed に実装します。
+
+### Menuを閉じてもWindowが残る
+
+これは正常な挙動です。
+
+Root MenuとDebug Windowは独立しています。Windowを閉じる場合はRoot Menuを再表示し、Window内のClose Buttonから RequestClose を呼び出してください。
+
+### Shippingビルドで表示されない
+
+ShippingビルドではRuntime生成が無効化されています。開発用ビルドやEditorで確認してください。
+
+## 13. Automation Test
+
+Registryのツリー検証テストが含まれています。
+
+テスト対象：
+
+- 親が存在しないNode
+- 自分自身を親にするNode
+- 複数Nodeによる循環参照
+- 同一バッチ内の重複 NodeId
+- 空の DisplayName
+- Commandを親にするNode
+
+テスト名：
+
+~~~text
 ReusableDebugMenu.Registry.AdversarialValidation
-```
+~~~
 
-### Unreal Editor から実行する
+### Editorから実行する
 
-UE 5.7 では、単独の `Test Automation` メニューが表示されないレイアウトがあります。
-次の手順で Automation 画面を開いてください。
+1. Unreal Editorを起動する。
+2. Tools > Session Frontend を開く。
+3. Window > Automation を選択する。
+4. ReusableDebugMenu.Registry.AdversarialValidation を検索して実行する。
 
-1. メインメニューの **`Tools` セクションから `Session Frontend`** を開きます。
-   （旧バージョンやレイアウトによっては `Window > Developer Tools > Session Frontend` と
-   表示されます。日本語 UI では各メニュー名が翻訳表示されます。）
-2. Session Frontend の **`Window > Automation`** タブを選択します。
-3. 検索欄に `ReusableDebugMenu.Registry.AdversarialValidation` を入力して実行します。
+Editorのレイアウトやバージョンによって、Automation画面は Tools > Test Automation または Window > Test Automation に表示される場合があります。
 
-エンジンのバージョンやレイアウトによっては `Tools > Test Automation` または
-`Window > Test Automation` と表示される場合もあります。これらは同じ Automation 画面です。
-コンソールからは次のコマンドでテストを列挙・実行できます。
+### Consoleから実行する
 
-```text
+~~~text
 Automation List
 Automation RunTests ReusableDebugMenu.Registry.AdversarialValidation
-```
+~~~
 
-`Test Automation` と `Session Frontend` は **UnrealEditor.exe のエディタ専用 UI** です。
-`UnrealEditor-Cmd.exe`、パッケージ化したゲーム、Game ターゲットで起動した場合は表示されません。
-これらはプロジェクトの `Edit > Plugins` で個別に有効化するプラグインではなく、Editor に組み込まれた
-`SessionFrontend`／`AutomationWindow` モジュールです。
-Session Frontend 自体が見つからない場合は、Editor ターゲットの `UnrealEditor.exe` を起動し直し、
-`Window > Load Layout > Default Editor Layout` でレイアウトを初期化してください。
+### CIまたはコマンドレットから実行する
 
-### コマンドレット／CI から実行する
+Editorを終了してから、プロジェクトルートで実行してください。
 
-Editor を終了した状態で、プロジェクトルートから次を実行します。
+~~~powershell
+$EngineRoot = "C:/Program Files/Epic Games/UE_5.7"
+$ProjectFile = (Resolve-Path "./YourProject.uproject").Path
+$EditorCmd = "$EngineRoot/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"
 
-```powershell
-& "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor-Win64-DebugGame-Cmd.exe" `
-  "C:\MyProjects\UE\Action_2\Action_2.uproject" `
-  -unattended -nop4 -nullrhi -nosound `
-  '-ExecCmds=Automation RunTests ReusableDebugMenu.Registry.AdversarialValidation; Quit' `
-  '-TestExit=Automation Test Queue Empty'
-```
+$Arguments = @(
+    $ProjectFile,
+    "-unattended",
+    "-nop4",
+    "-nullrhi",
+    "-nosound",
+    "-ExecCmds=Automation RunTests ReusableDebugMenu.Registry.AdversarialValidation; Quit",
+    "-TestExit=Automation Test Queue Empty"
+)
 
-終了コードが `0` で、ログに `Test Completed ... AdversarialValidation` と表示されれば成功です。
-失敗時は `TestTrue`／`TestFalse` の説明を確認してください。CI ではこの終了コードを
-ジョブの成否に使用します。同じプロジェクトを開いた Editor と同時に実行すると、モジュールや
-Derived Data Cache のロック競合が起こるため、必ず Editor を終了してから実行してください。
+& $EditorCmd $Arguments
+~~~
 
-このテストは Registry の純粋な検証だけを対象にします。`DA_DebugMenuCatalog` の実際の
-`NodeId`、`WindowClass`、Widget の BindWidget 設定は検証しないため、Data Asset と PIE の
-動作確認は別途行ってください。
+終了コードが0で、ログにテスト完了が出れば成功です。
 
-## プロジェクトへの導入
+このテストはRegistryの純粋な検証のみを対象とします。Data Assetの内容、Widget Blueprint、Input Mapping、PIEの実動作は別途確認してください。
 
-1. `ReusableDebugMenu` ディレクトリ全体を対象プロジェクトの `Plugins` ディレクトリに
-   コピーして、有効化します。
-2. `UReusableDebugMenuListEntryWidget` を継承した Widget Blueprint を作成します。
-   `entryTitleText` という名前の `TextBlock` が必須です。`selectorText` と
-   `entryButton` は任意です。
-3. `UReusableDebugMenuRootWidget` を継承した Widget Blueprint を作成します。
-   `debugListView` という名前の `ListView` を配置し、Entry Widget Class に手順2の
-   List Entry Blueprint を指定します。
-4. 各プロジェクト固有の Window は `UReusableDebugMenuWindow` を継承して作成し、
-   `UReusableDebugMenuCatalog` Data Asset の `Command` Node に割り当てます。
-5. 所有する Local Player の PlayerController から
-   `ULocalPlayer::GetSubsystem<UReusableDebugMenuSubsystem>()` の `Configure` を呼び、
-   1つの Input Action を `ToggleMenu` にバインドします。
+## 14. サンプルアセットの場所
 
-### Data Asset でメニューを定義する
+プラグインには動作確認用のサンプルアセットが含まれています。
 
-プロジェクト固有のメニューは `UReusableDebugMenuCatalog` の Data Asset に定義します。
+~~~text
+Plugins/ReusableDebugMenu/Content/
+├─ DataAssets/
+│  └─ DA_DebugMenuCatalog.uasset
+├─ Input/
+│  ├─ Actions/
+│  │  ├─ IA_DebugMenu.uasset
+│  │  └─ IA_DebugModifier.uasset
+│  └─ InputMappingContext/
+│     └─ IMC_Debug.uasset
+└─ Widgets/
+   ├─ WBP_DebugRootWidget.uasset
+   ├─ WBP_DebugMenuListEntry.uasset
+   ├─ WBP_DebugMenuWindow.uasset
+   └─ WBP_DebugMenuWindow_1.uasset
+~~~
 
-1. Content Browser で右クリックし、`Miscellaneous > Data Asset` を選択します。
-2. クラスに `ReusableDebugMenuCatalog` を指定して、例えば
-   `DA_DebugMenuCatalog` として保存します。
-3. `Entries` 配列にメニュー項目を追加し、各項目の `Node` を設定します。
-   `NodeId` はプロジェクト内で一意かつ安定した値にしてください。
-4. `NodeType` が `Category` の項目は、子項目をまとめるだけのノードです。
-   `ParentId` は空にするか、既存の Category の `NodeId` を指定します。
-   **Category の `WindowClass` は必ず空にしてください。**
-5. `NodeType` が `Command` の項目は実行可能なノードです。`ParentId` に既存の
-   Category を指定し、`WindowClass` に `UReusableDebugMenuWindow` を継承した
-   **具象** Widget Blueprint を割り当てます。Abstract クラスは使用できません。
-6. `DisplayName` と `SortOrder` を設定して Data Asset を保存します。
+Content Browserでは、Editorのバージョンによってプラグインコンテンツが ReusableDebugMenu またはPluginカテゴリの下に表示されます。
 
-設定例は次のとおりです。
+サンプルアセットを別の場所へ移動する場合、CatalogやWidget間の参照が壊れないことを確認してください。
 
-| NodeId | ParentId | NodeType | WindowClass |
-| --- | --- | --- | --- |
-| `Action2.Player` | （空） | `Category` | （空） |
-| `Action2.Player.Health` | `Action2.Player` | `Command` | `WBP_DebugMenuWindow` |
+## 15. APIと設計上の注意
 
-`BP_ActionPlayerController` では、次の4つを設定します。
+- UReusableDebugMenuRegistryはMenu Treeの検証と保持を担当します。
+- UReusableDebugMenuRootWidgetはMenuの表示と階層移動を担当します。
+- UReusableDebugMenuWindowはプロジェクト固有のCommand画面の基底クラスです。
+- UReusableDebugMenuSubsystemはLocal Player単位のMenu / Windowライフサイクルを管理します。
+- UReusableDebugMenuControllerComponentはPlayerControllerとSubsystemを接続します。
+- Gameplayシステムから特定のRoot WidgetやList Widgetへ直接依存しないでください。
+- NodeIdは表示名ではなく機能を識別するIDです。既存のIDを名前変更や再利用に使わないでください。
+- Window Blueprint側でWindowの所有やGCを管理しないでください。
+- Debug用Input ActionをPawn用Mapping Contextへ重複登録しないでください。
 
-- `Toggle Debug Menu Action`: `IA_DebugMenu`
-- `Debug Input Mapping Context`: `IMC_Debug`
-- `Debug Widget Class`: `WBP_DebugRootWidget`
-- `Debug Menu Catalog`: `DA_DebugMenuCatalog`
+## 16. ライセンス・利用方針
 
-`IMC_Debug` は Pawn ではなく PlayerController が Local Player に登録します。
-そのため Pawn が未生成、死亡、UnPossessed の状態でも Toggle 入力を受け取れます。
-`IA_DebugMenu` と `IA_DebugModifier` のデバッグ用マッピングは `IMC_Debug` にだけ置き、
-`IMC_Default` から削除してください。両方に同じ Action を残すと、Pawn の所有中に
-入力が重複して通知される可能性があります。
+このプラグインを別プロジェクトで利用する場合は、プラグインフォルダ内のライセンスやリポジトリ全体のライセンスを確認してください。
 
-`IA_DebugMenu` が Chord Action を使用する場合、ホスト側のPlayerControllerアダプターが
-現在有効なキーとChord状態を判定します。ルートWidgetはこの判定をUIの決定・戻る処理より
-先に実行するため、同じゲームパッド操作でメニューを開閉できます。Chordが成立していない
-通常の決定ボタンは、従来どおりCategory／Commandの決定に使用されます。
-Pause中にも開閉する場合は、`IA_DebugMenu` とChordに使用するActionの
-`Trigger When Paused` を有効にしてください。
-
-`WBP_DebugRootWidget` には `debugListView` という名前の `ListView` を配置し、
-その Entry Widget Class に List Entry Blueprint を指定します。List Entry Blueprint
-には `entryTitleText` という名前の `TextBlock` が必須です。名前が異なると Blueprint
-コンパイルエラーになり、項目名が描画されません。
-
-Node ID は動作を識別するキーであるため、安定させてください。`DisplayName` は自由に
-ローカライズ・変更できます。Catalog に重複 ID、存在しない親、Category ではない親、
-循環、無効な Window class、空のラベルが含まれる場合、Catalog 全体が原子的に拒否されます。
-
-Subsystem は `AddToPlayerScreen` を使用するため、Local Player ごとに独立したメニューが
-表示されます。Player Index 0 を前提にしません。Shipping build では Runtime 生成を無効化しています。
-
-デフォルトでは、Subsystem は一時的に `FInputModeGameAndUI` を適用し、マウスカーソルを
-表示します。DebugMenuを閉じてもDebugWindowは表示されたままですが、ゲームをPauseせずに
-`FInputModeGameOnly` と元のカーソル状態へ戻します。Windowの操作が必要な場合はDebugMenuを
-再表示してください。
-既存の Input Mode stack を持つ
-プロジェクトでは `bInManageInputMode = false` を渡し、独自のアダプターで Input を復元してください。
-Pause については所有権を追跡し、Subsystem 自身が正常に Pause した場合にのみ解除します。
-
-## 運用方法
-
-### 基本方針
-
-メニューの動作は `ReusableDebugMenu`、プロジェクト固有の設定はホストプロジェクト側で管理します。
-通常の項目追加でプラグインのC++を変更する必要はありません。
-
-- メニュー階層と表示名: `UReusableDebugMenuCatalog` Data Asset
-- コマンド画面の見た目と処理: `UReusableDebugMenuWindow` 派生Widget Blueprint
-- ルートと一覧行のレイアウト: `UReusableDebugMenuRootWidget`／
-  `UReusableDebugMenuListEntryWidget` 派生Widget Blueprint
-- 入力とLocal Playerへの接続: ホスト側のPlayerControllerアダプター
-
-### 初回セットアップ
-
-1. プロジェクトの `Plugins/ReusableDebugMenu` を有効にし、Editorターゲットを一度ビルドします。
-2. Root Widget、List Entry Widget、必要なCommand WindowのBlueprintを作成します。
-3. Catalog Data Assetを作成し、CategoryとCommandを登録します（詳細は「Data Assetでメニューを定義する」を参照）。
-4. `IMC_Debug` の `IA_DebugMenu` に Toggle キーを割り当て、`IA_DebugModifier` などの
-   デバッグ用 Action もこの Context にまとめます。
-5. `IMC_Default` に残っているデバッグ用 Action のマッピングを削除します。
-6. PlayerControllerの `Toggle Debug Menu Action` に `IA_DebugMenu`、
-   `Debug Input Mapping Context` に `IMC_Debug`、`Debug Widget Class` に
-   `WBP_DebugRootWidget`、`Debug Menu Catalog` に `DA_DebugMenuCatalog` を割り当てます。
-7. Editorを再起動してからPIEで、Pawn生成前・Pawn消滅後を含めて Toggle 入力を確認します。
-   キーボードとゲームパッドの両方で、プレイ画面から開く操作と、メニューの任意の階層から
-   同じ操作で閉じてプレイ画面へ戻ることを確認してください。
-
-`Debug Input Mapping Context` は Controller の `BeginPlay` で登録し、`EndPlay` で解除します。
-`SetupInputComponent` でも登録を再試行するため、Local Player の初期化順序が異なる画面でも
-Pawn の `EnableMappingContext`／`UnPossessed` に依存しません。未設定の場合はログに警告が出て、
-デバッグメニューの Toggle 入力だけが無効になります。
-
-### 日常の変更手順
-
-メニュー項目を追加・変更する場合は、次の順序で作業します。
-
-1. 既存のCategoryを親にしてCatalogへ新しいCommandを追加します。
-2. Command用の具象Window Blueprintを `WindowClass` に割り当てます。
-3. `NodeId`、`ParentId`、`NodeType`、`DisplayName`、`SortOrder`を確認してData Assetを保存します。
-4. PIEを再起動し、キーボード／ゲームパッドのToggle操作、Enter／ゲームパッド決定、
-   Escape／BackSpace／ゲームパッド戻るを確認します。Toggle操作にChordを使う場合は、
-   Chordなしの決定操作がCategory選択として残ることも確認します。戻る操作はCategory階層を
-   一段戻るためだけに使用し、最上位CategoryではDebugMenuを閉じないことを確認します。
-5. Command Windowを開いた状態でルートのDebugMenuを閉じ、Windowが表示されたままゲームを
-   継続できること、マウスフォーカスがゲーム画面へ戻ることを確認します。Windowを閉じる場合は
-   DebugMenuを再表示してからWindow内の `RequestClose` ボタンを使用し、入力モードとカーソル状態を確認します。
-6. 問題がなければ `.uasset` と必要なC++変更を同じ変更単位でバージョン管理へ登録します。
-
-`NodeId` は保存済みデータや外部コードから参照される識別子です。表示名を変更しても構いませんが、
-既存の `NodeId` を名前変更や再利用に使わないでください。Categoryへ `WindowClass` を設定したり、
-Commandの `WindowClass` を空にしたりするとCatalog全体が拒否されます。
-
-### Window Blueprintの実装ルール
-
-Window Blueprintでは、表示開始時の初期化を `On Debug Window Opened`、終了時の後処理を
-`On Debug Window Closed` イベントにまとめます。画面内の閉じるボタンからは
-`RequestClose` を呼び出してください。SubsystemがWindowの生成、表示順、終了、GCを管理するため、
-Blueprint側で別のWindowを生成して保持しないでください。
-Windowのフォーカス可否はプラグイン基底クラスがC++で設定します。ルートメニューを閉じた状態では
-ゲーム側にマウスフォーカスを戻すため、Windowを操作・終了する場合はメニューを再表示してください。
-
-### DebugMenuとDebugWindowの独立した運用
-
-Commandを決定すると、`DebugWindow` はルートの `DebugMenu` とは別のWidgetとして表示されます。
-その状態でルートメニューをToggle操作で閉じても、表示中のWindowは閉じずに残り、ゲームは
-再開してマウスフォーカスもゲーム画面へ戻ります。戻る操作はCategory階層の移動専用であり、
-最上位CategoryからDebugMenuを閉じる用途には使用しません。Windowを操作・終了する場合は
-DebugMenuを再表示し、Window内の閉じるボタンから `RequestClose` を呼び出してください。
-
-メニューを閉じた後は、`FInputModeGameOnly`を適用してゲーム側にマウスとキーボードのフォーカスを
-戻します。`Pause Game When Open` が有効でSubsystem自身がPauseした場合も、ルートメニューを
-閉じた時点でPauseを解除します。Windowは表示のみ継続し、メニューを再表示すると再び操作できます。
-
-### C++から動的に登録する場合
-
-Data Assetを使わず、ホスト側のユースケースで動的に登録することもできます。
-`Configure` を先に呼び、Categoryは `RegisterNodes`、Commandは具象Windowと一緒に
-`RegisterWindowNode` を呼び出します。エラー時は登録されず、既存のRegistryは変更されません。
-
-```cpp
-FText Error;
-Subsystem->Configure(RootWidgetClass, nullptr, true, true);
-Subsystem->RegisterNodes(CategoryNodes, Error);
-Subsystem->RegisterWindowNode(CommandNode, WindowClass, Error);
-```
-
-`RegisterNodes` にCommandを渡すことはできません。複数ノードを一括登録する場合は、親を含む全ノードを
-同じ配列に入れ、登録成功を確認してから次の処理へ進めてください。
-
-### Action_2でのファイル管理
-
-現在の `Action_2` は、旧 `Source/Action_2/Debug` 実装ではなく、`ReusableDebugMenu` と
-`ActionPlayerController` のアダプターを使用します。新しいデバッグ項目を追加するときは、旧フォルダへ
-互換クラスを戻さず、次のいずれかで実装してください。
-
-- 表示だけの変更: Content内のWidget Blueprintを編集
-- 項目の追加・並べ替え: `DA_DebugMenuCatalog` を編集
-- プロジェクト固有の入力・登録: PlayerControllerアダプターを編集
-- 他プロジェクトでの再利用: 各プロジェクトに薄いアダプターを作り、プラグイン本体は変更しない
-
-Action_2のアダプターはCatalogが無効または空の場合、6つの既定Categoryへフォールバックします。
-これはCommand Windowを復元する処理ではないため、ログのCatalogエラーを修正してから運用してください。
-
-## トラブルシューティング
-
-`Category 'Player' must not specify a window adapter` が出た場合は、Catalog の
-`Player` エントリの `Node Type` を `Category` にし、`Window Class` を空にします。
-`Window Class` を指定できるのは `Command` エントリだけです。1つでも不正なエントリが
-あると、誤ったメニューを表示しないため Catalog 全体が拒否されます。
-
-Pawn が存在しない画面で Toggle キーが反応しない場合は、PlayerController の
-`Debug Input Mapping Context` に `IMC_Debug`（例:
-`/Game/Project/Debug/Input/InputMappingContext/IMC_Debug`）が割り当てられているか確認します。
-デバッグ用 Action を Pawn の `IMC_Default` にだけ登録している構成では、
-`UnPossessed`／`EndPlay` で Context が解除されるため、Title や死亡画面では入力できません。
-`IMC_Debug` を Controller が登録する構成にし、`IMC_Default` から重複するデバッグ用マッピングを
-削除してください。
-
-ホスト側のアダプターは Catalog が拒否された場合にデフォルトの Category を登録して
-メニューを開けるようにできます。ただし Command の Window は復旧しないため、ログに
-出た Catalog のエラーを修正してください。
-
-トグル用 Input Action は `Started` にバインドしてください。`Triggered` はキーを押して
-いる間、毎フレーム通知されるため、表示直後に再度 Toggle されることがあります。
-
-### 「ゲームは停止するがメニューが見えない」場合
-
-この症状は、画面に項目がない状態でも Widget の追加後に `SetPause(true)` が成功するため発生します。
-`DA_DebugMenuCatalog` が上記の理由で拒否されると Registry に項目が登録されず、
-Root Widget の ListView が空になります。その状態でも Widget の背景が見えないレイアウト
-なら、ゲームだけが停止したように見えます。Catalog のエラーを直してから PIE を再起動
-してください。
-
-Action_2 の PlayerController アダプターは、Catalog が拒否された場合にデフォルトの
-Category を登録するフォールバックを持っています。ただし、これは Command の Window
-を復元するものではありません。修正後もエラーが出る場合は、エディタを一度終了して
-から C++ を再ビルドし、古いモジュールが残らない状態で起動してください。
-
-## C++ 再ビルド時の Data Asset 保護
-
-Data Asset の内容は `Content` 配下の `.uasset` に保存されます。通常のフルビルドで
-内容が消えることはありません。ただし、次の反射型を変更した状態で `Live Coding` や
-`Hot Reload` を実行すると、UE が一時的な `LIVECODING_*` 構造体を作成します。
-
-- `USTRUCT` の追加・削除・変更
-- `UCLASS`、`UENUM`、`UPROPERTY` の型・名前の変更
-- Data Asset が参照する構造体の移動・リネーム
-
-この状態で `Struct Property ... type mismatch` または `Array Inner Type mismatch` が
-表示された場合、Data Asset を保存しないでください。再インスタンス化された一時オブジェクト
-の初期値で `.uasset` を上書きする危険があります。
-
-安全な手順は次のとおりです。
-
-1. PIE を停止します。型不一致の警告が出ていなければ Data Asset を保存します。警告が
-   出ている場合は保存せず、そのまま Editor を終了します。
-2. `Content/Project/Debug/Widgets/DA_DebugMenuCatalog.uasset` をバックアップするか、
-   バージョン管理にコミットします。
-3. Unreal Editor を完全に終了します。Live Coding のコンソールも終了させます。
-4. Editor を閉じた状態で通常の C++ フルビルドを実行します。
-5. Editor を再起動し、Data Asset の内容を確認してから PIE を開始します。
-
-反射型を頻繁に変更する間は、`Editor Preferences > General > Live Coding > Enable Live Coding`
-を一時的に無効にしておくと、同じ事故を防ぎやすくなります。
-
-反射型を変更する必要がある場合は、既存の `UPROPERTY` 名と型をできるだけ維持し、
-新しいプロパティは末尾に追加してください。名前を変更する場合は `CoreRedirects` を
-用意し、変更直後に Data Asset を開いて保存し直します。すでに内容が消えた場合は、
-上記バックアップまたはソース管理から `.uasset` を戻し、最終的な C++ 型で Editor を
-再起動してから再保存してください。
+プロジェクト固有のCatalog、Window Blueprint、Root Widget、Input設定は、利用するプロジェクト側で管理してください。
