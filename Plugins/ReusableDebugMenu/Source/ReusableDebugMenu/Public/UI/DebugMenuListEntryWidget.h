@@ -8,7 +8,12 @@
 class UButton;
 class UTextBlock;
 
-/** Generic UListView row. Blueprint is responsible only for visual layout. */
+/**
+ * @brief 1つのDebug Menu Itemを表示する再利用可能なUListView Rowです。
+ *
+ * C++がNode Textと選択処理を提供し、BlueprintはVisual Layoutと
+ * OptionalなSelector／Button Widgetだけを担当します。
+ */
 UCLASS(Abstract, Blueprintable)
 class REUSABLEDEBUGMENU_API UReusableDebugMenuListEntryWidget
 	: public UUserWidget

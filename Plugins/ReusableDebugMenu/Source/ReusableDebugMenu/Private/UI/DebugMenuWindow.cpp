@@ -4,9 +4,9 @@ void UReusableDebugMenuWindow::InitializeDebugWindow(const FName InNodeId)
 {
 	NodeId = InNodeId;
 
-	// Debug windows are interactive overlays managed by the subsystem. Enforce
-	// focus support in C++ so each host project's Widget Blueprint does not need
-	// to repeat the same Class Defaults setting.
+	// Debug WindowはSubsystemが管理するInteractive Overlayです。各Host Projectの
+	// Widget Blueprintで同じClass Defaults設定を繰り返さなくて済むよう、
+	// C++側でFocus対応を強制します。
 	SetIsFocusable(true);
 }
 

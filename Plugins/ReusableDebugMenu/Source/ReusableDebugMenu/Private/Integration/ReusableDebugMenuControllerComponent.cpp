@@ -6,51 +6,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedPlayerInput.h"
 #include "GameFramework/PlayerController.h"
-#include "Input/Events.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "InputTriggers.h"
+#include "Integration/ReusableDebugMenuInputMatcher.h"
 #include "ReusableDebugMenu.h"
 #include "UI/DebugMenuRootWidget.h"
-
-namespace
-{
-	bool AreChordTriggersSatisfied(
-		const TArray<TObjectPtr<UInputTrigger>>& Triggers,
-		const UEnhancedPlayerInput& PlayerInput)
-	{
-		for (const UInputTrigger* Trigger : Triggers)
-		{
-			const UInputTriggerChordAction* ChordTrigger =
-				Cast<UInputTriggerChordAction>(Trigger);
-			if (!IsValid(ChordTrigger))
-			{
-				continue;
-			}
-
-			const FInputActionInstance* ChordInstance = IsValid(ChordTrigger->ChordAction)
-				? PlayerInput.FindActionInstanceData(ChordTrigger->ChordAction)
-				: nullptr;
-			const bool bChordTriggered =
-				ChordInstance != nullptr &&
-				ChordInstance->GetTriggerEvent() == ETriggerEvent::Triggered;
-
-			if (Trigger->IsA<UInputTriggerChordBlocker>())
-			{
-				if (bChordTriggered)
-				{
-					return false;
-				}
-			}
-			else if (!bChordTriggered)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-}
 
 void UReusableDebugMenuControllerComponent::BeginPlay()
 {
@@ -76,7 +36,10 @@ void UReusableDebugMenuControllerComponent::EndPlay(
 			VisibilityChangedHandle.Reset();
 		}
 
-		Subsystem->OnToggleInputRequested().Unbind();
+		if (Subsystem->OnToggleInputRequested().IsBoundToObject(this))
+		{
+			Subsystem->OnToggleInputRequested().Unbind();
+		}
 		Subsystem->NotifyPlayerControllerEndPlay(GetOwnerPlayerController());
 	}
 
@@ -86,6 +49,8 @@ void UReusableDebugMenuControllerComponent::EndPlay(
 
 bool UReusableDebugMenuControllerComponent::InitializeDebugMenu()
 {
+	bInitialized = false;
+
 	APlayerController* PlayerController = GetOwnerPlayerController();
 	if (!IsValid(PlayerController))
 	{
@@ -118,7 +83,16 @@ bool UReusableDebugMenuControllerComponent::InitializeDebugMenu()
 	}
 
 	UnbindInput();
-	RegisterMappingContext();
+	if (!RegisterMappingContext())
+	{
+		return false;
+	}
+
+	if (!BindInput())
+	{
+		RemoveMappingContext();
+		return false;
+	}
 
 	Subsystem->OnToggleInputRequested().BindUObject(
 		this,
@@ -140,6 +114,12 @@ bool UReusableDebugMenuControllerComponent::InitializeDebugMenu()
 				TEXT("Rejected debug menu catalog '%s': %s"),
 				*GetNameSafe(Catalog),
 				*Error.ToString());
+			UnbindInput();
+			RemoveMappingContext();
+			if (Subsystem->OnToggleInputRequested().IsBoundToObject(this))
+			{
+				Subsystem->OnToggleInputRequested().Unbind();
+			}
 			return false;
 		}
 	}
@@ -151,7 +131,6 @@ bool UReusableDebugMenuControllerComponent::InitializeDebugMenu()
 			&ThisClass::HandleVisibilityChanged);
 	}
 
-	BindInput();
 	bInitialized = true;
 	return true;
 }
@@ -190,7 +169,7 @@ bool UReusableDebugMenuControllerComponent::IsDebugMenuOpen() const
 	return IsValid(Subsystem) && Subsystem->IsMenuOpen();
 }
 
-void UReusableDebugMenuControllerComponent::BindInput()
+bool UReusableDebugMenuControllerComponent::BindInput()
 {
 	APlayerController* PlayerController = GetOwnerPlayerController();
 	UEnhancedInputComponent* EnhancedInput = IsValid(PlayerController)
@@ -204,7 +183,7 @@ void UReusableDebugMenuControllerComponent::BindInput()
 			Warning,
 			TEXT("Debug menu input binding is unavailable on '%s'."),
 			*GetNameSafe(this));
-		return;
+		return false;
 	}
 
 	FEnhancedInputActionEventBinding& Binding = EnhancedInput->BindAction(
@@ -215,6 +194,7 @@ void UReusableDebugMenuControllerComponent::BindInput()
 
 	BoundInputComponent = EnhancedInput;
 	InputBindingHandle = Binding.GetHandle();
+	return InputBindingHandle != 0;
 }
 
 void UReusableDebugMenuControllerComponent::UnbindInput()
@@ -229,7 +209,7 @@ void UReusableDebugMenuControllerComponent::UnbindInput()
 	InputBindingHandle = 0;
 }
 
-void UReusableDebugMenuControllerComponent::RegisterMappingContext()
+bool UReusableDebugMenuControllerComponent::RegisterMappingContext()
 {
 	if (!IsValid(DebugInputMappingContext))
 	{
@@ -238,7 +218,7 @@ void UReusableDebugMenuControllerComponent::RegisterMappingContext()
 			Warning,
 			TEXT("Debug input mapping context is not assigned on '%s'."),
 			*GetNameSafe(this));
-		return;
+		return false;
 	}
 
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = GetEnhancedInputSubsystem();
@@ -249,17 +229,18 @@ void UReusableDebugMenuControllerComponent::RegisterMappingContext()
 			Warning,
 			TEXT("Could not resolve Enhanced Input subsystem for '%s'."),
 			*GetNameSafe(this));
-		return;
+		return false;
 	}
 
 	if (InputSubsystem->HasMappingContext(DebugInputMappingContext))
 	{
-		return;
+		return true;
 	}
 
 	bMappingContextRegistered = false;
 	InputSubsystem->AddMappingContext(DebugInputMappingContext, MappingContextPriority);
 	bMappingContextRegistered = InputSubsystem->HasMappingContext(DebugInputMappingContext);
+	return bMappingContextRegistered;
 }
 
 void UReusableDebugMenuControllerComponent::RemoveMappingContext()
@@ -297,14 +278,17 @@ bool UReusableDebugMenuControllerComponent::MatchesToggleInput(
 		? InputSubsystem->GetPlayerInput()
 		: nullptr;
 
-	if (!IsValid(EnhancedPlayerInput) ||
-		!AreChordTriggersSatisfied(ToggleMenuAction->Triggers, *EnhancedPlayerInput))
+	if (!IsValid(EnhancedPlayerInput) || !IsValid(InputSubsystem) ||
+		!FReusableDebugMenuInputMatcher::Matches(
+			*ToggleMenuAction,
+			*EnhancedPlayerInput,
+			*InputSubsystem,
+			KeyEvent))
 	{
 		return false;
 	}
 
-	return InputSubsystem->QueryKeysMappedToAction(ToggleMenuAction).Contains(
-		KeyEvent.GetKey());
+	return true;
 }
 
 APlayerController* UReusableDebugMenuControllerComponent::GetOwnerPlayerController() const

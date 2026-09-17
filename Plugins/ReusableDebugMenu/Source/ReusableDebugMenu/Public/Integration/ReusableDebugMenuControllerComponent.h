@@ -19,10 +19,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	bIsMenuOpen);
 
 /**
- * PlayerController integration for the reusable debug menu.
+ * @brief PlayerControllerとReusableDebugMenuを接続するIntegration Adapterです。
  *
- * The component owns controller-specific input and lifecycle wiring while the
- * LocalPlayer subsystem owns menu and window state.
+ * Enhanced Inputの登録、PlayerController／LocalPlayerの解決、Blueprint向けの
+ * Convenience Callを担当します。Menu、Window、Gameplay Stateの所有は
+ * UReusableDebugMenuSubsystemに委譲します。
  */
 UCLASS(
 	ClassGroup = (Debug),
@@ -110,9 +111,9 @@ protected:
 	bool bManageInputMode = true;
 
 private:
-	void BindInput();
+	bool BindInput();
 	void UnbindInput();
-	void RegisterMappingContext();
+	bool RegisterMappingContext();
 	void RemoveMappingContext();
 	void HandleVisibilityChanged(bool bIsMenuOpen);
 

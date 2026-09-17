@@ -13,8 +13,10 @@ DECLARE_DELEGATE_OneParam(FOnDebugMenuWindowRequested, FName);
 DECLARE_DELEGATE(FOnDebugMenuCloseRequested);
 
 /**
- * Generic tree navigation view. It knows how to navigate definitions, but does
- * not know how windows are created or what game systems they inspect.
+ * @brief RegistryのCategory／Command Treeを操作するRoot UMG Viewです。
+ *
+ * 表示中のItemとNavigation Inputを管理し、CloseまたはCommand実行の
+ * Requestを発行します。Windowの生成やGame Systemの直接参照は行いません。
  */
 UCLASS(Abstract, Blueprintable)
 class REUSABLEDEBUGMENU_API UReusableDebugMenuRootWidget : public UUserWidget

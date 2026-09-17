@@ -7,19 +7,21 @@
 #include "ReusableDebugMenu.h"
 #include "UI/DebugMenuRootWidget.h"
 #include "UI/DebugMenuWindow.h"
+#include "Window/ReusableDebugMenuWindowManager.h"
 
 void UReusableDebugMenuSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	Registry = NewObject<UReusableDebugMenuRegistry>(this);
+	WindowManager = NewObject<UReusableDebugMenuWindowManager>(this);
+	WindowManager->Initialize(Registry);
 }
 
 void UReusableDebugMenuSubsystem::Deinitialize()
 {
 	CloseAllWindows();
 	HideMenu();
-	ActiveWindows.Reset();
-	WindowClasses.Reset();
+	WindowManager = nullptr;
 	MenuWidget = nullptr;
 	Registry = nullptr;
 	Super::Deinitialize();
@@ -111,7 +113,7 @@ bool UReusableDebugMenuSubsystem::RegisterWindowNode(
 	TSubclassOf<UReusableDebugMenuWindow> WindowClass,
 	FText& OutError)
 {
-	if (!IsValid(Registry))
+	if (!IsValid(Registry) || !IsValid(WindowManager))
 	{
 		OutError = NSLOCTEXT("ReusableDebugMenu", "RegistryUnavailable", "The debug menu registry is unavailable.");
 		return false;
@@ -135,7 +137,7 @@ bool UReusableDebugMenuSubsystem::RegisterWindowNode(
 		return false;
 	}
 
-	WindowClasses.Add(Node.NodeId, WindowClass);
+	WindowManager->SetWindowClass(Node.NodeId, WindowClass);
 	return true;
 }
 
@@ -143,7 +145,7 @@ bool UReusableDebugMenuSubsystem::RegisterCatalog(
 	const UReusableDebugMenuCatalog* Catalog,
 	FText& OutError)
 {
-	if (!IsValid(Registry) || !IsValid(Catalog))
+	if (!IsValid(Registry) || !IsValid(WindowManager) || !IsValid(Catalog))
 	{
 		OutError = NSLOCTEXT("ReusableDebugMenu", "InvalidCatalog", "The debug menu catalog or registry is invalid.");
 		return false;
@@ -151,7 +153,8 @@ bool UReusableDebugMenuSubsystem::RegisterCatalog(
 
 	TArray<FDebugMenuNodeDefinition> Nodes;
 	Nodes.Reserve(Catalog->Entries.Num());
-	TMap<FName, TSubclassOf<UReusableDebugMenuWindow>> CandidateWindowClasses = WindowClasses;
+	TMap<FName, TSubclassOf<UReusableDebugMenuWindow>> CandidateWindowClasses =
+		WindowManager->GetWindowClasses();
 
 	for (const FDebugMenuCatalogEntry& Entry : Catalog->Entries)
 	{
@@ -193,7 +196,7 @@ bool UReusableDebugMenuSubsystem::RegisterCatalog(
 		return false;
 	}
 
-	WindowClasses = MoveTemp(CandidateWindowClasses);
+	WindowManager->SetWindowClasses(MoveTemp(CandidateWindowClasses));
 	return true;
 }
 
@@ -225,7 +228,7 @@ bool UReusableDebugMenuSubsystem::ShowMenu()
 		return false;
 	}
 
-	if (HasActiveDebugWindows() && MenuOwnerController.Get() != PlayerController)
+	if (HasActiveDebugWindows() && GameplayState.GetPlayerController() != PlayerController)
 	{
 		CloseAllWindows();
 		HideMenu();
@@ -270,17 +273,23 @@ bool UReusableDebugMenuSubsystem::ShowMenu()
 	}
 
 	const bool bDebugSessionAlreadyActive = bMenuOpen || HasActiveDebugWindows();
-	MenuOwnerController = PlayerController;
 	if (!bDebugSessionAlreadyActive)
 	{
-		bPreviousMouseCursorVisible = PlayerController->bShowMouseCursor;
-		bPausedBySubsystem = false;
+		GameplayState.Capture(PlayerController);
+	}
+	else if (GameplayState.GetPlayerController() == nullptr)
+	{
+		GameplayState.Capture(PlayerController);
 	}
 
 	if (bPauseGameWhenOpen && PlayerController->GetWorld() && !PlayerController->GetWorld()->IsPaused())
 	{
-		bPausedBySubsystem = PlayerController->SetPause(true);
-		if (!bPausedBySubsystem)
+		const bool bPausedBySubsystem = PlayerController->SetPause(true);
+		if (bPausedBySubsystem)
+		{
+			GameplayState.MarkPausedBySubsystem();
+		}
+		else
 		{
 			UE_LOG(
 				LogReusableDebugMenu,
@@ -289,15 +298,7 @@ bool UReusableDebugMenuSubsystem::ShowMenu()
 		}
 	}
 
-	if (bManageInputMode)
-	{
-		FInputModeGameAndUI InputMode;
-		InputMode.SetWidgetToFocus(MenuWidget->TakeWidget());
-		InputMode.SetHideCursorDuringCapture(false);
-		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-		PlayerController->SetInputMode(InputMode);
-		PlayerController->bShowMouseCursor = true;
-	}
+	GameplayState.ApplyMenuInputMode(bManageInputMode, MenuWidget);
 
 	bMenuOpen = true;
 	MenuWidget->SetFocusToFirstItem();
@@ -327,7 +328,7 @@ void UReusableDebugMenuSubsystem::HideMenu()
 void UReusableDebugMenuSubsystem::NotifyPlayerControllerEndPlay(
 	const APlayerController* PlayerController)
 {
-	if (MenuOwnerController.Get() == PlayerController ||
+	if (GameplayState.GetPlayerController() == PlayerController ||
 		(IsValid(MenuWidget) && MenuWidget->GetOwningPlayer() == PlayerController))
 	{
 		CloseAllWindows();
@@ -354,43 +355,18 @@ bool UReusableDebugMenuSubsystem::MatchesToggleInput(const FKeyEvent& KeyEvent) 
 
 bool UReusableDebugMenuSubsystem::HasActiveDebugWindows() const
 {
-	for (const TPair<FName, TObjectPtr<UReusableDebugMenuWindow>>& Pair : ActiveWindows)
-	{
-		if (IsValid(Pair.Value) && Pair.Value->IsInViewport())
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void UReusableDebugMenuSubsystem::RestoreGameplayInputState()
-{
-	APlayerController* PlayerController = MenuOwnerController.Get();
-	if (IsValid(PlayerController) && bManageInputMode)
-	{
-		FInputModeGameOnly InputMode;
-		PlayerController->SetInputMode(InputMode);
-		PlayerController->bShowMouseCursor = bPreviousMouseCursorVisible;
-	}
+	return IsValid(WindowManager) && WindowManager->HasActiveWindows();
 }
 
 void UReusableDebugMenuSubsystem::ReleaseMenuGameplayState()
 {
-	APlayerController* PlayerController = MenuOwnerController.Get();
-	if (IsValid(PlayerController) && bPausedBySubsystem)
-	{
-		PlayerController->SetPause(false);
-	}
-
-	bPausedBySubsystem = false;
+	GameplayState.ReleasePause();
 
 	if (HasActiveDebugWindows())
 	{
-		// DebugWindow is an independent visual overlay. Return mouse and keyboard
-		// input to the game while leaving the window rendered on screen.
-		RestoreGameplayInputState();
+		// Debug Windowは独立したVisual Overlayです。Windowを画面に残したまま、
+		// MouseとKeyboardのInputだけをGameへ戻します。
+		GameplayState.RestoreInputState(bManageInputMode);
 		return;
 	}
 
@@ -404,83 +380,23 @@ void UReusableDebugMenuSubsystem::RestoreGameplayStateIfIdle()
 		return;
 	}
 
-	RestoreGameplayInputState();
-
-	bPausedBySubsystem = false;
-	MenuOwnerController.Reset();
+	GameplayState.RestoreInputState(bManageInputMode);
+	GameplayState.Reset();
 }
 
 void UReusableDebugMenuSubsystem::ToggleWindow(const FName NodeId)
 {
-	if (TObjectPtr<UReusableDebugMenuWindow>* Existing = ActiveWindows.Find(NodeId))
+	if (IsValid(WindowManager))
 	{
-		if (IsValid(*Existing) && (*Existing)->IsInViewport())
-		{
-			CloseWindow(NodeId);
-			return;
-		}
-		ActiveWindows.Remove(NodeId);
+		WindowManager->ToggleWindow(NodeId, GameplayState.GetPlayerController());
 	}
-
-	if (!IsValid(Registry))
-	{
-		return;
-	}
-
-	const FDebugMenuNodeDefinition* Node = Registry->FindNode(NodeId);
-	const TSubclassOf<UReusableDebugMenuWindow>* WindowClass = WindowClasses.Find(NodeId);
-	if (Node == nullptr || Node->NodeType != EDebugMenuNodeType::Command || WindowClass == nullptr || !*WindowClass)
-	{
-		UE_LOG(
-			LogReusableDebugMenu,
-			Warning,
-			TEXT("Cannot open unregistered or invalid debug window '%s'."),
-			*NodeId.ToString());
-		return;
-	}
-
-	APlayerController* PlayerController = MenuOwnerController.Get();
-	if (!IsValid(PlayerController))
-	{
-		return;
-	}
-
-	UReusableDebugMenuWindow* Window = CreateWidget<UReusableDebugMenuWindow>(
-		PlayerController,
-		*WindowClass);
-	if (!IsValid(Window))
-	{
-		UE_LOG(
-			LogReusableDebugMenu,
-			Error,
-			TEXT("Failed to create debug window '%s'."),
-			*NodeId.ToString());
-		return;
-	}
-
-	Window->InitializeDebugWindow(NodeId);
-	Window->OnCloseRequested().BindUObject(this, &ThisClass::CloseWindow);
-	if (!Window->AddToPlayerScreen(1001))
-	{
-		return;
-	}
-
-	ActiveWindows.Add(NodeId, Window);
-	Window->NotifyOpened();
 }
 
 void UReusableDebugMenuSubsystem::CloseWindow(const FName NodeId)
 {
-	TObjectPtr<UReusableDebugMenuWindow> Window;
-	if (!ActiveWindows.RemoveAndCopyValue(NodeId, Window))
+	if (IsValid(WindowManager))
 	{
-		return;
-	}
-
-	if (IsValid(Window))
-	{
-		Window->NotifyClosed();
-		Window->RemoveFromParent();
+		WindowManager->CloseWindow(NodeId);
 	}
 
 	RestoreGameplayStateIfIdle();
@@ -488,10 +404,8 @@ void UReusableDebugMenuSubsystem::CloseWindow(const FName NodeId)
 
 void UReusableDebugMenuSubsystem::CloseAllWindows()
 {
-	TArray<FName> WindowIds;
-	ActiveWindows.GetKeys(WindowIds);
-	for (const FName WindowId : WindowIds)
+	if (IsValid(WindowManager))
 	{
-		CloseWindow(WindowId);
+		WindowManager->CloseAllWindows();
 	}
 }

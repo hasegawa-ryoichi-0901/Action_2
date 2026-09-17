@@ -5,10 +5,11 @@
 
 struct FKeyEvent;
 
-/** Host-owned matcher used to recognize its debug-menu toggle input in focused UI. */
+/** Host ProjectがFocused UI上のDebug Menu Toggle Inputを識別するためのMatcherです。 */
 DECLARE_DELEGATE_RetVal_OneParam(bool, FDebugMenuToggleInputMatcher, const FKeyEvent&);
 
 UENUM(BlueprintType)
+/** @brief ノードが子ノードへの移動かCommand実行かを識別します。 */
 enum class EDebugMenuNodeType : uint8
 {
 	Category,
@@ -16,8 +17,10 @@ enum class EDebugMenuNodeType : uint8
 };
 
 /**
- * A stable, presentation-independent definition for one node in the debug menu tree.
- * NodeId and ParentId are identifiers; DisplayName is presentation text only.
+ * @brief Debug Menuの1ノードを表す、表示層に依存しない安定した定義です。
+ *
+ * NodeIdとParentIdは永続的な識別子です。DisplayNameは表示用テキストであり、
+ * 検索キーとして使用してはいけません。
  */
 USTRUCT(BlueprintType)
 struct REUSABLEDEBUGMENU_API FDebugMenuNodeDefinition

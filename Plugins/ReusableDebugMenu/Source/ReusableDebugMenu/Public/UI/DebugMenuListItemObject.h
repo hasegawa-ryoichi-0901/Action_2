@@ -5,7 +5,12 @@
 #include "DebugMenuTypes.h"
 #include "DebugMenuListItemObject.generated.h"
 
-/** UObject adapter required by UListView. It contains data, never an entry widget. */
+/**
+ * @brief UListViewが1つのMenu Nodeを扱うためのUObject Data Adapterです。
+ *
+ * List Binding用のNode Definitionを保持しますが、Row Widgetの表示や
+ * Command実行は所有しません。
+ */
 UCLASS()
 class REUSABLEDEBUGMENU_API UDebugMenuListItemObject : public UObject
 {

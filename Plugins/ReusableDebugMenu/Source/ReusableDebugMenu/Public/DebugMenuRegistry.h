@@ -8,8 +8,10 @@
 DECLARE_MULTICAST_DELEGATE(FOnDebugMenuRegistryChanged);
 
 /**
- * Owns and validates the menu tree. Mutations are atomic: an invalid batch never
- * leaves a partially updated registry.
+ * @brief 正規化されたDebug Menu Treeを保持・検証・検索します。
+ *
+ * 登録はアトミックに行われ、不正なBatchによってRegistryが部分的に
+ * 更新されることはありません。Widget生成やGameplay Stateの処理は担当しません。
  */
 UCLASS()
 class REUSABLEDEBUGMENU_API UReusableDebugMenuRegistry : public UObject

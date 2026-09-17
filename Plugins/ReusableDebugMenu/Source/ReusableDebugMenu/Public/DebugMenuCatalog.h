@@ -7,7 +7,12 @@
 
 class UReusableDebugMenuWindow;
 
-/** Outer-layer binding between a core command and its UMG adapter. */
+/**
+ * @brief Menu Node定義とプロジェクト所有のUMG Adapterを関連付けます。
+ *
+ * CategoryにはWindowClassを設定せず、Command Nodeには具象の
+ * UReusableDebugMenuWindow派生クラスを設定します。
+ */
 USTRUCT(BlueprintType)
 struct REUSABLEDEBUGMENU_API FDebugMenuCatalogEntry
 {
@@ -24,7 +29,12 @@ struct REUSABLEDEBUGMENU_API FDebugMenuCatalogEntry
 	TSubclassOf<UReusableDebugMenuWindow> WindowClass;
 };
 
-/** Project-specific menu content. The plugin owns behavior; projects own this data. */
+/**
+ * @brief プロジェクト固有のMenu内容をSubsystemへ提供するDataAssetです。
+ *
+ * PluginはMenuの検証と実行フローを担当し、Host ProjectはこのAssetと、
+ * Assetから参照されるCommand Window Classを所有します。
+ */
 UCLASS(BlueprintType)
 class REUSABLEDEBUGMENU_API UReusableDebugMenuCatalog : public UDataAsset
 {

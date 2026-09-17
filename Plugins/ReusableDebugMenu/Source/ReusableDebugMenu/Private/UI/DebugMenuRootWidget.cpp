@@ -65,8 +65,8 @@ FReply UReusableDebugMenuRootWidget::NativeOnPreviewKeyDown(
 	const FGeometry& InGeometry,
 	const FKeyEvent& InKeyEvent)
 {
-	// The host owns Enhanced Input configuration. Let it recognize its toggle
-	// action before this widget consumes the same key as UI confirm/cancel.
+	// Enhanced Inputの設定はHostが所有します。このWidgetが同じKeyをUIの
+	// Confirm／Cancelとして消費する前に、Host側でToggle Actionを識別させます。
 	if (!InKeyEvent.IsRepeat() &&
 		ToggleInputRequested.IsBound() &&
 		ToggleInputRequested.Execute(InKeyEvent))
@@ -148,7 +148,7 @@ void UReusableDebugMenuRootWidget::ConfirmSelectedItem()
 		return;
 	}
 
-	// The application layer decides which adapter executes this command.
+	// どのAdapterでCommandを実行するかはApplication Layerが決定します。
 	WindowRequested.ExecuteIfBound(Definition.NodeId);
 }
 

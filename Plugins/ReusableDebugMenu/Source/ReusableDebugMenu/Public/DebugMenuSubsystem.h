@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "DebugMenuTypes.h"
+#include "DebugMenuGameplayState.h"
 #include "DebugMenuSubsystem.generated.h"
 
 class APlayerController;
@@ -10,12 +11,16 @@ class UReusableDebugMenuCatalog;
 class UReusableDebugMenuRegistry;
 class UReusableDebugMenuRootWidget;
 class UReusableDebugMenuWindow;
+class UReusableDebugMenuWindowManager;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDebugMenuVisibilityChanged, bool);
 
 /**
- * Application facade for menu lifecycle and window use cases.
- * Local-player scope avoids Player Index 0 assumptions and split-screen leaks.
+ * @brief LocalPlayer単位のDebug Menuユースケースを提供するApplication Facadeです。
+ *
+ * MenuのLifecycle、Registry／Catalog登録、Gameplay Stateの復元、
+ * WindowManager操作を調整します。PlayerControllerのInput Bindingは所有せず、
+ * UReusableDebugMenuControllerComponentが担当します。
  */
 UCLASS()
 class REUSABLEDEBUGMENU_API UReusableDebugMenuSubsystem : public ULocalPlayerSubsystem
@@ -43,10 +48,10 @@ public:
 
 	bool ToggleMenu();
 	bool ShowMenu();
-	/** Hides only the root menu; active debug windows remain visible and the game continues. */
+	/** Root Menuだけを隠し、表示中のDebug Windowは残したままゲームを継続します。 */
 	void HideMenu();
 	void NotifyPlayerControllerEndPlay(const APlayerController* PlayerController);
-	/** Returns whether the root menu is visible; independent windows may still be open. */
+	/** Root Menuの表示状態を返します。独立したDebug Windowは表示中の可能性があります。 */
 	bool IsMenuOpen() const;
 
 	UReusableDebugMenuRegistry* GetRegistry() const { return Registry; }
@@ -57,7 +62,6 @@ private:
 	APlayerController* ResolvePlayerController() const;
 	bool MatchesToggleInput(const FKeyEvent& KeyEvent) const;
 	bool HasActiveDebugWindows() const;
-	void RestoreGameplayInputState();
 	void ReleaseMenuGameplayState();
 	void RestoreGameplayStateIfIdle();
 	void ToggleWindow(FName NodeId);
@@ -68,16 +72,10 @@ private:
 	TObjectPtr<UReusableDebugMenuRegistry> Registry;
 
 	UPROPERTY(Transient)
+	TObjectPtr<UReusableDebugMenuWindowManager> WindowManager;
+
+	UPROPERTY(Transient)
 	TObjectPtr<UReusableDebugMenuRootWidget> MenuWidget;
-
-	UPROPERTY(Transient)
-	TMap<FName, TObjectPtr<UReusableDebugMenuWindow>> ActiveWindows;
-
-	UPROPERTY(Transient)
-	TMap<FName, TSubclassOf<UReusableDebugMenuWindow>> WindowClasses;
-
-	UPROPERTY(Transient)
-	TWeakObjectPtr<APlayerController> MenuOwnerController;
 
 	UPROPERTY(Transient)
 	TSubclassOf<UReusableDebugMenuRootWidget> MenuWidgetClass;
@@ -85,8 +83,7 @@ private:
 	bool bMenuOpen = false;
 	bool bPauseGameWhenOpen = true;
 	bool bManageInputMode = true;
-	bool bPausedBySubsystem = false;
-	bool bPreviousMouseCursorVisible = false;
+	FReusableDebugMenuGameplayState GameplayState;
 	FOnDebugMenuVisibilityChanged VisibilityChanged;
 	FDebugMenuToggleInputMatcher ToggleInputRequested;
 };

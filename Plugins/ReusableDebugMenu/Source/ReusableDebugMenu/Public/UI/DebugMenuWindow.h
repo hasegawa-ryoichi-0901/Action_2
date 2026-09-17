@@ -6,7 +6,12 @@
 
 DECLARE_DELEGATE_OneParam(FOnDebugMenuWindowCloseRequested, FName);
 
-/** Project-specific debug windows derive from this presentation port. */
+/**
+ * @brief プロジェクト固有のCommand UIを実装するBlueprint向け基底Widgetです。
+ *
+ * 生成と破棄はWindowManagerが所有します。派生WidgetはCommand UIを提供し、
+ * 自身をViewportから直接削除せずRequestCloseで終了要求を発行します。
+ */
 UCLASS(Abstract, Blueprintable)
 class REUSABLEDEBUGMENU_API UReusableDebugMenuWindow : public UUserWidget
 {
