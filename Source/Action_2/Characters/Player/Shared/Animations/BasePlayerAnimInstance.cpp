@@ -44,6 +44,6 @@ void UBasePlayerAnimInstance::SetShouldMove()
 {
 	UCharacterMovementComponent* movementComponent = basePlayer->GetCharacterMovement();
 	const FVector acceleration = movementComponent->GetCurrentAcceleration();
-    const bool bHasAcceleration = !acceleration.IsNearlyZero();
+	const bool bHasAcceleration = !acceleration.IsNearlyZero();
 	this->shouldMove = this->groundSpeed > this->minGroundSpeedToMove && bHasAcceleration;
 }
